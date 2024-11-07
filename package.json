@@ -1,0 +1,28 @@
+{
+  "name": "service_easy",
+  "version": "1.0.0",
+  "description": "CS 546 Web Programming I - Final Project",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "node ./tasks/seed.js",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "start:prod": "NODE_ENV=production nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vijaybkhot/ServiceEasy.git"
+  },
+  "author": "Group 10: Vijay Khot - 20021838 | Piyush Devendra Kataktalware - 20022156 | Shreyas Desai - 20022834 | Raj Kale - 20029349",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vijaybkhot/ServiceEasy/issues"
+  },
+  "homepage": "https://github.com/vijaybkhot/ServiceEasy#readme",
+  "dependencies": {
+    "express": "^4.21.1",
+    "mongodb": "^6.10.0"
+  }
+}
