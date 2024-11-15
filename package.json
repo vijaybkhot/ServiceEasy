@@ -22,7 +22,13 @@
   },
   "homepage": "https://github.com/vijaybkhot/ServiceEasy#readme",
   "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.5",
     "express": "^4.21.1",
-    "mongodb": "^6.10.0"
+    "express-handlebars": "^8.0.1",
+    "mongodb": "^6.10.0",
+    "mongoose": "^8.8.1",
+    "validator": "^13.12.0",
+    "xss": "^1.0.15"
   }
 }
