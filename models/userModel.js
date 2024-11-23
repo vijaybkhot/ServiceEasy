@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
@@ -38,23 +39,12 @@ const userSchema = new mongoose.Schema(
       enum: ["customer", "employee", "store-manager", "admin"],
       default: "customer",
     },
-    password: {
+    hashedPassword: {
       type: String,
       trim: true,
       required: "Please enter a password",
       minlength: [8, "Password must be atleast 8 characters"],
       select: false, // Don't return passwords in default query
-    },
-    passwordConfirm: {
-      type: String,
-      required: [true, "Please confirm your password"],
-      validate: {
-        validator: function (el) {
-          return el === this.password;
-        },
-        message: "Passwords are not the same!",
-      },
-      select: false,
     },
     isActive: {
       type: Boolean,
@@ -64,15 +54,6 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-// Hashing the password
-userSchema.pre("save", async function (next) {
-  if (this.isModified("password") || this.isNew) {
-    this.password = await bcrypt.hash(this.password, 12);
-    this.passwordConfirm = undefined;
-  }
-  next();
-});
 
 // Method to check password
 userSchema.methods.correctPassword = async function (
