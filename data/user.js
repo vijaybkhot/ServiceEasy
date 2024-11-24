@@ -145,7 +145,7 @@ export async function updateUser(userId, upObj) {
   });
 
   if (!updatedUser) {
-    throw new Error(`Could no update user with id: ${userId}`);
+    throw new Error(`Could no update password with id: ${userId}`);
   }
 
   return updatedUser;
@@ -153,14 +153,68 @@ export async function updateUser(userId, upObj) {
 
 // Update password
 export async function updatePassword(userId, oldPassword, newPassword) {
+  // Check if both passwords are valid strings and trim
+  newPassword = dataValidator.isValidString(
+    newPassword,
+    "newPassword",
+    "updatePassword function"
+  );
+  oldPassword = dataValidator.isValidString(
+    oldPassword,
+    "oldPassword",
+    "updatePassword function"
+  );
+  userId = dataValidator.isValidString(
+    userId,
+    "userId",
+    "updatePassword function"
+  );
+
+  if (!isValidObjectId(userId)) {
+    throw new Error(
+      `userId entered in the update password function is not a valid Object Id`
+    );
+  }
+  // Throw if both old and new passwords input are the same
+  if (oldPassword === newPassword) {
+    throw new Error(`The new password and old password cannot be the same.`);
+  }
   // Get the user by id
-  const user = await User.findById(userId).select("+password");
-  newPassword = dataValidator.isValidString(newPassword);
+  const user = await User.findById(userId).select("+hashedPassword");
+
+  // Check if old password entered is correct
+  let isOldPasswordCorrect = await bcrypt.compare(
+    oldPassword,
+    user.hashedPassword
+  );
+  if (!isOldPasswordCorrect) {
+    throw new Error(
+      `Incorrect password. Please enter the correct current password.`
+    );
+  }
+
+  // Hash the new password
+  let newHashedPassword = await bcrypt.hash(newPassword, 12);
+
+  // Update the user with new password
+  let updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { hashedPassword: newHashedPassword },
+    {
+      new: true,
+    }
+  );
+
+  if (!updatedUser) {
+    throw new Error(`Could no update user with id: ${userId}`);
+  }
+
+  return updatedUser;
 }
 
 //---------------------------- Test ----------------s
 
-import mongoose from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 import dotenv from "dotenv";
 dotenv.config({ path: "./config.env" });
 
@@ -213,12 +267,12 @@ async function testUpdateUser() {
 }
 
 async function testUpdatePassword() {
-  let oldPassword;
-  let newPassword;
+  let oldPassword = "newPassword123";
+  let newPassword = "password123";
   let userId = "6740cf739235b20b3a06481d";
 
   try {
-    const updatedUser = await updatePassword(userId, upObj);
+    const updatedUser = await updatePassword(userId, oldPassword, newPassword);
     console.log(updatedUser);
   } catch (error) {
     console.error(error.message);
@@ -242,12 +296,12 @@ const connectDB = async () => {
 
 export const main = async () => {
   await connectDB(); // Connect to MongoDB
-  await testUpdateUser();
+  await testUpdatePassword();
   await mongoose.disconnect(); // Disconnect after
 };
 
-// // Run the main function
-// main().catch((error) => {
-//   console.error("Error running the test script:", error);
-//   mongoose.disconnect();
-// });
+// Run the main function
+main().catch((error) => {
+  console.error("Error running the test script:", error);
+  mongoose.disconnect();
+});
