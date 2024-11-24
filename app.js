@@ -1,12 +1,9 @@
 import express from "express";
+import path from "path";
 import exphbs from "express-handlebars";
-import sanitizeInputs from "./utilities/middlewares/securityMiddlewares.js";
+import { sanitizeInputs } from "./utilities/middlewares/securityMiddlewares.js";
 import parserMiddlewares from "./utilities/middlewares/parserMiddlewares.js";
-import {
-  userRouter,
-  storeRouter,
-  serviceRequestRouter,
-} from "./routes/index.js";
+import configRoutes from "./routes/index.js";
 
 const app = express();
 
@@ -17,12 +14,17 @@ app.use(sanitizeInputs);
 parserMiddlewares(app);
 
 // Client side engine
-app.engine("handlebars", exphbs.engine({ defaultLayout: "main" }));
+app.engine(
+  "handlebars",
+  exphbs.engine({
+    defaultLayout: "main",
+    layoutsDir: path.join(process.cwd(), "views/layouts"),
+    partialsDir: path.join(process.cwd(), "views/partials"),
+  })
+);
 app.set("view engine", "handlebars");
 
 // Routes
-app.use("/users", userRouter);
-app.use("/stores", storeRouter);
-app.use("/serviceRequest", serviceRequestRouter);
+configRoutes(app);
 
 export default app;

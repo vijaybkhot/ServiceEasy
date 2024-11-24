@@ -1,6 +1,8 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import validator from "validator";
+
+import { signupLimiter } from "../utilities/middlewares/securityMiddlewares.js";
 import dataValidator from "../utilities/dataValidator.js";
 import * as userController from "../data/user.js";
 
@@ -8,7 +10,21 @@ const saltRounds = 12;
 
 const router = express.Router();
 
-router.post("/signup", async (req, res, next) => {
+router.get("/login", async (req, res, next) => {
+  res.status(200).render("users/login", {
+    title: "Log into ServiceEasy",
+    cssPath: "/public/css/login.css",
+  });
+});
+
+router.get("/signup", async (req, res, next) => {
+  res.status(200).render("users/signup", {
+    title: "Signup for ServiceEasy",
+    cssPath: "/public/css/signup.css",
+  });
+});
+
+router.post("/signup", signupLimiter, async (req, res, next) => {
   let { name, email, phone, password, role, passwordConfirm } = req.body;
 
   try {
@@ -68,4 +84,5 @@ router.post("/signup", async (req, res, next) => {
     res.status(400).json({ error: error.message });
   }
 });
+
 export default router;

@@ -300,8 +300,8 @@ export const main = async () => {
   await mongoose.disconnect(); // Disconnect after
 };
 
-// Run the main function
-main().catch((error) => {
-  console.error("Error running the test script:", error);
-  mongoose.disconnect();
-});
+// // Run the main function
+// main().catch((error) => {
+//   console.error("Error running the test script:", error);
+//   mongoose.disconnect();
+// });
