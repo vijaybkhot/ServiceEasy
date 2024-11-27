@@ -45,7 +45,7 @@ export async function createUser(
     const user = await User.create(newUser);
     return user;
   } catch (error) {
-    throw new Error(`Error creating user: ${error.message}`);
+    throw new Error(error.message);
   }
 }
 

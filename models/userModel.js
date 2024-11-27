@@ -63,6 +63,16 @@ userSchema.methods.correctPassword = async function (
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
+// Check for duplicate email
+userSchema.pre("validate", async function (next) {
+  const userWithEmail = await User.findOne({ email: this.email });
+  if (userWithEmail && this.isNew) {
+    next(new Error("Email already exists. Login to continue."));
+  } else {
+    next();
+  }
+});
+
 const User = mongoose.model("User", userSchema);
 
 export default User;

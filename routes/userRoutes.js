@@ -1,73 +1,167 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import validator from "validator";
+import session from "express-session";
 
 import { signupLimiter } from "../utilities/middlewares/securityMiddlewares.js";
 import dataValidator from "../utilities/dataValidator.js";
 import * as userController from "../data/user.js";
+import User from "../models/userModel.js";
+import { isAuthenticated } from "../utilities/middlewares/authenticationMiddleware.js";
 
 const saltRounds = 12;
 
 const router = express.Router();
 
+router.get("/home", async (req, res, next) => {
+  res.status(200).render("users/home", {
+    title: "Welcome to ServiceEasy",
+    cssPath: "/public/css/home.css",
+  });
+});
+
 router.get("/login", async (req, res, next) => {
+  if (req.session.user) {
+    res.redirect("/home");
+    return;
+  }
   res.status(200).render("users/login", {
     title: "Log into ServiceEasy",
     cssPath: "/public/css/login.css",
+    errors: [],
   });
+});
+
+router.post("/login", async (req, res) => {
+  const errors = [];
+  let { email, password } = req.body;
+
+  try {
+    // Validate input
+    try {
+      email = dataValidator.isValidString(email, "email", "login route");
+      password = dataValidator.isValidString(
+        password,
+        "password",
+        "login route"
+      );
+
+      if (!validator.isEmail(email)) {
+        errors.push("Please enter a valid email.");
+      }
+
+      if (password.length < 8) {
+        errors.push("Password must be at least 8 characters.");
+      }
+    } catch (validationError) {
+      errors.push(validationError.message);
+    }
+
+    if (errors.length > 0) {
+      return res.status(400).render("users/login", {
+        title: "Log into ServiceEasy",
+        cssPath: "/public/css/login.css",
+        errors,
+      });
+    }
+
+    const user = await User.findOne({ email }).select("+hashedPassword");
+    if (!user) {
+      errors.push("Incorrect email or password.");
+      return res.status(404).render("users/login", {
+        title: "Log into ServiceEasy",
+        cssPath: "/public/css/login.css",
+        errors,
+      });
+    }
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
+    if (!isPasswordValid) {
+      errors.push("Incorrect password.");
+      return res.status(401).render("users/login", {
+        title: "Log into ServiceEasy",
+        cssPath: "/public/css/login.css",
+        errors,
+      });
+    }
+
+    user.hashedPassword = undefined;
+    req.session.user = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+    };
+    return res.status(200).redirect("/home");
+  } catch (error) {
+    errors.push("An unexpected error occurred. Please try again later.");
+    return res.status(500).render("users/login", {
+      title: "Log into ServiceEasy",
+      cssPath: "/public/css/login.css",
+      errors,
+    });
+  }
 });
 
 router.get("/signup", async (req, res, next) => {
+  if (req.session.user) {
+    res.redirect("/home");
+    return;
+  }
   res.status(200).render("users/signup", {
     title: "Signup for ServiceEasy",
     cssPath: "/public/css/signup.css",
+    errors: [],
   });
 });
 
-router.post("/signup", signupLimiter, async (req, res, next) => {
+router.post("/signup", signupLimiter, async (req, res) => {
   let { name, email, phone, password, role, passwordConfirm } = req.body;
+  name = name.trim();
+  email = email.trim();
+  phone = phone.trim();
+  password = password.trim();
+  role = typeof role === "string" ? role.trim() : "customer";
+
+  passwordConfirm = passwordConfirm.trim();
+  let errors = [];
+
+  if (!dataValidator.validName(name)) errors.push("Invalid name.");
+  if (!validator.isEmail(email)) errors.push("Invalid email.");
+  if (!dataValidator.isValidPhoneNumber(phone)) errors.push("Invalid phone.");
+  if (!dataValidator.isValidStringBoolean(password))
+    errors.push("Invalid password.");
+  if (!dataValidator.isValidStringBoolean(role)) errors.push("Invalid role.");
+  if (!dataValidator.isValidStringBoolean(passwordConfirm))
+    errors.push("Invalid passwordConfirm.");
+  if (password !== passwordConfirm) errors.push("Passwords dont match.");
+  if (password.length < 8) {
+    errors.push("Password must be at least 8 characters.");
+  }
+  if (!["customer", "employee", "store-manager", "admin"].includes(role)) {
+    errors.push(
+      `User role ${role} is not valid. Role must be one of ["customer", "employee", "store-manager", "admin"].`
+    );
+  }
+
+  if (errors.length > 0) {
+    req.session.user = undefined;
+    return res.status(401).render("users/signup", {
+      title: "Signup for ServiceEasy",
+      cssPath: "/public/css/signup.css",
+      errors: errors,
+      name,
+      email,
+      phone,
+    });
+  }
 
   try {
-    name = dataValidator.isValidString(name, "name", "signup route");
-    email = dataValidator.isValidString(email, "email", "signup route");
-    phone = dataValidator.isValidString(phone, "phone", "signup route");
-    password = dataValidator.isValidString(
-      password,
-      "password",
-      "signup route"
-    );
-    passwordConfirm = dataValidator.isValidString(
-      passwordConfirm,
-      "passwordConfirm",
-      "signup route"
-    );
-    role = role
-      ? dataValidator.isValidString(role, "role", "signup route")
-      : "customer";
-
-    if (!dataValidator.validName(name))
-      throw new Error("Please enter a valid name");
-    if (!validator.isEmail(email))
-      throw new Error("Please enter a valid email");
-    if (!dataValidator.isValidPhoneNumber(phone))
-      throw new Error("Please enter a valid phone number");
-    if (!password || !passwordConfirm)
-      throw new Error("Please enter password and password confirm.");
-    if (password !== passwordConfirm)
-      throw new Error("The passwords don't match. ");
-    if (password.length < 8)
-      throw new Error("Password must be atleast 8 characters.");
-    if (role === undefined || role === "") {
-      role = "customer";
-    }
-    if (!["customer", "employee", "store-manager", "admin"].includes(role)) {
-      throw new Error(
-        `User role ${role} is not valid. User should be either ["customer", "employee", "store-manager", "admin"].`
-      );
-    }
-
     // Hash password
     const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     // Create new user
     const newUser = await userController.createUser(
       name,
@@ -76,13 +170,50 @@ router.post("/signup", signupLimiter, async (req, res, next) => {
       hashedPassword,
       role
     );
-    return res.status(201).json({
-      message: "User created successfully",
-      user: newUser,
-    });
+
+    newUser.hashedPassword = undefined;
+    req.session.user = {
+      id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+      phone: newUser.phone,
+      role: newUser.role,
+    };
+    errors = [];
+    return res.status(200).redirect("/home");
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.log(typeof error);
+    console.log(typeof error.Error);
+    console.log(error);
+
+    if (error.code === 11000 && error.keyValue && error.keyValue.email) {
+      errors.push(
+        "A user with this email already exists. Please log in to your account."
+      );
+    } else {
+      errors.push(error.message);
+    }
+    return res.status(401).render("users/signup", {
+      title: "Sign Up for ServiceEasy",
+      cssPath: "/public/css/signup.css",
+      errors,
+      name,
+      email,
+      phone,
+    });
   }
+});
+
+router.get("/logout", async (req, res) => {
+  req.session.destroy();
+  return res.status(200).redirect("/home");
+});
+
+router.get("/my-dashboard", async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect("/login");
+  }
+  res.render("my-dashboard", { user: req.session.user });
 });
 
 export default router;

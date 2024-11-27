@@ -16,6 +16,9 @@ const exportedMethods = {
     }
     return val.trim();
   },
+  isValidStringBoolean(val) {
+    return typeof val === "string" && val.trim().length > 0;
+  },
 };
 
 export default exportedMethods;
