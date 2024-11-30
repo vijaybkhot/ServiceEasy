@@ -12,7 +12,7 @@ const app = express();
 
 const staticDir = express.static("public");
 app.use("/public", staticDir);
-
+app.use(express.urlencoded({ extended: true }));
 app.use(sanitizeInputs);
 parserMiddlewares(app);
 
@@ -24,5 +24,10 @@ app.set("view engine", "handlebars");
 app.use("/users", userRouter);
 app.use("/stores", storeRouter);
 app.use("/serviceRequest", serviceRequestRouter);
+
+app.listen(3000, () => {
+  console.log("We've now got a server!");
+  console.log("Your routes will be running on http://localhost:3000");
+});
 
 export default app;

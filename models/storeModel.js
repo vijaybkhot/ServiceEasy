@@ -31,9 +31,12 @@ const storeSchema = new mongoose.Schema(
       trim: true,
       validate: {
         validator: function (val) {
-          return validator.isMobilePhone(val, undefined, { strictMode: false });
+          return validator.isMobilePhone(val, undefined, { strictMode: true }) && /^\+/.test(val);
         },
         message: "Please enter a valid phone number for the store",
+      },
+      set: function (val) {
+        return val.trim().startsWith('+') ? val.trim() : `+${val.trim()}`;
       },
     },
     storeManager: {
@@ -54,9 +57,22 @@ storeSchema.pre(/^find/, function (next) {
     path: "storeManager",
     select: "name email phone",
   });
-
   next();
 });
+
+storeSchema.statics.findStoresNear = function (longitude, latitude, distance) {
+  return this.find({
+    location: {
+      $near: {
+        $geometry: {
+          type: "Point",
+          coordinates: [longitude, latitude],
+        },
+        $maxDistance: distance,
+      },
+    },
+  });
+};
 
 const Store = mongoose.model("Store", storeSchema);
 
