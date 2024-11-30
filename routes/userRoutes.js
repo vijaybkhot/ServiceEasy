@@ -7,6 +7,7 @@ import { signupLimiter } from "../utilities/middlewares/securityMiddlewares.js";
 import dataValidator from "../utilities/dataValidator.js";
 import * as userController from "../data/user.js";
 import User from "../models/userModel.js";
+import Email from "../utilities/email.js";
 import { isAuthenticated } from "../utilities/middlewares/authenticationMiddleware.js";
 
 const saltRounds = 12;
@@ -179,13 +180,11 @@ router.post("/signup", signupLimiter, async (req, res) => {
       phone: newUser.phone,
       role: newUser.role,
     };
+    const url = `${req.protocol}://${req.get("host")}/home`;
+    await new Email(newUser, url).sendWelcome();
     errors = [];
     return res.status(200).redirect("/home");
   } catch (error) {
-    console.log(typeof error);
-    console.log(typeof error.Error);
-    console.log(error);
-
     if (error.code === 11000 && error.keyValue && error.keyValue.email) {
       errors.push(
         "A user with this email already exists. Please log in to your account."
