@@ -6,6 +6,7 @@ import {
   userRouter,
   storeRouter,
   serviceRequestRouter,
+  repairRouter,
 } from "./routes/index.js";
 
 const app = express();
@@ -24,5 +25,6 @@ app.set("view engine", "handlebars");
 app.use("/users", userRouter);
 app.use("/stores", storeRouter);
 app.use("/serviceRequest", serviceRequestRouter);
+app.use("/repairs",repairRouter);
 
 export default app;

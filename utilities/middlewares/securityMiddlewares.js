@@ -1,4 +1,5 @@
 import xss from "xss";
+// import rateLimit from "express-rate-limit";
 
 // Middleware to sanitize all input data in req.body
 const sanitizeInputs = (req, res, next) => {
