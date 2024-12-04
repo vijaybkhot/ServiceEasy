@@ -15,7 +15,7 @@ const app = express();
 
 const staticDir = express.static("public");
 app.use("/public", staticDir);
-
+app.use(express.urlencoded({ extended: true }));
 app.use(sanitizeInputs);
 parserMiddlewares(app);
 
@@ -62,5 +62,10 @@ app.set("view engine", "handlebars");
 
 // Routes
 configRoutes(app);
+
+app.listen(3000, () => {
+  console.log("We've now got a server!");
+  console.log("Your routes will be running on http://localhost:3000");
+});
 
 export default app;
