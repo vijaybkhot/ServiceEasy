@@ -10,4 +10,4 @@ export const getCollection = async (collectionName) => {
   return collections[collectionName];
 };
 
-export const storesCollection = await getCollection("servicerequests");
+export const requestsCollection = await getCollection("serviceRequests");
