@@ -10,25 +10,25 @@ import xss from "xss";
 //   }
 //   next();
 // };
-const sanitizeInput = (input) => {
-  if (typeof input === "string") {
-    return xss(input); // Sanitize strings
-  } else if (Array.isArray(input)) {
-    return input.map((item) => sanitizeInput(item)); // Recursively sanitize arrays
-  } else if (typeof input === "object" && input !== null) {
-    const sanitizedObject = {};
-    for (const key in input) {
-      sanitizedObject[key] = sanitizeInput(input[key]); // Recursively sanitize objects
+const sanitizeInput = (req, res, next) => {
+  for (let key in req.body) {
+    if (typeof req.body[key] === "string") {
+      req.body[key] = xss(req.body[key]);
+    } else if (Array.isArray(req.body[key])) {
+      req.body[key].map((item) => sanitizeInput(item));
+    } else if (typeof req.body[key] === "object" && req.body[key] !== null) {
+      for (const sub_key in req.body[key]) {
+        req.body[key][sub_key] = sanitizeInput(req.body[key][sub_key]);
+      }
     }
-    return sanitizedObject;
   }
-  return input; // Return as-is for non-string types
-};
-
-const sanitizeMiddleware = (req, res, next) => {
-  req.body = sanitizeInput(req.body);
-  req.query = sanitizeInput(req.query);
-  req.params = sanitizeInput(req.params);
   next();
 };
-export default sanitizeMiddleware;
+
+// const sanitizeMiddleware = (req, res, next) => {
+//   req.body = sanitizeInput(req.body);
+//   req.query = sanitizeInput(req.query);
+//   req.params = sanitizeInput(req.params);
+//   next();
+// };
+export default sanitizeInput;

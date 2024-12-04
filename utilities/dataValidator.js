@@ -1,9 +1,22 @@
-import mongoose from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 import validator from "validator";
 
 const exportedMethods = {
   validName(val) {
-    return /^[a-zA-Z\s]+$/.test(val) && val.trim().length > 0;
+    if (/^[a-zA-Z\s]+$/.test(val) && val.trim().length > 0)
+      throw "Enter non-empty string consiting only characters!";
+    return val.trim();
+  },
+  validId(id) {
+    if (
+      typeof id === "undefined" ||
+      typeof id !== "string" ||
+      typeof id === "null"
+    )
+      throw "ID should be defined as a string!";
+    if (id.trim().length === 0) throw "ID shouldn't be empty!";
+    if (!isValidObjectId(id)) throw "passed ID should be a valid ObjectID!";
+    return id.trim();
   },
   validLocation(location) {
     if (
@@ -12,6 +25,7 @@ const exportedMethods = {
       !location.hasOwnProperty("address")
     )
       return false;
+    location.type = location.type.trim();
     if (location.coordinates.length !== 2) return false;
     if (
       typeof location.coordinates[0] !== "number" ||
@@ -25,35 +39,38 @@ const exportedMethods = {
       location.coordinates[1] < -90
     )
       return false;
-    if (location.address.length >= 300 || location.address.length < 20)
+    if (
+      location.address.length >= 300 ||
+      location.address.length < 20 ||
+      location.address.trim().length == 0
+    )
       return false;
-    return true;
+    location.address = location.address.trim();
+    return location;
   },
   validPhone(phone) {
-    const trimmedPhone = phone.trim();
-    const hasCountryCode = /^\+\d+$/.test(trimmedPhone);
-    const isValidPhone = validator.isMobilePhone(trimmedPhone, undefined, { strictMode: true });
-    return hasCountryCode && isValidPhone;
+    if (validator.isMobilePhone(phone, undefined, { strictMode: false }))
+      throw "Enter a valid phone number!";
+    return phone.trim()
   },
   validStore(request_body) {
     const { name, location, phone, storeManager } = request_body;
 
-    if (!this.validName(name)) 
+    if (!this.validName(name))
       throw new Error("Name of the store must be valid!");
-    
-    if (!this.validLocation(location)) 
+    if (!this.validLocation(location))
       throw new Error(
         "Please enter a valid location in the format {coordinates[Longitude[-180,180], latitude[-90,90]] and address within 20-300 characters!"
       );
-    
-    if (!this.validPhone(phone)) 
+
+    if (!this.validPhone(phone))
       throw new Error(
         "Please enter a valid phone number with a country code (e.g., +1234567890)!"
       );
-    
-    if (!mongoose.isValidObjectId(storeManager.trim())) 
+
+    if (!mongoose.isValidObjectId(storeManager.trim()))
       throw new Error("Enter a valid Store Manager ID!");
-    
+
     return {
       name: name.trim(),
       location,
