@@ -1,0 +1,19 @@
+<main class="main">
+      <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <link rel="stylesheet" href="/public/css/store.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/public/js/index.js"></script>
+  <h1>{{store.name}}</h1>
+
+  <div class="store-details-container">
+    <div class="store-info">
+      <h2>{{store.name}}</h2>
+      <p><b>Address:</b> {{store.location.address}}</p>
+      <p><b>Phone:</b> {{store.phone}}</p>
+      {{!-- <p><b>Store Manager ID:</b> {{store.storeManager}}</p> --}}
+    </div>
+  </div>
+</main>

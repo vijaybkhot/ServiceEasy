@@ -10,15 +10,25 @@ import xss from "xss";
 //   }
 //   next();
 // };
-const sanitizeInput = (req, res, next) => {
+
+const signupLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message:
+    "Too many accounts created from this IP, please try again after 15 minutes",
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+const sanitizeInputs = (req, res, next) => {
   for (let key in req.body) {
     if (typeof req.body[key] === "string") {
       req.body[key] = xss(req.body[key]);
     } else if (Array.isArray(req.body[key])) {
-      req.body[key].map((item) => sanitizeInput(item));
+      req.body[key].map((item) => sanitizeInputs(item));
     } else if (typeof req.body[key] === "object" && req.body[key] !== null) {
       for (const sub_key in req.body[key]) {
-        req.body[key][sub_key] = sanitizeInput(req.body[key][sub_key]);
+        req.body[key][sub_key] = sanitizeInputs(req.body[key][sub_key]);
       }
     }
   }
@@ -31,4 +41,4 @@ const sanitizeInput = (req, res, next) => {
 //   req.params = sanitizeInput(req.params);
 //   next();
 // };
-export default sanitizeInput;
+export { sanitizeInputs, signupLimiter };
