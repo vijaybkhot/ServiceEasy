@@ -11,16 +11,22 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const stores = await getAll();
-    res.status(200).json(stores);
+    // console.log(stores)
+    res.status(200).render("stores/all-stores",{
+      title:"List of all Stores",
+      stores:stores,
+      json:JSON.stringify,
+    });
   } catch (error) {
     res.status(400).json({ error: error });
   }
 });
+
 router.get("/:id", async (req, res) => {
   try {
     const id = dataValidator.validId(req.params.id);
     const store = await getById(id);
-    res.status(200).json(store);
+    res.status(200).render("stores/store", { title: "Store Details", store })
   } catch (error) {
     console.log(error);
     res.status(400).json({ error: error });
