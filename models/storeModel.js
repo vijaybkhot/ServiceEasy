@@ -54,9 +54,22 @@ storeSchema.pre(/^find/, function (next) {
     path: "storeManager",
     select: "name email phone",
   });
-
   next();
 });
+
+storeSchema.statics.findStoresNear = function (longitude, latitude, distance) {
+  return this.find({
+    location: {
+      $near: {
+        $geometry: {
+          type: "Point",
+          coordinates: [longitude, latitude],
+        },
+        $maxDistance: distance,
+      },
+    },
+  });
+};
 
 const Store = mongoose.model("Store", storeSchema);
 
