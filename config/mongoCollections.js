@@ -10,4 +10,7 @@ export const getCollection = async (collectionName) => {
   return collections[collectionName];
 };
 
-export const storesCollection = await getCollection("stores");
+const storesCollection = await getCollection("stores");
+const usersCollection = await getCollection("users");
+
+export {storesCollection,usersCollection}

@@ -183,7 +183,6 @@ router.post("/signup", signupLimiter, async (req, res) => {
     return res.status(200).redirect("/home");
   } catch (error) {
     console.log(typeof error);
-    console.log(typeof error.Error);
     console.log(error);
 
     if (error.code === 11000 && error.keyValue && error.keyValue.email) {

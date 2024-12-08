@@ -1,66 +1,134 @@
-// ADD functions
-// getById, getAll, createStore, Updatetore, DeleteStore
-import { ReturnDocument } from "mongodb";
-import { storesCollection } from "../config/mongoCollections.js";
 import validatorFuncs from "../utilities/dataValidator.js";
 import { ObjectId } from "mongodb";
+import Store from "../models/storeModel.js";
 
 async function getAll() {
-  const stores = await storesCollection.find({}).toArray();
-  return stores;
+  const stores = await Store.find();
+  const plainStores = stores.map(store => store.toObject());
+  return plainStores
 }
 async function getById(id) {
-  id = validatorFuncs.validId(id);
-  const store = await storesCollection.findOne({ _id: new ObjectId(id) });
-  //   if (!store) throw new Error("No store found with the given ID.");
-  return store;
+  id = validatorFuncs.isValidString(id, "Id", getById.id);
+  if (!validatorFuncs.validId(id)) {
+    throw new Error(`${id} is not valid. Provide a Valid Object ID.`);
+  }
+  try {
+    const store = await Store.findById(id);
+    const plainStore =  store.toObject();
+    if (!plainStore) throw new Error(`Store with ID ${id} not found.`);
+    return plainStore;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 }
 
 async function createStore(storeDetails) {
-  const { name, location, phone, storeManager } =
-    validatorFuncs.validStore(storeDetails);
-  const newStore = new Store({ name, location, phone, storeManager });
-  const result = await storesCollection.insertOne(newStore);
-  return result.insertId;
+  storeDetails.name = validatorFuncs.isValidString(
+    storeDetails.name,
+    "name",
+    "createStore.storeDetails.name"
+  );
+  storeDetails.phone = validatorFuncs.isValidString(
+    storeDetails.phone,
+    "phone",
+    "createStore.storeDetails.phone"
+  );
+  storeDetails.storeManager = validatorFuncs.isValidString(
+    storeDetails.storeManager,
+    "storeManager",
+    "createStore.storeDetails.storeManager"
+  );
+
+  const { name, location, phone, storeManager } = storeDetails;
+  if (!validatorFuncs.validName(name))
+    throw new Error("Please enter valid Name!");
+  if (!validatorFuncs.validLocation(location))
+    throw new Error("Please enter valid Location!");
+  if (!validatorFuncs.isValidPhoneNumber(phone))
+    throw new Error("Please enter valid Phone!");
+  if (!validatorFuncs.validId(storeManager))
+    throw new Error("Please enter valid Store Manager ID!");
+
+  location.type = location.type.trim();
+  location.address = location.address.trim();
+
+  try {
+    const newStore = await Store.create({ name, location, phone, storeManager }); 
+    return newStore;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 }
 
 async function updateStore(storeId, storeDetails) {
-  storeId = validatorFuncs.validId(storeId);
-  const store = await storesCollection.findOne({
+  storeId = validatorFuncs.isValidString(
+    storeId,
+    "storeId",
+    updateStore.storeId
+  );
+  if (!validatorFuncs.validId(storeId)) {
+    throw new Error(`${storeId} is not valid. Provide a Valid Object ID.`);
+  }
+  const store = await Store.findById({
     _id: new ObjectId(storeId),
   });
-  // console.log(store)
-  if (!store) throw `Store with id ${storeId} not found!`;
+  
+  if (!store) throw new Error(`Store with id ${storeId} not found!`);
 
   const updatedStoreObject = {};
-  if (storeDetails.hasOwnProperty("name"))
-    updatedStoreObject.name = validatorFuncs.validName(storeDetails.name);
-  if (storeDetails.hasOwnProperty("location"))
-    updatedStoreObject.location = validatorFuncs.validLocation(
-      storeDetails.location
-    );
-  if (storeDetails.hasOwnProperty("phone"))
-    updatedStoreObject.phone = validatorFuncs.validPhone(storeDetails.phone);
-  if (storeDetails.hasOwnProperty("storeManager"))
-    updatedStoreObject.storeManager = validatorFuncs.validId(
-      storeDetails.storeManager
-    );
+  if (storeDetails.hasOwnProperty("name")) {
+    if (!validatorFuncs.isValidString(storeDetails.name))
+      throw new Error("Please enter valid Name!");
+    updatedStoreObject.name = storeDetails.name.trim();
+  }
 
-  const updatedStore = await storesCollection.findOneAndUpdate(
-    { _id: new ObjectId(storeId) },
-    { $set: updatedStoreObject },
-    { returnDocument: "after" }
-  );
+  if (storeDetails.hasOwnProperty("location")) {
+    if (!validatorFuncs.validLocation(storeDetails.location))
+      throw new Error("Please enter valid Location!");
+    storeDetails.location.type = storeDetails.location.type.trim();
+    storeDetails.location.address = storeDetails.location.address.trim();
+    updatedStoreObject.location = storeDetails.location;
+  }
 
-  if (!updatedStore) throw `Store with id ${storeId} couldn't be updated!`;
-  return updatedStore;
+  if (storeDetails.hasOwnProperty("phone")) {
+    if (!validatorFuncs.isValidPhoneNumber(storeDetails.phone))
+      throw new Error("Please enter valid Phone!");
+    updatedStoreObject.phone = storeDetails.phone.trim();
+  }
+
+  if (storeDetails.hasOwnProperty("storeManager")) {
+    if (!validatorFuncs.validId(storeManager))
+      throw new Error("Please enter valid Store Manager ID!");
+    updatedStoreObject.storeManager = storeDetails.storeManager.trim();
+  }
+
+  try {
+    const updatedStore = await Store.findByIdAndUpdate(storeId, updatedStoreObject, {
+      new: true,
+      runValidators: true,
+    });
+    if (!updatedStore) throw new Error(`Store with ID ${storeId} not found.`);
+    return updatedStore;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 }
 
 async function deleteStore(storeId) {
-  storeId = validatorFuncs.validId(storeId);
-  const deletedStore = storesCollection.findOneAndDelete({
-    _id: new ObjectId(storeId),
-  });
-  return deletedStore
+  storeId = validatorFuncs.isValidString(
+    storeId,
+    "storeId",
+    updateStore.storeId
+  );
+  if (!validatorFuncs.validId(storeId)) {
+    throw new Error(`${storeId} is not valid. Provide a Valid Object ID.`);
+  }
+  try {
+    const deletedStore = await Store.findByIdAndDelete(storeId);
+    if (!deletedStore) throw new Error(`Store with ID ${storeId} not found.`);
+    return deletedStore;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 }
 export { getAll, getById, createStore, updateStore, deleteStore };

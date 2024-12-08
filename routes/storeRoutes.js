@@ -1,82 +1,148 @@
 import express from "express";
 import dataValidator from "../utilities/dataValidator.js";
-import { storesCollection } from "../config/mongoCollections.js";
-import validator from "validator";
-import Store from "../models/storeModel.js";
-import { getAll, getById, createStore, updateStore, deleteStore } from "../data/stores.js";
-// import validId from "../utilities/dataValidator.js";
+import {
+  getAll,
+  getById,
+  createStore,
+  updateStore,
+  deleteStore,
+} from "../data/stores.js";
+import {
+  isAuthenticated,
+  hasRole,
+} from "../utilities/middlewares/authenticationMiddleware.js";
 
 const router = express.Router();
 
+// Route to render the "Add Store" page
+router.get("/add", isAuthenticated, hasRole("admin"), (req, res) => {
+  try {
+    res.status(200).render("stores/add-store", { title: "Add Store" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Route to fetch all stores
 router.get("/", async (req, res) => {
   try {
     const stores = await getAll();
     // console.log(stores)
-    res.status(200).render("stores/all-stores",{
-      title:"List of all Stores",
-      stores:stores,
-      json:JSON.stringify,
+    res.status(200).render("stores/all-stores", {
+      title: "List of all Stores",
+      stores: stores,
+      json: JSON.stringify,
+      errors: [],
+      user: req.session.user,
     });
   } catch (error) {
     res.status(400).json({ error: error });
   }
 });
 
+// Route to fetch a specific store by ID
 router.get("/:id", async (req, res) => {
+  const errors = [];
   try {
-    const id = dataValidator.validId(req.params.id);
+    const id = dataValidator.isValidString(
+      req.params.id,
+      "id",
+      "/get Store Route"
+    );
+    if (!dataValidator.validId(id)) {
+      errors.push("Please provide a valid Store ID!");
+    }
+    if (errors.length > 0) {
+      return res.status(400).render("stores/store", {
+        title: "Store Details",
+        errors,
+      });
+    }
     const store = await getById(id);
-    res.status(200).render("stores/store", { title: "Store Details", store })
+    res.status(200).render("stores/store", { title: "Store Details", store,
+      user: req.session.user,
+     });
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ error: error });
+    errors.push("An unexpected error occurred. Please try again later.");
+    // console.log(error);
+    res.status(500).render("stores/store", {
+      title: "Store Details",
+      errors,
+    });
   }
 });
-router.post("/", async (req, res) => {
+
+// Route to add a store
+router.post("/", isAuthenticated, hasRole("admin"), async (req, res) => {
+  const errors = [];
+  const { name, longitude, latitude, address, phone, storeManager } = req.body;
+
+  const location = {
+    type: "Point",
+    coordinates: [parseFloat(longitude), parseFloat(latitude)],
+    address: address.trim(),
+  };
+
+  if (!dataValidator.validName(name)) errors.push("Enter a valid name!");
+  if (!dataValidator.validLocation(location))
+    errors.push("Enter a valid location!");
+  if (!dataValidator.isValidPhoneNumber(phone))
+    errors.push("Enter a valid phone number!");
+  if (!dataValidator.validId(storeManager))
+    errors.push("Enter a valid Store Manager ID!");
+
+  if (errors.length > 0) {
+    return res.status(400).render("stores/add-store", {
+      title: "Add Store",
+      errors,
+    });
+  }
+
   try {
-    const result = await createStore(req.body);
+    const storeDetails = { name:name, location:location, phone:phone, storeManager:storeManager }
+    const result = await createStore(storeDetails);
     if (result) {
-      res
-        .status(201)
-        .json({ message: "Store added successfully", store: result });
+      res.status(200).redirect("/stores")
     } else {
       throw new Error("Failed to add the store");
     }
   } catch (error) {
-    res.status(400).json({ error: error });
+    res.status(400).json({ error: error.message });
   }
 });
 
+// Route to update a store
 router.patch("/:id", async (req, res) => {
   try {
     const result = await updateStore(req.params.id, req.body);
-    // console.log(result)
     if (result) {
       res
         .status(201)
-        .json({ message: "store Updated successfully", store: result });
+        .json({ message: "Store updated successfully", store: result });
     } else {
       throw new Error("Failed to update the store!");
     }
   } catch (error) {
     console.log(error);
-    res.status(400).json({ error: error });
+    res.status(400).json({ error: error.message });
   }
 });
+
+// Route to delete a store
 router.delete("/:id", async (req, res) => {
   try {
     const result = await deleteStore(req.params.id);
-    // console.log(result)
     if (result) {
       res
         .status(201)
-        .json({ message: "store Deleted successfully", store: result });
+        .json({ message: "Store deleted successfully", store: result });
     } else {
       throw new Error("Failed to delete the store!");
     }
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ error: error });
+    // console.log(error);
+    res.status(400).json({ error: error.message });
   }
-})
+});
+
 export default router;

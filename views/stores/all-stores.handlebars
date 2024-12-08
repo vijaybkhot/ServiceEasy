@@ -4,6 +4,7 @@
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   />
   <link rel="stylesheet" href="/public/css/all-stores.css" />
+  <link rel="stylesheet" href="/public/css/styles.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="/public/js/leaflet.js"></script>
   <script src="/public/js/index.js"></script>
@@ -11,6 +12,20 @@
 </head>
 <main class="main">
   <h1>{{title}}</h1>
+  {{#if errors}}
+    <div class="error-messages">
+      {{#each errors}}
+        <div class="error-message font-italic">{{this}}</div>
+      {{/each}}
+    </div>
+  {{/if}}
+  {{#if user}}
+    {{#if (eq user.role "admin")}}
+      <button class="add-store">
+        Add Store
+      </button>
+    {{/if}}
+  {{/if}}
   <div class="content-container">
     <div class="store-cards">
       {{#each stores}}
