@@ -1,0 +1,72 @@
+<main>
+    <section id="service-requests">
+        <h2>Your Service Requests</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Device</th>
+                    <th>Repair Type</th>
+                    <th>Price</th>
+                    <th>Date Created</th>
+                    <th>Delivery/Completion Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each serviceRequests}}
+                <tr class="{{#if isCompleted}}completed-request{{else}}current-request{{/if}}">
+                    <td>{{deviceBrand}} {{deviceModel}}</td>
+                    <td>{{repairType}}</td>
+                    <td>${{associatedPrice}}</td>
+                    <td>{{formatDate createdAt}}</td>
+                    <td>
+                        {{#if isCompleted}}
+                        {{formatDate completedAt}}
+                        {{else}}
+                        {{formatDate expectedDelivery}}
+                        {{/if}}
+                    </td>
+                    <td>{{capitalize status}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </section>
+
+    <section id="new-service-request-form" style="display: none;">
+        <h2>New Service Request</h2>
+        <form id="newServiceRequestForm" action="/service-requests" method="POST">
+            <label for="deviceBrand">Device Brand:</label>
+            <select id="deviceBrand" name="deviceBrand" required>
+                <option value="">Select a device brand</option>
+                <option value="iPhone">iPhone</option>
+                <option value="Macbook">Macbook</option>
+                <option value="iPad">iPad</option>
+            </select>
+
+            <label for="deviceModel">Device Model:</label>
+            <input type="text" id="deviceModel" name="deviceModel" required>
+
+            <label for="repairType">Repair Type:</label>
+            <input type="text" id="repairType" name="repairType" required>
+
+            <label for="priority">Priority:</label>
+            <select id="priority" name="priority">
+                <option value="regular">Regular</option>
+                <option value="fast service">Fast Service</option>
+            </select>
+
+            <label for="comments">Comments:</label>
+            <textarea id="comments" name="comments"></textarea>
+
+            <button type="submit">Submit Request</button>
+        </form>
+    </section>
+</main>
+
+<script>
+    document.getElementById('newRequestButton').addEventListener('click', () => {
+        const formSection = document.getElementById('new-service-request-form');
+        formSection.style.display = formSection.style.display === 'none' ? 'block' : 'none';
+    });
+</script>
