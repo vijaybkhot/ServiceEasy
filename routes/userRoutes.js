@@ -79,7 +79,7 @@ router.post("/login", async (req, res) => {
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
     if (!isPasswordValid) {
-      errors.push("Incorrect password.");
+      errors.push("Incorrect email or password.");
       return res.status(401).render("users/login", {
         title: "Log into ServiceEasy",
         cssPath: "/public/css/login.css",
