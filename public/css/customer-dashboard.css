@@ -1,0 +1,123 @@
+main {
+  margin: 20px;
+}
+
+h2 {
+  color: #2c3e50;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* Section Styles */
+section {
+  margin-bottom: 30px;
+}
+
+/* Service Requests Table */
+#service-requests table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#service-requests th,
+#service-requests td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+#service-requests th {
+  background-color: #2980b9;
+  color: white;
+  font-size: 16px;
+}
+
+#service-requests td {
+  background-color: #fff;
+}
+
+#service-requests tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* New Service Request Form */
+#new-service-request-form {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+#new-service-request-form label {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #2c3e50;
+  display: block;
+}
+
+#new-service-request-form select,
+#new-service-request-form input,
+#new-service-request-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+#new-service-request-form textarea {
+  resize: vertical;
+  height: 100px;
+}
+
+#new-service-request-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #2980b9;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#new-service-request-form button:hover {
+  background-color: #3498db;
+}
+
+/* Hidden Section Display */
+#new-service-request-form[style="display: none;"] {
+  display: none;
+}
+
+/* Error Message Styling */
+.error-messages {
+  margin-top: 20px;
+  color: #e74c3c;
+  font-size: 14px;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #new-service-request-form {
+    width: 90%;
+  }
+
+  #service-requests table {
+    font-size: 14px;
+  }
+}

@@ -7,47 +7,13 @@ body {
   color: #444;
 }
 
-/* Header */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #fff;
-  padding: 1rem 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.header__logo img {
-  height: 50px;
-}
-
-.nav {
-  display: flex;
-  align-items: right;
-  gap: 1.5rem;
-}
-
-.nav__el {
-  text-decoration: none;
-  color: #444;
-  font-weight: bold;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  transition: background 0.3s;
-}
-
-.nav__el:hover,
-.nav__el--cta {
-  background: #8fd3f4;
-  color: #fff;
-}
-
 /* Footer */
 .footer {
   text-align: center;
-  background: #fff;
-  padding: 1.5rem;
-  border-top: 1px solid #ccc;
+  background-color: #333; /* Same background as header */
+  color: white; /* Same text color as header */
+  padding: 2rem 30px; /* Increase padding for better spacing */
+  border-top: 2px solid #444; /* Same border as header */
 }
 
 .footer__logo img {
@@ -65,18 +31,18 @@ body {
 
 .footer__nav a {
   text-decoration: none;
-  color: #555;
+  color: white;
   font-weight: bold;
   transition: color 0.3s;
 }
 
 .footer__nav a:hover {
-  color: #84fab0;
+  color: #84fab0; /* Same hover effect as header */
 }
 
 .footer__copyright {
   font-size: 0.9rem;
-  color: #666;
+  color: #ccc; /* Lighter text color for copyright */
 }
 
 /* Error container */
@@ -97,4 +63,74 @@ body {
 .error-message {
   color: #e74c3c;
   font-size: 0.9rem;
+}
+
+/* Header */
+header {
+  background-color: #333;
+  color: white;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #444;
+}
+
+header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+  flex-grow: 1;
+}
+
+header .left {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+header .right {
+  display: flex;
+  align-items: center;
+}
+
+header a {
+  color: white;
+  text-decoration: none;
+  margin: 0 10px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+header a:hover {
+  color: #4caf50;
+}
+
+header .new-request-btn,
+header .track-order-btn {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  margin-right: 10px;
+}
+
+header .new-request-btn:hover,
+header .track-order-btn:hover {
+  background-color: #45a049;
+}
+
+header p {
+  margin: 0;
+}
+
+header .logout-btn {
+  margin-left: 10px;
 }
