@@ -17,7 +17,9 @@ export const hasRole = (requiredRoles) => {
     }
 
     // Ensure `requiredRoles` is an array for flexibility
-    const roles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
+    const roles = Array.isArray(requiredRoles)
+      ? requiredRoles
+      : [requiredRoles];
 
     if (roles.includes(req.session.user.role)) {
       return next();

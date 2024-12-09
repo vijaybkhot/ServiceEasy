@@ -26,22 +26,21 @@ const serviceRequestSchema = new mongoose.Schema(
         "waiting for drop-off",
         "in-process",
         "pending for approval",
-        "approved",
-        "reassigned",
         "ready for pickup",
-        "rejected",
+        "reassigned",
+        "complete",
       ],
       required: true,
     },
-    reassigned: {
-      type: Boolean,
-      default: false,
-    },
-    priority: {
-      type: String,
-      enum: ["regular", "fast service"],
-      default: "regular",
-    },
+    // reassigned: {
+    //   type: Boolean,
+    //   default: false,
+    // },
+    // priority: {
+    //   type: String,
+    //   enum: ["regular", "fast service"],
+    //   default: "regular",
+    // },
     payment: [
       {
         transaction_id: {
