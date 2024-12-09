@@ -1,10 +1,23 @@
 <header>
+    <div class="left">
+        {{#if user}}
+        <p>Welcome, {{user.name}}!</p>
+        {{else}}
+        <p>Welcome, Guest!</p>
+        {{/if}}
+    </div>
+
     <h1>{{title}}</h1>
-    {{#if user}}
-    <a href="/logout">Logout</a>
-    <p>Welcome, {{user.name}}!</p>
-    {{else}}
-    <a href="/signup">Sign Up</a>
-    <a href="/login">Log In</a>
-    {{/if}}
+
+    <div class="right">
+        {{#if user}}
+        <button id="newRequestButton" class="new-request-btn">New Repair Order</button>
+        <button id="trackOrderButton" class="track-order-btn">Track Repair Order</button>
+        <a href="/logout" class="logout-btn">Logout</a>
+        {{else}}
+        <a href="/login" class="login-btn">Log In</a>
+        <a href="/signup" class="signup-btn">Sign Up</a>
+        <button id="trackOrderButton" class="track-order-btn">Track Repair Order</button>
+        {{/if}}
+    </div>
 </header>

@@ -16,7 +16,7 @@ const router = express.Router();
 
 router.get("/home", async (req, res, next) => {
   res.status(200).render("users/home", {
-    title: "Welcome to ServiceEasy",
+    title: "Home Page",
     cssPath: "/public/css/home.css",
   });
 });
