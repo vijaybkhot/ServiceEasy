@@ -10,6 +10,7 @@ const serviceRequestSchema = new mongoose.Schema(
     employee_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
     store_id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -43,19 +44,9 @@ const serviceRequestSchema = new mongoose.Schema(
     // },
     payment: [
       {
-        transaction_id: {
-          type: String,
-          unique: true,
-          required: true,
-        },
-        transaction_date: {
-          type: Date,
-          default: Date.now,
-        },
-        amount: {
-          type: Number,
-          required: true,
-        },
+        transaction_id: { type: String, unique: true, required: true },
+        transaction_date: { type: Date, default: Date.now },
+        amount: { type: Number, required: true },
         status: {
           type: String,
           enum: ["success", "failed", "in-process", "pending"],
@@ -68,8 +59,13 @@ const serviceRequestSchema = new mongoose.Schema(
         },
       },
     ],
-    employee_activity: [
+    employeeActivity: [
       {
+        activity_type: {
+          type: String,
+          enum: ["repair", "approval", "follow-up"],
+          required: true,
+        },
         processing_employee_id: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "User",
@@ -77,50 +73,45 @@ const serviceRequestSchema = new mongoose.Schema(
         },
         assigned_by: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "User", // Could be the manager or another employee
+          ref: "User",
           required: true,
         },
-        activity: {
+        comments: [
+          {
+            user: {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: "User",
+              required: true,
+            },
+            date: { type: Date, default: Date.now },
+            comment: { type: String, required: true },
+          },
+        ],
+        status: {
           type: String,
-          enum: ["repair", "inspect"],
-          required: true,
+          enum: ["pending", "in-progress", "completed"],
+          default: "pending",
         },
-        employee_comment: {
-          to: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: false,
-          },
-          date: {
-            type: Date,
-            default: Date.now,
-          },
-          comment: {
-            type: String,
-            required: true,
-          },
-        },
-        date_assigned: {
-          type: Date,
-          default: Date.now,
-        },
-        date_completed: {
-          type: Date,
-        },
+        start_time: { type: Date },
+        end_time: { type: Date },
       },
     ],
     feedback: {
-      rating: {
-        type: Number,
-        min: 1,
-        max: 5,
-        required: false, // Not required initially
-      },
-      comment: {
-        type: String,
-        required: false, // Not required initially
-      },
+      rating: { type: Number, min: 1, max: 5, required: false },
+      comment: { type: String, required: false },
     },
+    auditTrail: [
+      {
+        timestamp: { type: Date, default: Date.now },
+        action: { type: String, required: true }, // e.g., "Status changed", "Comment added"
+        performed_by: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        details: { type: String },
+      },
+    ],
   },
   { timestamps: true }
 );

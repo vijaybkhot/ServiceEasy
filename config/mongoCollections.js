@@ -13,4 +13,4 @@ export const getCollection = async (collectionName) => {
 const storesCollection = await getCollection("stores");
 const usersCollection = await getCollection("users");
 
-export {storesCollection,usersCollection}
+export { storesCollection, usersCollection };
