@@ -149,7 +149,7 @@ router.post("/signup", signupLimiter, async (req, res) => {
 
   if (errors.length > 0) {
     req.session.user = undefined;
-    return res.status(401).render("users/signup", {
+    return res.status(400).render("users/signup", {
       title: "Signup for ServiceEasy",
       cssPath: "/public/css/signup.css",
       errors: errors,

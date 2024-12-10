@@ -57,7 +57,7 @@ app.engine(
     layoutsDir: path.join(process.cwd(), "views/layouts"),
     partialsDir: path.join(process.cwd(), "views/partials"),
     helpers: {
-      eq: (a, b) => a === b, 
+      eq: (a, b) => a === b,
     },
   })
 );
@@ -66,9 +66,9 @@ app.set("view engine", "handlebars");
 // Routes
 configRoutes(app);
 
-app.listen(3000, () => {
-  console.log("We've now got a server!");
-  console.log("Your routes will be running on http://localhost:3000");
-});
+// app.listen(3000, () => {
+//   console.log("We've now got a server!");
+//   console.log("Your routes will be running on http://localhost:3000");
+// });
 
 export default app;

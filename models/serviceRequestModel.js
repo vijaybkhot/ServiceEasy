@@ -10,7 +10,17 @@ const serviceRequestSchema = new mongoose.Schema(
     employee_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: function () {
+        // employee_id is required if status is "in-process" or later
+        const requiredStatuses = [
+          "in-process",
+          "pending for approval",
+          "ready for pickup",
+          "reassigned",
+          "complete",
+        ];
+        return requiredStatuses.includes(this.status);
+      },
     },
     store_id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -20,6 +30,7 @@ const serviceRequestSchema = new mongoose.Schema(
     repair_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Repair",
+      required: [true, "A service request must be associated with a repair."],
     },
     status: {
       type: String,
@@ -33,97 +44,93 @@ const serviceRequestSchema = new mongoose.Schema(
       ],
       required: true,
     },
-    // reassigned: {
-    //   type: Boolean,
-    //   default: false,
-    // },
-    // priority: {
-    //   type: String,
-    //   enum: ["regular", "fast service"],
-    //   default: "regular",
-    // },
-    payment: [
-      {
-        transaction_id: { type: String, unique: true, required: true },
-        transaction_date: { type: Date, default: Date.now },
-        amount: { type: Number, required: true },
-        status: {
-          type: String,
-          enum: ["success", "failed", "in-process", "pending"],
-          required: true,
+    payment: {
+      isPaid: {
+        type: Boolean,
+        default: false,
+        required: true,
+      },
+      amount: {
+        type: Number,
+        required: function () {
+          // If isPaid is true, amount must be provided
+          return this.isPaid;
         },
-        payment_mode: {
-          type: String,
-          enum: ["CC", "DC", "DD", "cheque"],
-          required: true,
+        min: 0,
+      },
+      transaction_id: {
+        type: String,
+        unique: true,
+        required: function () {
+          // If isPaid is true, transaction_id must be provided
+          return this.isPaid;
         },
       },
-    ],
-    employeeActivity: [
-      {
-        activity_type: {
-          type: String,
-          enum: ["repair", "approval", "follow-up"],
-          required: true,
+      payment_mode: {
+        type: String,
+        enum: ["CC", "DC", "DD", "cheque", "cash", "other"],
+        required: function () {
+          // If isPaid is true, payment_mode must be provided
+          return this.isPaid;
         },
-        processing_employee_id: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
-        assigned_by: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
-        comments: [
-          {
-            user: {
-              type: mongoose.Schema.Types.ObjectId,
-              ref: "User",
-              required: true,
-            },
-            date: { type: Date, default: Date.now },
-            comment: { type: String, required: true },
-          },
-        ],
-        status: {
-          type: String,
-          enum: ["pending", "in-progress", "completed"],
-          default: "pending",
-        },
-        start_time: { type: Date },
-        end_time: { type: Date },
+        default: "CC",
       },
-    ],
-    feedback: {
-      rating: { type: Number, min: 1, max: 5, required: false },
-      comment: { type: String, required: false },
+      payment_date: {
+        type: Date,
+        required: function () {
+          // If isPaid is true, payment_date must be provided
+          return this.isPaid;
+        },
+        default: Date.now,
+      },
     },
-    auditTrail: [
-      {
-        timestamp: { type: Date, default: Date.now },
-        action: { type: String, required: true }, // e.g., "Status changed", "Comment added"
-        performed_by: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
+    feedback: {
+      rating: {
+        type: Number,
+        min: 1,
+        max: 5,
+        required: function () {
+          // Rating is required if feedback is provided
+          return this.feedback !== undefined;
         },
-        details: { type: String },
       },
-    ],
+      comment: {
+        type: String,
+        required: false,
+      },
+    },
+    completedAt: { type: Date },
   },
   { timestamps: true }
 );
 
-// Service request pre hook
+// Pre-validation hook to ensure employee_id is set when required by the status
+serviceRequestSchema.pre("validate", function (next) {
+  const requiredStatuses = [
+    "in-process",
+    "pending for approval",
+    "ready for pickup",
+    "reassigned",
+    "complete",
+  ];
+  if (requiredStatuses.includes(this.status) && !this.employee_id) {
+    return next(
+      new Error(`Employee ID is required when status is '${this.status}'.`)
+    );
+  }
+
+  // Ensure rating is provided if feedback exists
+  if (this.feedback && this.feedback.rating === undefined) {
+    return next(new Error("Rating is required if feedback is provided."));
+  }
+
+  next();
+});
+
+// Pre-save middleware to set completedAt when status is "complete"
 serviceRequestSchema.pre("save", function (next) {
-  if (this.status === "ready for pickup" || this.status === "completed") {
-    if (!this.feedback || !this.feedback.rating || !this.feedback.comment) {
-      return next(
-        new Error("Feedback is required once the service is complete.")
-      );
-    }
+  if (this.status === "complete" && !this.completedAt) {
+    this.completedAt = new Date();
   }
   next();
 });

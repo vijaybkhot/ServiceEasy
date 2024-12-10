@@ -13,7 +13,6 @@ export async function createUser(
   role = "customer"
 ) {
   // Input validation
-  console.log("name:", name);
   name = dataValidator.isValidString(name, "name", createUser.name);
   if (!dataValidator.validName(name))
     throw new Error(

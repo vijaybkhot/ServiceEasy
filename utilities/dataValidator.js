@@ -1,17 +1,17 @@
-import mongoose, { isValidObjectId } from "mongoose";
+import mongoose from "mongoose";
+const { ObjectId } = mongoose.Types;
 import validator from "validator";
-
-// import { isValidObjectId } from "mongoose";
 import { ObjectId } from "mongodb";
-// import validator from "validator";
 
 const exportedMethods = {
   isValidObjectId(id) {
-    if (!id) throw "You must provide an id to search for";
-    if (typeof id !== "string") throw "Id must be a string";
+    if (!id) throw new Error("You must provide an id to search for");
+    if (typeof id !== "string") throw new Error("Id must be a string");
     id = id.trim();
-    if (id.length === 0) throw "Id cannot be an empty string or just spaces";
-    if (!ObjectId.isValid(id)) throw `Invalid ObjectId string: ${id}`;
+    if (id.length === 0)
+      throw new Error("Id cannot be an empty string or just spaces");
+    if (!ObjectId.isValid(id))
+      throw new Error(`Invalid ObjectId string: ${id}`);
     return id;
   },
 
@@ -220,6 +220,11 @@ const exportedMethods = {
     //   phone: phone.trim(),
     //   storeManager: storeManager.trim(),
     // };
+  },
+
+  // Validate name input
+  validName(val) {
+    return /^[a-zA-Z\s]+$/.test(val) && val.trim().length > 0;
   },
 };
 

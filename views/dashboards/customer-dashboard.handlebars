@@ -15,7 +15,7 @@
             <tbody>
                 {{#each serviceRequests}}
                 <tr class="{{#if isCompleted}}completed-request{{else}}current-request{{/if}}">
-                    <td>{{deviceBrand}} {{deviceModel}}</td>
+                    <td>{{deviceType}} {{deviceModel}}</td>
                     <td>{{repairType}}</td>
                     <td>${{associatedPrice}}</td>
                     <td>{{formatDate createdAt}}</td>
@@ -36,37 +36,86 @@
     <section id="new-service-request-form" style="display: none;">
         <h2>New Service Request</h2>
         <form id="newServiceRequestForm" action="/service-requests" method="POST">
-            <label for="deviceBrand">Device Brand:</label>
-            <select id="deviceBrand" name="deviceBrand" required>
-                <option value="">Select a device brand</option>
+
+
+            <label for="deviceType">Device Type:</label>
+            <select id="deviceType" name="deviceType" required>
+                <option value="" disabled selected>Select a device type</option>
                 <option value="iPhone">iPhone</option>
                 <option value="Macbook">Macbook</option>
                 <option value="iPad">iPad</option>
             </select>
 
             <label for="deviceModel">Device Model:</label>
-            <input type="text" id="deviceModel" name="deviceModel" required>
+            <select id="deviceModel" name="deviceModel" required>
+                <option value="" disabled selected>Select a device model</option>
+                <option value="iPhone 14">iPhone 14</option>
+                <option value="Macbook Air M2">Macbook Air M2</option>
+                <option value="iPad Pro 12.9">iPad Pro 12.9</option>
+            </select>
 
             <label for="repairType">Repair Type:</label>
-            <input type="text" id="repairType" name="repairType" required>
+            <select id="repairType" name="repairType" required>
+                <option value="" disabled selected>Select a repair type</option>
+                <option value="Screen Replacement">Screen Replacement</option>
+                <option value="Battery Replacement">Battery Replacement</option>
+                <option value="Water Damage Repair">Water Damage Repair</option>
+            </select>
 
-            <label for="priority">Priority:</label>
+            {{!-- <label for="priority">Priority:</label>
             <select id="priority" name="priority">
                 <option value="regular">Regular</option>
                 <option value="fast service">Fast Service</option>
-            </select>
+            </select> --}}
 
-            <label for="comments">Comments:</label>
-            <textarea id="comments" name="comments"></textarea>
+            {{!-- <label for="comments">Comments:</label>
+            <textarea id="comments" name="comments"></textarea> --}}
 
-            <button type="submit">Submit Request</button>
+            <button type="submit">Get Quotation</button>
         </form>
+    </section>
+
+
+    <!-- Quotation Display Section (Dynamically filled after form submission) -->
+    <section id="quotation-display" style="display: none;">
+        <h2>Quotation Details</h2>
+        <table>
+            <tr>
+                <th>Device Type</th>
+                <td id="quote-deviceType"></td>
+            </tr>
+            <tr>
+                <th>Device Model</th>
+                <td id="quote-deviceModel"></td>
+            </tr>
+            <tr>
+                <th>Repair Name</th>
+                <td id="quote-repairName"></td>
+            </tr>
+            <tr>
+                <th>Defective Parts</th>
+                <td id="quote-defectiveParts"></td>
+            </tr>
+            <tr>
+                <th>Price</th>
+                <td id="quote-price"></td>
+            </tr>
+            <tr>
+                <th>Estimated Time</th>
+                <td id="quote-estimatedTime"></td>
+            </tr>
+        </table>
+
+        <!-- Select Store for Order Placement -->
+        <label for="storeSelect">Select Store:</label>
+        <select id="storeSelect" name="storeSelect" required>
+            {{#each stores}}
+            <option value="{{this.id}}">{{this.name}}</option>
+            {{/each}}
+        </select>
+
+        <button id="placeOrderButton">Place Order</button>
     </section>
 </main>
 
-<script>
-    document.getElementById('newRequestButton').addEventListener('click', () => {
-        const formSection = document.getElementById('new-service-request-form');
-        formSection.style.display = formSection.style.display === 'none' ? 'block' : 'none';
-    });
-</script>
+<script type="module" src="/public/js/dashboard.js"></script>
