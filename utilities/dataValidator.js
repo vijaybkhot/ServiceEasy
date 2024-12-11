@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const { ObjectId } = mongoose.Types;
 import validator from "validator";
-import { ObjectId } from "mongodb";
+// import { ObjectId } from "mongodb";
 
 const exportedMethods = {
   isValidObjectId(id) {
@@ -117,6 +117,11 @@ const exportedMethods = {
   isValidStringArray(val, argument, routeOrFunction) {
     if (!Array.isArray(val)) {
       throw new Error(`${argument} must be an array in ${routeOrFunction}.`);
+    }
+    if (val.length === 0) {
+      throw new Error(
+        `${argument} must not be an empty array in ${routeOrFunction}.`
+      );
     }
     if (
       val.some((item) => typeof item !== "string" || item.trim().length === 0)
