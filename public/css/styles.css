@@ -49,8 +49,8 @@ body {
 .error-container {
   margin-bottom: 1rem;
   padding: 1rem;
-  border: 1px solid #e74c3c;
-  background-color: #f9e7e7;
+  /* border: 1px solid #e74c3c; */
+  /* background-color: #f9e7e7; */
   border-radius: 5px;
 }
 

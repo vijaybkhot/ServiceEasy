@@ -158,7 +158,7 @@ const exportedMethods = {
     )
       return false;
     if (id.trim().length === 0) return false;
-    if (!isValidObjectId(id)) return false;
+    if (!this.isValidObjectId(id)) return false;
     return true;
   },
   validLocation(location) {

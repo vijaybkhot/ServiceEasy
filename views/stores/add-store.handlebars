@@ -1,46 +1,51 @@
-<main class="main">
-  <h1>Add Store</h1>
-  <form action="/stores" method="POST" id="add-store-form">
-    <label for="store-name">Store Name:</label>
-    <input type="text" id="store-name" name="name" required />
-  <br/>
-    <label for="store-location">Location:</label>
-    <div id="location-container">
-      <label for="store-longitude">Longitude:</label>
-      <input
-        type="number"
-        id="store-longitude"
-        name="longitude"
-        step="any"
-        required
-      />
+{{! <main class="main"> }}
+<link rel="stylesheet" href="/public/css/add-store.css" />
+<script src="/public/js/add-store_form_validate.js"></script>
+<form action="/stores" method="POST" id="add-store-form">
+  <label for="store-name">Store Name:</label>
+  <input type="text" id="store-name" name="name" required />
+  <br />
+  <label for="store-location">Location:</label>
+  <div id="location-container">
+    <label for="store-longitude">Longitude:</label>
+    <input
+      type="number"
+      id="store-longitude"
+      name="longitude"
+      step="any"
+      required
+    />
 
-      <label for="store-latitude">Latitude:</label>
-      <input
-        type="number"
-        id="store-latitude"
-        name="latitude"
-        step="any"
-        required
-      /><br />
+    <label for="store-latitude">Latitude:</label>
+    <input
+      type="number"
+      id="store-latitude"
+      name="latitude"
+      step="any"
+      required
+    /><br />
 
-      <label for="store-address">Address:</label>
-      <input type="text" id="store-address" name="address" required />
+    <label for="store-address">Address:</label>
+    <input type="text" id="store-address" name="address" required />
+  </div>
+
+  <label for="store-phone">Phone:</label>
+  <input type="text" id="store-phone" name="phone" required /><br />
+
+  <label for="store-manager">Store Manager:</label>
+  <input type="text" id="store-manager" name="storeManager" required /><br />
+
+  <button type="submit">Add Store</button>
+
+  <div id="error-messages">
+    <div id="error-container" class="error-container">
+      {{#if errors}}
+        {{#each errors}}
+          {{this}}
+        {{/each}}
+      {{/if}}
     </div>
+  </div>
 
-    <label for="store-phone">Phone:</label>
-    <input type="text" id="store-phone" name="phone" required /><br />
-
-    <label for="store-manager">Store Manager:</label>
-    <input type="text" id="store-manager" name="storeManager" required /><br />
-
-    <button type="submit">Add Store</button>
-  </form>
-  {{#if errors}}
-    <div class="error-messages">
-      {{#each errors}}
-        <div class="error-message font-italic">{{this}}</div>
-      {{/each}}
-    </div>
-  {{/if}}
-</main>
+</form><br />
+{{! </main> }}
