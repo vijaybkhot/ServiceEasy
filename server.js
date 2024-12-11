@@ -21,7 +21,7 @@ app.use((error, req, res, next) => {
   });
 });
 
-const DB = process.env.DATABASE.replace(
+const DB = process.env?.DATABASE.replace(
   "<PASSWORD>",
   process.env.DATABASE_PASSWORD
 );

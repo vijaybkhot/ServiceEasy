@@ -23,12 +23,12 @@ parserMiddlewares(app);
 app.use(
   session({
     name: "AuthCookie",
-    secret: process.env.SESSION_SECRET,
+    secret: process.env?.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: { maxAge: 1000 * 60 * 60 * process.env.SESSION_TIMEOUT_HOURS },
     store: MongoStore.create({
-      mongoUrl: process.env.DATABASE.replace(
+      mongoUrl: process.env?.DATABASE.replace(
         "<PASSWORD>",
         process.env.DATABASE_PASSWORD
       ),
