@@ -8,6 +8,11 @@ import {
   getRepairById,
   updateRepair,
   createRepair,
+  addRepairType,
+  updateRepairType,
+  deleteRepairType,
+  getRepairType,
+  getRepairTypes,
 } from "../data/repairData.js";
 
 const router = express.Router();
