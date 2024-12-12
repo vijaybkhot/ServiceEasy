@@ -19,14 +19,12 @@ const router = express.Router();
 router.get("/add", isAuthenticated, hasRole("admin"), async (req, res) => {
   try {
     const storeManagers = await getUsersByRole("store-manager");
-    res
-      .status(200)
-      .render("stores/add-store", {
-        title: "Add Store",
-        storeManagers: storeManagers,
-      });
+    return res.status(200).render("stores/add-store", {
+      title: "Add Store",
+      storeManagers: storeManagers,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 });
 
@@ -35,7 +33,7 @@ router.get("/", async (req, res) => {
   try {
     const stores = await getAll();
     // console.log(stores)
-    res.status(200).render("stores/all-stores", {
+    return res.status(200).render("stores/all-stores", {
       title: "List of all Stores",
       stores: stores,
       json: JSON.stringify,
@@ -43,7 +41,28 @@ router.get("/", async (req, res) => {
       user: req.session.user,
     });
   } catch (error) {
-    res.status(400).json({ error: error });
+    return res.status(400).json({ error: error });
+  }
+});
+
+// Route to fetch all stores in JSON
+router.get("/jsonStores", async (req, res) => {
+  try {
+    const stores = await getAll();
+
+    if (!stores) {
+      return res.status(404).json({ error: "No stores found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      stores: stores,
+    });
+  } catch (error) {
+    console.error("Error fetching stores:", error);
+    return res
+      .status(500)
+      .json({ error: "Internal Server Error", details: error.message });
   }
 });
 
@@ -66,7 +85,7 @@ router.get("/:id", async (req, res) => {
       });
     }
     const store = await getById(id);
-    res.status(200).render("stores/store", {
+    return res.status(200).render("stores/store", {
       title: "Store Details",
       store,
       user: req.session.user,
@@ -74,7 +93,7 @@ router.get("/:id", async (req, res) => {
   } catch (error) {
     errors.push("An unexpected error occurred. Please try again later.");
     // console.log(error);
-    res.status(500).render("stores/store", {
+    return res.status(500).render("stores/store", {
       title: "Store Details",
       errors,
     });
@@ -85,14 +104,18 @@ router.get("/:id", async (req, res) => {
 router.post("/", isAuthenticated, hasRole("admin"), async (req, res) => {
   const errors = [];
   const { name, longitude, latitude, address, phone, storeManager } = req.body;
-  // console.log(name, longitude, latitude, address, phone, storeManager)
+
   const location = {
     type: "Point",
     coordinates: [parseFloat(longitude), parseFloat(latitude)],
     address: address.trim(),
   };
 
-  if (!dataValidator.validName(name)) errors.push("Enter a valid name!");
+  const nameRegex = /^[a-zA-Z0-9\s\-',.]+$/;
+  if (!nameRegex.test(name))
+    throw new Error(
+      "Store name can only contain alphabets, numbers, spaces, hyphens, apostrophes, and commas."
+    );
   if (!dataValidator.validLocation(location))
     errors.push("Enter a valid location!");
   if (!dataValidator.isValidPhoneNumber(phone))
@@ -102,13 +125,11 @@ router.post("/", isAuthenticated, hasRole("admin"), async (req, res) => {
 
   if (errors.length > 0) {
     const storeManagers = await getUsersByRole("store-manager");
-    res
-      .status(400)
-      .render("stores/add-store", {
-        title: "Add Store",
-        storeManagers: storeManagers,
-        errors:errors
-      });
+    return res.status(400).render("stores/add-store", {
+      title: "Add Store",
+      storeManagers: storeManagers,
+      errors: errors,
+    });
   }
 
   try {
@@ -120,12 +141,12 @@ router.post("/", isAuthenticated, hasRole("admin"), async (req, res) => {
     };
     const result = await createStore(storeDetails);
     if (result) {
-      res.status(200).redirect("/stores");
+      return res.status(200).redirect("/stores");
     } else {
       throw new Error("Failed to add the store");
     }
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 });
 
@@ -134,7 +155,7 @@ router.patch("/:id", async (req, res) => {
   try {
     const result = await updateStore(req.params.id, req.body);
     if (result) {
-      res
+      return res
         .status(201)
         .json({ message: "Store updated successfully", store: result });
     } else {
@@ -142,7 +163,7 @@ router.patch("/:id", async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 });
 
@@ -151,7 +172,7 @@ router.delete("/:id", async (req, res) => {
   try {
     const result = await deleteStore(req.params.id);
     if (result) {
-      res
+      return res
         .status(201)
         .json({ message: "Store deleted successfully", store: result });
     } else {
@@ -159,7 +180,7 @@ router.delete("/:id", async (req, res) => {
     }
   } catch (error) {
     // console.log(error);
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 });
 

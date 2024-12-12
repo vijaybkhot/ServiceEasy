@@ -58,6 +58,10 @@ app.engine(
     partialsDir: path.join(process.cwd(), "views/partials"),
     helpers: {
       eq: (a, b) => a === b,
+      json: (context) => JSON.stringify(context),
+      ifEquals: function (arg1, arg2, options) {
+        return arg1 === arg2 ? options.fn(this) : options.inverse(this);
+      },
     },
   })
 );

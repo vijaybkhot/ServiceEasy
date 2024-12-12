@@ -1,8 +1,31 @@
+// Middleware to redirect to login if user is not logged in
 export const isAuthenticated = (req, res, next) => {
-  if (req.session.user) {
+  if (req.session && req.session.user) {
     return next();
   }
-  res.redirect("/login");
+  return res.status(401).redirect("/login");
+};
+
+// Protect routes and throw error if user not logged in
+export const customerProtect = (req, res, next) => {
+  if (!req.session.user) {
+    return res.status(401).render("errors/error", {
+      status: 401,
+      message: "You need to log in to access this page.",
+      cssPath: `/public/css/error.css`,
+    });
+  }
+  if (
+    req.session.user.role !== "customer" &&
+    req.session.user.role !== "admin"
+  ) {
+    return res.status(403).render("errors/error", {
+      status: 403,
+      message: "You do not have permission to access this page.",
+      cssPath: `/public/css/error.css`,
+    });
+  }
+  next();
 };
 
 export const attachUserToLocals = (req, res, next) => {

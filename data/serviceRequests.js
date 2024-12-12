@@ -9,8 +9,8 @@ export async function createServiceRequest(
   employee_id = null,
   store_id,
   repair_id,
-  status,
-  payment = [],
+  status = "waiting for drop-off",
+  payment = {},
   feedback = {}
 ) {
   // Input validation
@@ -19,6 +19,7 @@ export async function createServiceRequest(
   repair_id = dataValidator.isValidObjectId(repair_id);
 
   const requiredStatuses = [
+    "waiting for drop-off",
     "in-process",
     "pending for approval",
     "ready for pickup",
@@ -66,13 +67,26 @@ export async function createServiceRequest(
   }
 
   // Payment Validation
-  payment.forEach((paymentItem, index) => {
-    const { amount, transaction_id, payment_mode } = paymentItem;
-    if (!transaction_id)
-      throw new Error(`Transaction ID is required for payment[${index}].`);
+  if (payment.isPaid) {
+    const { amount, transaction_id, payment_mode } = payment;
+
+    // Ensure amount is provided and valid
     if (typeof amount !== "number" || amount <= 0)
-      throw new Error(`Amount must be positive in payment[${index}].`);
-  });
+      throw new Error(`Amount must be a positive number.`);
+
+    // Ensure transaction_id is provided and unique
+    if (!transaction_id)
+      throw new Error(`Transaction ID is required when payment is made.`);
+
+    // Ensure payment_mode is provided and valid
+    const validPaymentModes = ["CC", "DC", "DD", "cheque", "cash", "other"];
+    if (!validPaymentModes.includes(payment_mode))
+      throw new Error(
+        `Invalid payment mode. Must be one of ${JSON.stringify(
+          validPaymentModes
+        )}.`
+      );
+  }
 
   // Feedback Validation
   if (
@@ -90,7 +104,13 @@ export async function createServiceRequest(
     store_id,
     repair_id,
     status,
-    payment,
+    payment: {
+      isPaid: payment.isPaid || false, // Default to false if not provided
+      amount: payment.amount || 0, // Default to 0 if not provided
+      transaction_id: payment.transaction_id || "", // Stripe's transaction ID
+      payment_mode: payment.payment_mode || "CC", // Default to "CC" if not provided
+      payment_date: payment.payment_date || Date.now(), // Default to current date if not provided
+    },
     feedback,
   };
 

@@ -43,7 +43,7 @@ section {
 }
 
 /* New Service Request Form */
-#new-service-request-form {
+#get-quotation-form {
   background-color: #ffffff;
   padding: 20px;
   border-radius: 8px;
@@ -52,16 +52,16 @@ section {
   margin: 0 auto;
 }
 
-#new-service-request-form label {
+#get-quotation-form label {
   font-size: 16px;
   margin-bottom: 8px;
   color: #2c3e50;
   display: block;
 }
 
-#new-service-request-form select,
-#new-service-request-form input,
-#new-service-request-form textarea {
+#get-quotation-form select,
+#get-quotation-form input,
+#get-quotation-form textarea {
   width: 100%;
   padding: 10px;
   margin-bottom: 15px;
@@ -70,12 +70,12 @@ section {
   font-size: 14px;
 }
 
-#new-service-request-form textarea {
+#get-quotation-form textarea {
   resize: vertical;
   height: 100px;
 }
 
-#new-service-request-form button {
+#get-quotation-form button {
   width: 100%;
   padding: 12px;
   background-color: #2980b9;
@@ -86,13 +86,8 @@ section {
   cursor: pointer;
 }
 
-#new-service-request-form button:hover {
+#get-quotation-form button:hover {
   background-color: #3498db;
-}
-
-/* Hidden Section Display */
-#new-service-request-form[style="display: none;"] {
-  display: none;
 }
 
 /* Error Message Styling */
@@ -117,11 +112,94 @@ section {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  #new-service-request-form {
+  #get-quotation-form {
     width: 90%;
   }
 
   #service-requests table {
     font-size: 14px;
   }
+}
+
+#quotation-display {
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: "Arial", sans-serif;
+}
+
+#quotation-display h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333333;
+  text-align: center;
+}
+
+#quotation-display table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+#quotation-display th,
+#quotation-display td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #e1e1e1;
+}
+
+#quotation-display th {
+  background-color: #f1f1f1;
+  color: #555555;
+  font-size: 16px;
+}
+
+#quotation-display td {
+  background-color: #f9f9f9;
+  font-size: 14px;
+}
+
+#quotation-display td#quote-price {
+  font-weight: bold;
+  color: #28a745;
+}
+
+#quotation-display td#quote-estimatedTime {
+  font-weight: bold;
+  color: #ff9900;
+}
+
+#quotation-display select {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #ffffff;
+  margin-bottom: 20px;
+}
+
+#quotation-display button {
+  background-color: #4caf50;
+  color: white;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+#quotation-display button:hover {
+  background-color: #45a049;
+}
+
+#quotation-display button:disabled {
+  background-color: #c6c6c6;
+  cursor: not-allowed;
 }

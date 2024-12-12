@@ -547,3 +547,33 @@ export async function deleteRepairType(deviceType, modelName, repairTypeName) {
     updatedDevice,
   };
 }
+
+// Get models for a device_type
+export async function getModelsForDeviceType(deviceType) {
+  // Validate deviceType
+  deviceType = dataValidator.isValidString(
+    deviceType,
+    "deviceType",
+    getModelsForDeviceType.name
+  );
+  if (!["iPhone", "Macbook", "iPad"].includes(deviceType)) {
+    throw new Error(
+      `Invalid device type: ${deviceType}. Must be one of ["iPhone", "Macbook", "iPad"].`
+    );
+  }
+
+  try {
+    // Fetch repair data for the given device type
+    const repair = await Repair.findOne({ device_type: deviceType });
+
+    // If no repair entry is found for the device type
+    if (!repair) {
+      throw new Error(`No repair data found for device type: ${deviceType}`);
+    }
+
+    // Return the models for the specified device type
+    return repair.models;
+  } catch (error) {
+    throw new Error(`Error fetching models for device type: ${error.message}`);
+  }
+}
