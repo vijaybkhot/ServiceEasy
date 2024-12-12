@@ -200,7 +200,7 @@ const exportedMethods = {
   validStore(request_body) {
     const { name, location, phone, storeManager } = request_body;
     return (
-      this.validName(name) &&
+      /^[a-zA-Z0-9\s\-',.]+$/.test(name) &&
       this.validLocation(location) &&
       this.validPhone(phone) &&
       mongoose.isValidObjectId(storeManager.trim())
@@ -229,7 +229,7 @@ const exportedMethods = {
 
   // Validate name input
   validName(val) {
-    return /^[a-zA-Z\s]+$/.test(val) && val.trim().length > 0;
+    return /^[a-zA-Z\s]*$/.test(val) && val.trim().length > 0;
   },
 };
 
