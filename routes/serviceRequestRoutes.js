@@ -34,64 +34,100 @@ router.post('/create', isAuthenticated, hasRole('customer'), async(req, res, nex
         customer_id = dataValidator.isValidObjectId(customer_id);
         store_id = dataValidator.isValidObjectId(store_id);
         repair_id = dataValidator.isValidObjectId(repair_id);
-
+      
         const requiredStatuses = [
-            "in-process",
-            "pending for approval",
-            "ready for pickup",
-            "reassigned",
-            "complete",
+          "waiting for drop-off",
+          "in-process",
+          "pending for approval",
+          "ready for pickup",
+          "reassigned",
+          "complete",
         ];
-
+      
         if (requiredStatuses.includes(status)) {
-            employee_id = dataValidator.isValidObjectId(employee_id);
+          employee_id = dataValidator.isValidObjectId(employee_id);
         }
-
+      
         // Check if IDs exist in the database
         const customer = await User.findById(customer_id);
         if (!customer || customer.role !== "customer") 
-            return new CustomError({message: `Invalid customer ID: ${customer_id}.`, statusCode: 400});
-
+          throw new CustomError({message: `Invalid customer ID: ${customer_id}.`, statusCode: 400});
+      
         const store = await Store.findById(store_id);
         if (!store) 
-            return new CustomError({message: `Invalid store ID: ${store_id}.`, statusCode: 400});
-
+          throw new CustomError({message: `Invalid store ID: ${store_id}.`, statusCode: 400});
+      
         const repair = await Repair.findById(repair_id);
         if (!repair) 
-            return new CustomError({message: `Invalid repair ID: ${repair_id}`, statusCode: 400});
-
+          throw new CustomError({message: `Invalid repair ID: ${repair_id}`, statusCode: 400});
+      
+        if (employee_id) {
+          const employee = await User.findById(employee_id);
+          if (!employee || employee.role !== "employee") {
+            throw new CustomError({message: `Invalid employee ID: ${employee_id}.`, statusCode: 400});
+          }
+        }
+      
         // Status Validation
         const validStatuses = [
-            "waiting for drop-off",
-            "in-process",
-            "pending for approval",
-            "ready for pickup",
-            "reassigned",
-            "complete",
+          "waiting for drop-off",
+          "in-process",
+          "pending for approval",
+          "ready for pickup",
+          "reassigned",
+          "complete",
         ];
         if (!validStatuses.includes(status)) {
-            throw new CustomError({message: `Invalid status: ${status}`, statusCode: 400});
+          throw new CustomError({message: `Invalid status: ${status}. Must be one of ${JSON.stringify(
+              validStatuses
+          )}.`, statusCode: 400});
         }
-
+      
+      
         // Payment Validation
-        if(!Object.keys(payment).length)
-            throw new CustomError({message: "Payment must be completed to place an order.", statusCode: 400});
-        
-        const { amount, transaction_id, payment_mode } = payment;
-        if (!transaction_id)
-            throw new CustomError({message: `Transaction ID is required for the payment`, statusCode: 400});
-        if (typeof amount !== "number" || amount <= 0)
+        if (payment.isPaid) {
+          const { amount, transaction_id, payment_mode } = payment;
+      
+          // Ensure amount is provided and valid
+          if (typeof amount !== "number" || amount <= 0)
             throw new CustomError({message: `Amount must be positive in the payment`, statusCode: 400});
-
+      
+          // Ensure transaction_id is provided and unique
+          if (!transaction_id)
+            throw new CustomError({message: `Transaction ID is required for the payment`, statusCode: 400});
+      
+          // Ensure payment_mode is provided and valid
+          const validPaymentModes = ["CC", "DC", "DD", "cheque", "cash", "other"];
+          if (!validPaymentModes.includes(payment_mode))
+            throw new CustomError({message: `Invalid payment mode. Must be one of ${JSON.stringify(
+                validPaymentModes
+            )}.`, statusCode: 400});
+        } 
+      
+        // Feedback Validation
+        if (
+          feedback &&
+          feedback.rating &&
+          (feedback.rating < 1 || feedback.rating > 5)
+        ) {
+          throw new CustomError({message: `Feedback rating must be between 1 and 5.`, statusCode: 400});
+        }
+      
         // Create the service request object
         const newServiceRequest = {
-            customer_id,
-            employee_id,
-            store_id,
-            repair_id,
-            status,
-            payment,
-            feedback,
+          customer_id,
+          employee_id,
+          store_id,
+          repair_id,
+          status,
+          payment: {
+            isPaid: payment.isPaid || false, // Default to false if not provided
+            amount: payment.amount || 0, // Default to 0 if not provided
+            transaction_id: payment.transaction_id || "", // Stripe's transaction ID
+            payment_mode: payment.payment_mode || "CC", // Default to "CC" if not provided
+            payment_date: payment.payment_date || Date.now(), // Default to current date if not provided
+          },
+          feedback,
         };
 
         const serviceRequest = await createServiceRequest(...newServiceRequest);
