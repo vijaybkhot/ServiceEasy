@@ -131,7 +131,7 @@ export const getAllServiceRequests = async () => {
 
     return serviceRequests;
   } catch (error) {
-    throw new Error(`Failed to fetch service requests: ${error.message}`);
+    throw new CustomError({message: `Failed to fetch service requests: ${error.message}`, statusCode: 500});
   }
 };
 
@@ -142,7 +142,7 @@ export async function getServiceRequestById(serviceRequestId) {
   // Check if the service request exists
   const serviceRequest = await ServiceRequest.findById(serviceRequestId);
   if (!serviceRequest) {
-    throw new Error(`No service request found with ID: ${serviceRequestId}.`);
+    throw new CustomError({message: `No service request found with ID: ${serviceRequestId}.`, statusCode: 404});
   }
 
   return serviceRequest;
@@ -155,7 +155,7 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
   // Check if the service request exists
   const existingRequest = await ServiceRequest.findById(serviceRequestId);
   if (!existingRequest) {
-    throw new Error(`No service request found with ID: ${serviceRequestId}.`);
+    throw new CustomError({message: `No service request found with ID: ${serviceRequestId}.`, statusCode: 404});
   }
 
   let updateObject = {};
@@ -165,7 +165,7 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
     updateObject.customer_id = dataValidator.isValidObjectId(upObj.customer_id);
     const customer = await User.findById(updateObject.customer_id);
     if (!customer || customer.role !== "customer") {
-      throw new Error(`Invalid customer ID: ${updateObject.customer_id}.`);
+      throw new CustomError({message: `Invalid customer ID: ${updateObject.customer_id}.`, statusCode: 400});
     }
   }
 
@@ -174,7 +174,7 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
     updateObject.employee_id = dataValidator.isValidObjectId(upObj.employee_id);
     const employee = await User.findById(updateObject.employee_id);
     if (!employee || employee.role !== "employee") {
-      throw new Error(`Invalid employee ID: ${updateObject.employee_id}.`);
+      throw new CustomError({message: `Invalid employee ID: ${updateObject.employee_id}.`, statusCode: 400});
     }
   }
 
@@ -182,7 +182,7 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
   if (upObj.store_id) {
     updateObject.store_id = dataValidator.isValidObjectId(upObj.store_id);
     const store = await Store.findById(updateObject.store_id);
-    if (!store) throw new Error(`Invalid store ID: ${updateObject.store_id}.`);
+    if (!store) throw new CustomError({message: `Invalid store ID: ${updateObject.store_id}.`, statusCode: 400});
   }
 
   // Validate and update repair_id
@@ -190,7 +190,7 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
     updateObject.repair_id = dataValidator.isValidObjectId(upObj.repair_id);
     const repair = await Repair.findById(updateObject.repair_id);
     if (!repair)
-      throw new Error(`Invalid repair ID: ${updateObject.repair_id}.`);
+      throw new CustomError({message: `Invalid repair ID: ${updateObject.repair_id}.`, statusCode: 400});
   }
 
   // Validate and update status
@@ -211,18 +211,16 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
     ];
 
     if (!validStatuses.includes(updateObject.status)) {
-      throw new Error(
-        `Invalid status: ${
-          updateObject.status
-        }. Must be one of ${JSON.stringify(validStatuses)}.`
-      );
+      throw new CustomError({message: `Invalid status: ${
+        updateObject.status
+        }. Must be one of ${JSON.stringify(validStatuses)}.`, statusCode: 400});
     }
   }
 
   // Validate and update payment
   if (upObj.payment) {
     if (typeof upObj.payment !== "object" || Array.isArray(upObj.payment)) {
-      throw new Error("Payment must be an object.");
+      throw new CustomError({message: "Payment must be an object.", statusCode: 400});
     }
 
     const { isPaid, amount, transaction_id, payment_mode, payment_date } =
@@ -233,7 +231,7 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
     // Validate isPaid
     if (isPaid !== undefined) {
       if (typeof isPaid !== "boolean") {
-        throw new Error(`isPaid must be a boolean value.`);
+        throw new CustomError({message: `isPaid must be a boolean value.`, statusCode: 400});
       }
       updateObject.payment.isPaid = isPaid;
     }
@@ -242,7 +240,7 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
     if (isPaid === true) {
       if (amount !== undefined) {
         if (typeof amount !== "number" || amount < 0) {
-          throw new Error(`Amount must be a positive number.`);
+          throw new CustomError({message: `Amount must be a positive number.`, statusCode: 400});
         }
         updateObject.payment.amount = amount; // Update amount in the payment object
       }
@@ -252,7 +250,7 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
           typeof transaction_id !== "string" ||
           transaction_id.trim().length === 0
         ) {
-          throw new Error(`Transaction ID must be a non-empty string.`);
+          throw new CustomError({message: `Transaction ID must be a non-empty string.`, statusCode: 400});
         }
         updateObject.payment.transaction_id = transaction_id; // Update transaction_id
       }
@@ -260,11 +258,9 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
       if (payment_mode !== undefined) {
         const validModes = ["CC", "DC", "DD", "cheque", "cash", "other"];
         if (!validModes.includes(payment_mode)) {
-          throw new Error(
-            `Invalid payment_mode: ${payment_mode}. Must be one of ${validModes.join(
-              ", "
-            )}`
-          );
+          throw new CustomError({message: `Invalid payment_mode: ${payment_mode}. Must be one of ${validModes.join(
+            ", "
+          )}`, statusCode: 400});
         }
         updateObject.payment.payment_mode = payment_mode; // Update payment_mode
       }
@@ -272,7 +268,7 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
       if (payment_date !== undefined) {
         const date = new Date(payment_date);
         if (isNaN(date)) {
-          throw new Error(`Invalid payment_date. Must be a valid date.`);
+          throw new CustomError({message: `Invalid payment_date. Must be a valid date.`, statusCode: 400});
         }
         updateObject.payment.payment_date = date; // Update payment_date
       }
@@ -288,14 +284,14 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
   // Validate and update feedback
   if (upObj.feedback) {
     if (typeof upObj.feedback !== "object" || Array.isArray(upObj.feedback)) {
-      throw new Error("Feedback must be an object.");
+      throw new CustomError({message: "Feedback must be an object.", statusCode: 400});
     }
 
     const { rating, comment } = upObj.feedback;
 
     if (rating !== undefined) {
       if (typeof rating !== "number" || rating < 1 || rating > 5) {
-        throw new Error(`Feedback rating must be a number between 1 and 5.`);
+        throw new CustomError({message: `Feedback rating must be a number between 1 and 5.`, statusCode: 400});
       }
       updateObject.feedback = updateObject.feedback || {};
       updateObject.feedback.rating = rating;
@@ -358,9 +354,7 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
 
   // Throw error if no fields were updated
   if (Object.keys(updateObject).length === 0) {
-    throw new Error(
-      `No changes detected for service request with ID: ${serviceRequestId}.`
-    );
+    throw new CustomError({message: `No changes detected for service request with ID: ${serviceRequestId}.`, statusCode: 202});
   }
 
   // Update the service request
@@ -372,13 +366,11 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
       { new: true }
     );
   } catch (error) {
-    throw new Error(`Error updating service request: ${error.message}`);
+      throw new CustomError({message: `Error updating service request: ${error.message}`, statusCode: 500});
   }
 
   if (!updatedRequest) {
-    throw new Error(
-      `Could not update service request with ID: ${serviceRequestId}.`
-    );
+      throw new CustomError({message: `Could not update service request with ID: ${serviceRequestId}.`, statusCode: 500});
   }
 
   return updatedRequest;
@@ -391,7 +383,7 @@ export async function deleteServiceRequestById(serviceRequestId) {
   // Check if the service request exists
   const serviceRequest = await ServiceRequest.findById(serviceRequestId);
   if (!serviceRequest) {
-    throw new Error(`No service request found with ID: ${serviceRequestId}.`);
+    throw new CustomError({message: `No service request found with ID: ${serviceRequestId}.`, statusCode: 404});
   }
 
   // Delete the service request
@@ -399,17 +391,16 @@ export async function deleteServiceRequestById(serviceRequestId) {
   try {
     deletedRequest = await ServiceRequest.findByIdAndDelete(serviceRequestId);
   } catch (error) {
-    throw new Error(`Error deleting service request: ${error.message}`);
+    throw new CustomError({message: `Error deleting service request: ${error.message}`, statusCode: 500});
   }
 
   if (!deletedRequest) {
-    throw new Error(
-      `Could not delete service request with ID: ${serviceRequestId}.`
-    );
+    throw new CustomError({message: `Could not delete service request with ID: ${serviceRequestId}.`, statusCode: 500});
   }
 
   return deletedRequest;
 }
+
 export const getServiceRequestsByUser = async (user_id, role) => {
   try {
     // Validate input
@@ -421,25 +412,23 @@ export const getServiceRequestsByUser = async (user_id, role) => {
 
     const validRoles = ["customer", "employee"];
     if (!role || !validRoles.includes(role)) {
-      throw new Error(
-        `Invalid role: ${role}. Role must be one of ${JSON.stringify(
-          validRoles
-        )}.`
-      );
+      throw new CustomError({message: `Invalid role: ${role}. Role must be one of ${JSON.stringify(
+        validRoles
+      )}.`, statusCode: 500});
     }
 
     // Check if the user exists in the database
     const user = await User.findById(user_id);
     if (!user) {
-      throw new Error(`User with ID: ${user_id} does not exist.`);
+      throw new CustomError({message: `User with ID: ${user_id} does not exist.`, statusCode: 404});
     }
 
     if (role === "customer" && user.role !== "customer") {
-      throw new Error(`User with ID: ${user_id} is not a customer.`);
+      throw new CustomError({message: `User with ID: ${user_id} is not a customer.`, statusCode: 400});
     }
 
     if (role === "employee" && user.role !== "employee") {
-      throw new Error(`User with ID: ${user_id} is not an employee.`);
+      throw new CustomError({message: `User with ID: ${user_id} is not a employee.`, statusCode: 400});
     }
 
     // Filter logic based on role
@@ -455,7 +444,7 @@ export const getServiceRequestsByUser = async (user_id, role) => {
     // Return the result
     return serviceRequests;
   } catch (error) {
-    throw new Error(`Failed to get service requests: ${error.message}`);
+    throw new CustomError({message: `Failed to get service requests: ${error.message}`, statusCode: 500});
   }
 };
 
@@ -466,7 +455,7 @@ export async function getServiceRequestByStoreId(storeId) {
   // Check if store exists
   const store = await Store.findById(storeId);
   if (!store) {
-    throw new Error(`No store found with ID: ${storeId}.`);
+    throw new CustomError({message: `No store found with ID: ${storeId}.`, statusCode: 404});
   }
 
   // Fetch the service request(s) related to the store
@@ -474,13 +463,11 @@ export async function getServiceRequestByStoreId(storeId) {
   try {
     serviceRequests = await ServiceRequest.find({ store_id: storeId });
   } catch (error) {
-    throw new Error(
-      `Error fetching service requests for store ID ${storeId}: ${error.message}`
-    );
+    throw new CustomError({message: `Error fetching service requests for store ID ${storeId}: ${error.message}`, statusCode: 500});
   }
 
   if (!serviceRequests || serviceRequests.length === 0) {
-    throw new Error(`No service requests found for store with ID: ${storeId}.`);
+    throw new CustomError({message: `No service requests found for store with ID: ${storeId}.`, statusCode: 404});
   }
 
   return serviceRequests;
@@ -490,15 +477,14 @@ export async function addFeedbackToServiceRequest(serviceRequestId, feedback) {
   // Validate serviceRequestId
   serviceRequestId = dataValidator.isValidObjectId(serviceRequestId);
 
-  // Check if the service request exists
   const existingRequest = await ServiceRequest.findById(serviceRequestId);
   if (!existingRequest) {
-    throw new Error(`No service request found with ID: ${serviceRequestId}.`);
+      throw new CustomError({message: `No service request found with ID: ${serviceRequestId}.`, statusCode: 404});
   }
 
   // Validate feedback input
   if (typeof feedback !== "object") {
-    throw new Error("Feedback must be an object.");
+      throw new CustomError({message: "Feedback must be an object.", statusCode: 400});
   }
 
   const { rating, comment } = feedback;
@@ -506,12 +492,12 @@ export async function addFeedbackToServiceRequest(serviceRequestId, feedback) {
   // If feedback is provided, rating must be provided
   if (feedback) {
     if (rating === undefined) {
-      throw new Error("If feedback is provided, rating must be provided.");
+      throw new CustomError({message: "If feedback is provided, rating must be provided.", statusCode: 400});
     }
 
     // Validate rating
     if (typeof rating !== "number" || rating < 1 || rating > 5) {
-      throw new Error("Feedback rating must be a number between 1 and 5.");
+      throw new CustomError({message: "Feedback rating must be a number between 1 and 5.", statusCode: 400});
     }
 
     // Validate comment
@@ -519,7 +505,7 @@ export async function addFeedbackToServiceRequest(serviceRequestId, feedback) {
       comment !== undefined &&
       (typeof comment !== "string" || comment.trim().length === 0)
     ) {
-      throw new Error("Feedback comment must be a non-empty string.");
+      throw new CustomError({message: "Feedback comment must be a non-empty string.", statusCode: 400});
     }
   }
 
@@ -539,15 +525,11 @@ export async function addFeedbackToServiceRequest(serviceRequestId, feedback) {
       { new: true }
     );
   } catch (error) {
-    throw new Error(
-      `Error adding feedback to service request: ${error.message}`
-    );
+    throw new CustomError({message: `Error adding feedback to service request: ${error.message}`, statusCode: 500});
   }
 
   if (!updatedRequest) {
-    throw new Error(
-      `Could not update feedback for service request with ID: ${serviceRequestId}.`
-    );
+    throw new CustomError({message: `Could not update feedback for service request with ID: ${serviceRequestId}.`, statusCode: 500});
   }
 
   return updatedRequest;
@@ -560,34 +542,29 @@ export async function updateStatusById(serviceRequestId, newStatus) {
   // Check if the service request exists
   const existingRequest = await ServiceRequest.findById(serviceRequestId);
   if (!existingRequest) {
-    throw new Error(`No service request found with ID: ${serviceRequestId}.`);
+      throw new CustomError({message: `No service request found with ID: ${serviceRequestId}.`, statusCode: 404});
   }
 
   // Validate newStatus
   const validStatuses = [
-    "waiting for drop-off",
-    "in-process",
-    "pending for approval",
-    "ready for pickup",
-    "reassigned",
-    "complete",
+      "waiting for drop-off",
+      "in-process",
+      "pending for approval",
+      "ready for pickup",
+      "reassigned",
+      "complete",
   ];
 
   if (!validStatuses.includes(newStatus)) {
-    throw new Error(
-      `Invalid status: ${newStatus}. Must be one of ${JSON.stringify(
-        validStatuses
-      )}.`
-    );
+      throw new CustomError({message: `Invalid status: ${newStatus}. Must be one of ${JSON.stringify(
+          validStatuses
+      )}.`, statusCode: 400});
   }
 
   // Check if the new status is different from the current status
   if (existingRequest.status === newStatus) {
-    throw new Error(
-      `The status is already set to '${newStatus}'. No update needed.`
-    );
+      throw new CustomError({message: `The status is already set to '${newStatus}'. No update needed.`, statusCode: 202});
   }
-
   // Update the status of the service request
   let updatedRequest;
   try {
@@ -597,15 +574,11 @@ export async function updateStatusById(serviceRequestId, newStatus) {
       { new: true }
     );
   } catch (error) {
-    throw new Error(
-      `Error updating status of service request: ${error.message}`
-    );
+    throw new CustomError({message: `Error adding status of service request: ${error.message}`, statusCode: 500});
   }
 
   if (!updatedRequest) {
-    throw new Error(
-      `Could not update status for service request with ID: ${serviceRequestId}.`
-    );
+    throw new CustomError({message: `Could not update status for service request with ID: ${serviceRequestId}.`, statusCode: 500});
   }
 
   return updatedRequest;
