@@ -27,6 +27,7 @@ export async function createServiceRequest(
     "reassigned",
     "complete",
   ];
+
   if (requiredStatuses.includes(status)) {
     employee_id = dataValidator.isValidObjectId(employee_id);
   }
@@ -65,6 +66,7 @@ export async function createServiceRequest(
         validStatuses
     )}.`, statusCode: 400});
   }
+
 
   // Payment Validation
   if (payment.isPaid) {
