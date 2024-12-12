@@ -73,21 +73,20 @@ export async function createServiceRequest(
     const { amount, transaction_id, payment_mode } = payment;
 
     // Ensure amount is provided and valid
+    // Ensure amount is provided and valid
     if (typeof amount !== "number" || amount <= 0)
-      throw new Error(`Amount must be a positive number.`);
+      throw new CustomError({message: `Amount must be positive in the payment`, statusCode: 400});
 
     // Ensure transaction_id is provided and unique
     if (!transaction_id)
-      throw new Error(`Transaction ID is required when payment is made.`);
+      throw new CustomError({message: `Transaction ID is required for the payment`, statusCode: 400});
 
     // Ensure payment_mode is provided and valid
     const validPaymentModes = ["CC", "DC", "DD", "cheque", "cash", "other"];
     if (!validPaymentModes.includes(payment_mode))
-      throw new Error(
-        `Invalid payment mode. Must be one of ${JSON.stringify(
+      throw new CustomError({message: `Invalid payment mode. Must be one of ${JSON.stringify(
           validPaymentModes
-        )}.`
-      );
+      )}.`, statusCode: 400});
   }
 
   // Feedback Validation

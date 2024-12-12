@@ -25,7 +25,7 @@ router.post('/create', isAuthenticated, hasRole('customer'), async(req, res, nex
         employee_id = null,
         store_id,
         repair_id,
-        status,
+        status = "waiting for drop-off",
         payment = {},
         feedback = {}
     } = req.body;
