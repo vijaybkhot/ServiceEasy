@@ -5,6 +5,7 @@ import * as dataValidator from "../utilities/dataValidator.js";
 import User from "../models/userModel.js";
 import Store from "../models/storeModel.js";
 import Repair from '../models/repairModel.js'
+import CustomError from "../utilities/customError.js";
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ router.get('/', isAuthenticated, hasRole('employee'), async (req, res) => {
     }
 });
 
-router.post('/', isAuthenticated, hasRole('customer'), async(req, res) => {
+router.post('/', isAuthenticated, hasRole('customer'), async(req, res, next) => {
     const {
         customer_id,
         employee_id = null,
@@ -27,7 +28,6 @@ router.post('/', isAuthenticated, hasRole('customer'), async(req, res) => {
         payment = {},
         feedback = {}
     } = req.body;
-
     try {
         // Input validation
         customer_id = dataValidator.isValidObjectId(customer_id);
@@ -48,13 +48,16 @@ router.post('/', isAuthenticated, hasRole('customer'), async(req, res) => {
 
         // Check if IDs exist in the database
         const customer = await User.findById(customer_id);
-        if (!customer || customer.role !== "customer") res.status(400).render('dashboards/customer-dashboard', {error: `Invalid customer ID: ${customer_id}.`})
+        if (!customer || customer.role !== "customer") 
+            return new CustomError({message: `Invalid customer ID: ${customer_id}.`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
 
         const store = await Store.findById(store_id);
-        if (!store) res.status(400).render('dashboards/customer-dashboard', {error: `Invalid store ID: ${store_id}.`})
+        if (!store) 
+            return new CustomError({message: `Invalid store ID: ${store_id}.`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
 
         const repair = await Repair.findById(repair_id);
-        if (!repair) res.status(400).render('dashboards/customer-dashboard', {error: `Invalid repair ID: ${repair_id}`})
+        if (!repair) 
+            return new CustomError({message: `Invalid repair ID: ${repair_id}`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
 
         // Status Validation
         const validStatuses = [
@@ -66,27 +69,18 @@ router.post('/', isAuthenticated, hasRole('customer'), async(req, res) => {
             "complete",
         ];
         if (!validStatuses.includes(status)) {
-            res.status(400).render('dashboards/customer-dashboard', {error: `Invalid status: ${status}`})
+            throw new CustomError({message: `Invalid status: ${status}`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
         }
 
         // Payment Validation
         if(!Object.keys(payment).length)
-            throw new Error("Payment must be completed to place an order.");
+            throw new CustomError({message: "Payment must be completed to place an order.", statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
         
         const { amount, transaction_id, payment_mode } = payment;
         if (!transaction_id)
-            res.status(400).render('dashboards/customer-dashboard', {error: `Transaction ID is required for the payment`});
+            throw new CustomError({message: `Transaction ID is required for the payment`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
         if (typeof amount !== "number" || amount <= 0)
-            res.status(400).render('dashboards/customer-dashboard', {error: `Amount must be positive in the payment`});
-
-        // Feedback Validation
-        if (
-            feedback &&
-            feedback.rating &&
-            (feedback.rating < 1 || feedback.rating > 5)
-        ) {
-            res.status(400).render('dashboards/customer-dashboard', {error: `Feedback ratings must be between 1 and 5`});
-        }
+            throw new CustomError({message: `Amount must be positive in the payment`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
 
         // Create the service request object
         const newServiceRequest = {
@@ -102,8 +96,10 @@ router.post('/', isAuthenticated, hasRole('customer'), async(req, res) => {
         const serviceRequest = await createServiceRequest(...newServiceRequest);
         if(serviceRequest)
             res.status(200).render('dashboards/customer-dashboard');
+        else
+            throw new CustomError({message: 'Unable to create a request', statusCode: 500, pageToRender: 'dashboards/customer-dashboard'});
     } catch(e) {
-        res.status(400).render('dashboards/customer-dashboard', {error: e});
+        next();
     }
 })
 

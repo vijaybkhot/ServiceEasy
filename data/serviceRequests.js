@@ -3,6 +3,7 @@ import * as dataValidator from "../utilities/dataValidator.js";
 import User from "../models/userModel.js";
 import Store from "../models/storeModel.js";
 import Repair from "../models/repairModel.js";
+import CustomError from "../utilities/customError.js";
 
 export async function createServiceRequest(
   customer_id,
@@ -32,20 +33,21 @@ export async function createServiceRequest(
 
   // Check if IDs exist in the database
   const customer = await User.findById(customer_id);
-  if (!customer || customer.role !== "customer") {
-    throw new Error(`Invalid customer ID: ${customer_id}.`);
-  }
+  if (!customer || customer.role !== "customer") 
+    throw new CustomError({message: `Invalid customer ID: ${customer_id}.`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
 
   const store = await Store.findById(store_id);
-  if (!store) throw new Error(`Invalid store ID: ${store_id}.`);
+  if (!store) 
+    throw new CustomError({message: `Invalid store ID: ${store_id}.`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
 
   const repair = await Repair.findById(repair_id);
-  if (!repair) throw new Error(`Invalid repair ID: ${repair_id}.`);
+  if (!repair) 
+    throw new CustomError({message: `Invalid repair ID: ${repair_id}`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
 
   if (employee_id) {
     const employee = await User.findById(employee_id);
     if (!employee || employee.role !== "employee") {
-      throw new Error(`Invalid employee ID: ${employee_id}.`);
+      throw new CustomError({message: `Invalid employee ID: ${employee_id}.`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
     }
   }
 
@@ -59,11 +61,9 @@ export async function createServiceRequest(
     "complete",
   ];
   if (!validStatuses.includes(status)) {
-    throw new Error(
-      `Invalid status: ${status}. Must be one of ${JSON.stringify(
+    throw new CustomError({message: `Invalid status: ${status}. Must be one of ${JSON.stringify(
         validStatuses
-      )}.`
-    );
+    )}.`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
   }
 
   // Payment Validation
@@ -94,7 +94,7 @@ export async function createServiceRequest(
     feedback.rating &&
     (feedback.rating < 1 || feedback.rating > 5)
   ) {
-    throw new Error(`Feedback rating must be between 1 and 5.`);
+    throw new CustomError({message: `Feedback rating must be between 1 and 5.`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
   }
 
   // Create the service request object
@@ -118,7 +118,7 @@ export async function createServiceRequest(
     const serviceRequest = await ServiceRequest.create(newServiceRequest);
     return serviceRequest;
   } catch (error) {
-    throw new Error(error.message);
+    throw new CustomError({message: error.message, statusCode: 500, pageToRender: 'dashboards/customer-dashboard'});
   }
 }
 

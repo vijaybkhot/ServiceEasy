@@ -15,10 +15,10 @@ app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;
   const status = statusCode.toString().startsWith("4") ? "fail" : "error";
 
-  res.status(statusCode).json({
-    status: status,
-    message: error.message || "Internal Server Error",
-  });
+  res.status(statusCode).render(error.pageToRender, {
+    message : error.message || "Internal Server Error",
+    status: status
+  })
 });
 
 const DB = process.env?.DATABASE.replace(
