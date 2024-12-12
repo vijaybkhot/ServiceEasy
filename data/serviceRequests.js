@@ -34,20 +34,20 @@ export async function createServiceRequest(
   // Check if IDs exist in the database
   const customer = await User.findById(customer_id);
   if (!customer || customer.role !== "customer") 
-    throw new CustomError({message: `Invalid customer ID: ${customer_id}.`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
+    throw new CustomError({message: `Invalid customer ID: ${customer_id}.`, statusCode: 400});
 
   const store = await Store.findById(store_id);
   if (!store) 
-    throw new CustomError({message: `Invalid store ID: ${store_id}.`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
+    throw new CustomError({message: `Invalid store ID: ${store_id}.`, statusCode: 400});
 
   const repair = await Repair.findById(repair_id);
   if (!repair) 
-    throw new CustomError({message: `Invalid repair ID: ${repair_id}`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
+    throw new CustomError({message: `Invalid repair ID: ${repair_id}`, statusCode: 400});
 
   if (employee_id) {
     const employee = await User.findById(employee_id);
     if (!employee || employee.role !== "employee") {
-      throw new CustomError({message: `Invalid employee ID: ${employee_id}.`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
+      throw new CustomError({message: `Invalid employee ID: ${employee_id}.`, statusCode: 400});
     }
   }
 
@@ -63,7 +63,7 @@ export async function createServiceRequest(
   if (!validStatuses.includes(status)) {
     throw new CustomError({message: `Invalid status: ${status}. Must be one of ${JSON.stringify(
         validStatuses
-    )}.`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
+    )}.`, statusCode: 400});
   }
 
   // Payment Validation
@@ -94,7 +94,7 @@ export async function createServiceRequest(
     feedback.rating &&
     (feedback.rating < 1 || feedback.rating > 5)
   ) {
-    throw new CustomError({message: `Feedback rating must be between 1 and 5.`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
+    throw new CustomError({message: `Feedback rating must be between 1 and 5.`, statusCode: 400});
   }
 
   // Create the service request object
@@ -118,7 +118,7 @@ export async function createServiceRequest(
     const serviceRequest = await ServiceRequest.create(newServiceRequest);
     return serviceRequest;
   } catch (error) {
-    throw new CustomError({message: error.message, statusCode: 500, pageToRender: 'dashboards/customer-dashboard'});
+    throw new CustomError({message: error.message, statusCode: 500});
   }
 }
 

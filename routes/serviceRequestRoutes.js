@@ -49,15 +49,15 @@ router.post('/', isAuthenticated, hasRole('customer'), async(req, res, next) => 
         // Check if IDs exist in the database
         const customer = await User.findById(customer_id);
         if (!customer || customer.role !== "customer") 
-            return new CustomError({message: `Invalid customer ID: ${customer_id}.`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
+            return new CustomError({message: `Invalid customer ID: ${customer_id}.`, statusCode: 400});
 
         const store = await Store.findById(store_id);
         if (!store) 
-            return new CustomError({message: `Invalid store ID: ${store_id}.`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
+            return new CustomError({message: `Invalid store ID: ${store_id}.`, statusCode: 400});
 
         const repair = await Repair.findById(repair_id);
         if (!repair) 
-            return new CustomError({message: `Invalid repair ID: ${repair_id}`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
+            return new CustomError({message: `Invalid repair ID: ${repair_id}`, statusCode: 400});
 
         // Status Validation
         const validStatuses = [
@@ -69,18 +69,18 @@ router.post('/', isAuthenticated, hasRole('customer'), async(req, res, next) => 
             "complete",
         ];
         if (!validStatuses.includes(status)) {
-            throw new CustomError({message: `Invalid status: ${status}`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
+            throw new CustomError({message: `Invalid status: ${status}`, statusCode: 400});
         }
 
         // Payment Validation
         if(!Object.keys(payment).length)
-            throw new CustomError({message: "Payment must be completed to place an order.", statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
+            throw new CustomError({message: "Payment must be completed to place an order.", statusCode: 400});
         
         const { amount, transaction_id, payment_mode } = payment;
         if (!transaction_id)
-            throw new CustomError({message: `Transaction ID is required for the payment`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
+            throw new CustomError({message: `Transaction ID is required for the payment`, statusCode: 400});
         if (typeof amount !== "number" || amount <= 0)
-            throw new CustomError({message: `Amount must be positive in the payment`, statusCode: 400, pageToRender: 'dashboards/customer-dashboard'});
+            throw new CustomError({message: `Amount must be positive in the payment`, statusCode: 400});
 
         // Create the service request object
         const newServiceRequest = {
@@ -95,11 +95,19 @@ router.post('/', isAuthenticated, hasRole('customer'), async(req, res, next) => 
 
         const serviceRequest = await createServiceRequest(...newServiceRequest);
         if(serviceRequest)
-            res.status(200).render('dashboards/customer-dashboard');
+            res.redirect('/customer-dashboard');
         else
-            throw new CustomError({message: 'Unable to create a request', statusCode: 500, pageToRender: 'dashboards/customer-dashboard'});
+            throw new CustomError({message: 'Unable to create a request', statusCode: 500});
     } catch(e) {
-        next();
+        next(e);
+    }
+});
+
+router.get('/', isAuthenticated, (req, res, next) => {
+    try {
+
+    } catch(e) {
+        
     }
 })
 
