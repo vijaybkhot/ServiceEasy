@@ -1,43 +1,65 @@
 <main class="main" id="store-container">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
   <link rel="stylesheet" href="/public/css/store.css" />
   <link rel="stylesheet" href="/public/css/styles.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/public/js/form_validate.js"></script>
   <script src="/public/js/index.js"></script>
+
   <h1>{{store.name}}</h1>
   {{#if user}}
-  {{#if (eq user.role "admin")}}
-  <button class="edit-store">Edit Store</button>
-  <button class="save-changes">Save Changes</button>
-  <button class="cancel-edit">Cancel</button>
-  <button class="del-store">Delete Store</button>
-  {{/if}}
+    {{#if (eq user.role "admin")}}
+      <button class="edit-store">Edit Store</button>
+      <button class="save-changes">Save Changes</button>
+      <button class="cancel-edit">Cancel</button>
+      <button class="del-store">Delete Store</button>
+    {{/if}}
   {{/if}}
   <div class="store-details-container">
     <form class="store-info" id="store-info-form">
-      <input type="hidden" id="store-id" value="{{store._id}}">
+      <input type="hidden" id="store-id" value="{{store._id}}" />
       <h2>
+        {{! <b id="store-name-tag">Name:</b> }}
         <span id="store-name">{{store.name}}</span>
-        <input type="text" name="name" id="store-name-input" value="{{store.name}}" />
+        <input
+          type="text"
+          name="name"
+          id="store-name-input"
+          value="{{store.name}}"
+        />
       </h2>
       <p>
         <b>Address:</b>
         <span id="store-address">{{store.location.address}}</span>
-        <input type="text" name="address" id="store-address-input" value="{{store.location.address}}" />
+        <input
+          type="text"
+          name="address"
+          id="store-address-input"
+          value="{{store.location.address}}"
+        />
       </p>
       <p>
         <b>Phone:</b>
         <span id="store-phone">{{store.phone}}</span>
-        <input type="text" name="phone" id="store-phone-input" value="{{store.phone}}" />
+        <input
+          type="text"
+          name="phone"
+          id="store-phone-input"
+          value="{{store.phone}}"
+        />
       </p>
+      <div id="error-messages">
+        <div id="error-container" class="error-container">
+          {{#if errors}}
+            {{#each errors}}
+              {{this}}
+            {{/each}}
+          {{/if}}
+        </div>
+      </div>
     </form>
   </div>
-  {{!-- <div class="store-details-container">
-    <div class="store-info">
-      <h2>{{store.name}}</h2>
-      <p><b>Address:</b> {{store.location.address}}</p>
-      <p><b>Phone:</b> {{store.phone}}</p>
-      <p><b>Store Manager ID:</b> {{store.storeManager}}</p>
-    </div>
-  </div> --}}
 </main>

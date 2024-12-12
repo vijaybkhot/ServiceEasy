@@ -6,6 +6,50 @@ if (allStoresContainer) {
   if (addStoreButton) {
     addStoreButton.addEventListener("click", (event) => {
       window.location.href = "/stores/add";
+      event.preventDefault();
+      const errors = [];
+      const storeName = document.getElementById("store-name").value.trim();
+      const storeLongitude = document
+        .getElementById("store-longitude")
+        .value.trim();
+      const storeLatitude = document
+        .getElementById("store-latitude")
+        .value.trim();
+      const storeAddress = document
+        .getElementById("store-address")
+        .value.trim();
+      const storePhone = document.getElementById("store-phone").value.trim();
+      const storeManager = document
+        .getElementById("store-manager")
+        .value.trim();
+      const errorContainer = document.getElementById("error-container");
+
+      if (!storeName || !/^[a-zA-Z\s]*$/.test(storeName))
+        errors.push(
+          "Store name is required and must contain only letters and spaces."
+        );
+      if (storeLatitude > 90 || storeLatitude < -90)
+        errors.push("Latitude must be within -90 and 90!");
+      if (storeLongitude > 180 || storeLongitude < -180)
+        errors.push("Longitude must be within -180 and 180!");
+      if (
+        storeAddress.length >= 300 ||
+        storeAddress.length < 20 ||
+        storeAddress.trim().length === 0
+      )
+        errors.push("Store Address must be within 20-300 characters!");
+      if (!storePhone) errors.push("Phone number must be provided!");
+      if (!storeManager) errors.push("Store manager must be provided!");
+
+      errorContainer.innerHTML = "";
+      if (errors.length > 0) {
+        errors.forEach((error) => {
+          const errorElement = document.createElement("p");
+          errorElement.textContent = error;
+          errorElement.style.color = "red";
+          errorContainer.appendChild(errorElement);
+        });
+      }
     });
   }
 
@@ -25,6 +69,7 @@ if (storeContainer) {
   const deleteButton = document.querySelector(".del-store");
 
   // Editable fields
+  // const nameTag = document.querySelector("#store-name-tag");
   const nameInput = document.querySelector("#store-name-input");
   const addressInput = document.querySelector("#store-address-input");
   const phoneInput = document.querySelector("#store-phone-input");
@@ -40,6 +85,7 @@ if (storeContainer) {
     phoneSpan.style.display = "none";
 
     nameInput.style.display = "block";
+    // nameTag.style.display = "block";
     addressInput.style.display = "block";
     phoneInput.style.display = "block";
 
@@ -61,9 +107,48 @@ if (storeContainer) {
     editButton.style.display = "inline-block";
     saveButton.style.display = "none";
     cancelButton.style.display = "none";
+    const errorContainer = document.querySelector("#error-container");
+    errorContainer.innerHTML = ""; // Clear existing errors
+
   });
 
   saveButton.addEventListener("click", async (event) => {
+    event.preventDefault();
+    const errors = [];
+    const errorContainer = document.querySelector("#error-container");
+
+    const nameValue = nameInput.value.trim();
+    const addressValue = addressInput.value.trim();
+    const phoneValue = phoneInput.value.trim();
+    console.log(nameValue);
+    // Validation rules
+    if (!nameValue || !/^[a-zA-Z0-9\s\-',.]+$/.test(nameValue)) {
+      errors.push(
+        "Store name is required and should contain valid characters."
+      );
+    }
+    if (
+      addressValue.length < 20 ||
+      addressValue.length > 300 ||
+      addressValue.trim() === ""
+    ) {
+      errors.push("Store Address must be between 20-300 characters.");
+    }
+    if (!phoneValue) {
+      errors.push("Phone number should be provided!");
+    }
+
+    // Clear and show errors if validation fails
+    errorContainer.innerHTML = ""; // Clear existing errors
+    if (errors.length > 0) {
+      errors.forEach((error) => {
+        const errorElement = document.createElement("p");
+        errorElement.textContent = error;
+        errorElement.style.color = "red";
+        errorContainer.appendChild(errorElement);
+      });
+      return; // Stop execution if there are errors
+    }
     const updatedStore = {
       name: nameInput.value,
       address: addressInput.value,

@@ -11,13 +11,20 @@ import {
   isAuthenticated,
   hasRole,
 } from "../utilities/middlewares/authenticationMiddleware.js";
+import { getUsersByRole } from "../data/user.js";
 
 const router = express.Router();
 
 // Route to render the "Add Store" page
-router.get("/add", isAuthenticated, hasRole("admin"), (req, res) => {
+router.get("/add", isAuthenticated, hasRole("admin"), async (req, res) => {
   try {
-    res.status(200).render("stores/add-store", { title: "Add Store" });
+    const storeManagers = await getUsersByRole("store-manager");
+    res
+      .status(200)
+      .render("stores/add-store", {
+        title: "Add Store",
+        storeManagers: storeManagers,
+      });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -59,9 +66,11 @@ router.get("/:id", async (req, res) => {
       });
     }
     const store = await getById(id);
-    res.status(200).render("stores/store", { title: "Store Details", store,
+    res.status(200).render("stores/store", {
+      title: "Store Details",
+      store,
       user: req.session.user,
-     });
+    });
   } catch (error) {
     errors.push("An unexpected error occurred. Please try again later.");
     // console.log(error);
@@ -76,7 +85,7 @@ router.get("/:id", async (req, res) => {
 router.post("/", isAuthenticated, hasRole("admin"), async (req, res) => {
   const errors = [];
   const { name, longitude, latitude, address, phone, storeManager } = req.body;
-
+  // console.log(name, longitude, latitude, address, phone, storeManager)
   const location = {
     type: "Point",
     coordinates: [parseFloat(longitude), parseFloat(latitude)],
@@ -92,17 +101,26 @@ router.post("/", isAuthenticated, hasRole("admin"), async (req, res) => {
     errors.push("Enter a valid Store Manager ID!");
 
   if (errors.length > 0) {
-    return res.status(400).render("stores/add-store", {
-      title: "Add Store",
-      errors,
-    });
+    const storeManagers = await getUsersByRole("store-manager");
+    res
+      .status(400)
+      .render("stores/add-store", {
+        title: "Add Store",
+        storeManagers: storeManagers,
+        errors:errors
+      });
   }
 
   try {
-    const storeDetails = { name:name, location:location, phone:phone, storeManager:storeManager }
+    const storeDetails = {
+      name: name,
+      location: location,
+      phone: phone,
+      storeManager: storeManager,
+    };
     const result = await createStore(storeDetails);
     if (result) {
-      res.status(200).redirect("/stores")
+      res.status(200).redirect("/stores");
     } else {
       throw new Error("Failed to add the store");
     }

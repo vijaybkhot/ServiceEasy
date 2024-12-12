@@ -1,14 +1,4 @@
-/* General reset for better consistency across browsers */
-/* body, html {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-  height: 100%;
-}
-
-/* Centering the main container */
-.main {
+/* .main {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -33,7 +23,7 @@
   color: #333;
 }
 
-#add-store-form input {
+#add-store-form input, select {
   width: calc(100% - 1rem); /* Allow for padding space */
   padding: 0.5rem;
   margin-bottom: 1rem;
@@ -63,7 +53,7 @@
 }
 
 #add-store-form button:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: #0056b3; 
 }
 
 .error-container {
@@ -73,4 +63,4 @@
 
 .error-container {
   font-style: italic;
-}
+} 

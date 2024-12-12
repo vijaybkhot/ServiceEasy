@@ -70,6 +70,16 @@ export async function getAllUsers() {
   return users;
 }
 
+export async function getUsersByRole(role) {
+  const users = await User.find({role:role});
+  const plainUsers = users.map((user) => user.toObject());
+  // console.log(plainUsers)
+  if (users.length === 0) {
+    throw new Error("No users found.");
+  }
+  return plainUsers;
+}
+
 // Update user details except password
 export async function updateUser(userId, upObj) {
   // Check and get if the user with userId exists

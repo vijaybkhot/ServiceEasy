@@ -1,9 +1,16 @@
 .store-details-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  max-width: 1200px;
-  justify-content: center;
+  display: flex;  
+  flex-direction: column;
+  align-items: center; /* Center the div horizontally */
+  justify-content: center; /* Center the div vertically */
+  text-align: center;
+  margin: 0 auto;
+  /* min-height: 100vh; Ensure vertical centering on larger screens */
+  padding: 20px;
+  /* box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); */
+  border-radius: 8px;
+  /* background-color: #f9f9f9; */
+  max-width: 600px; 
 }
 .store-info {
   flex: 1;
@@ -17,23 +24,49 @@
 
 .store-info h2 {
   font-size: 22px;
+  margin-bottom: 10px;
   color: #333;
 }
 
+
 .edit-store, .del-store, .cancel-edit, .save-changes {
-  padding: 10px 20px;
   background-color: #007bff;
-  color: white;
+  margin-top: 10px;
+  padding: 10px 15px;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
-  margin-bottom: 20px;
+  font-size: 1rem;
 }
 
+.del-store{
+  background-color: red;
+  color: white;
+}
 .cancel-edit, .save-changes{
   display: none;
 }
 
-#store-name-input, #store-address-input, #store-phone-input{
+#store-name-input, #store-address-input, #store-phone-input, #store-name-tag{
   display: none;
+}
+
+#store-container h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
+}
+
+#store-info-form input[type="text"] {
+  display: none; /* Hidden by default */
+  margin-top: 5px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%; /* Adjust to fill the container */
+  max-width: 400px; /* Constrain width for better alignment */
+  font-size: 1rem;
+  box-sizing: border-box;
+  text-align: center; /* Keep text centered in the input */
 }

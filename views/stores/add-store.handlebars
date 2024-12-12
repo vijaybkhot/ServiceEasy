@@ -1,6 +1,6 @@
 {{! <main class="main"> }}
 <link rel="stylesheet" href="/public/css/add-store.css" />
-<script src="/public/js/add-store_form_validate.js"></script>
+<script src="/public/js/form_validate.js"></script>
 <form action="/stores" method="POST" id="add-store-form">
   <label for="store-name">Store Name:</label>
   <input type="text" id="store-name" name="name" required />
@@ -33,7 +33,14 @@
   <input type="text" id="store-phone" name="phone" required /><br />
 
   <label for="store-manager">Store Manager:</label>
-  <input type="text" id="store-manager" name="storeManager" required /><br />
+  <select name="storeManager" id="store-manager" required>
+    {{#each storeManagers}}
+    <option value="{{this._id}}">
+      {{this.name}}
+    </option>
+    {{/each}}
+  </select>
+  
 
   <button type="submit">Add Store</button>
 
