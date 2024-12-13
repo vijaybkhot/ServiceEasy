@@ -1,0 +1,74 @@
+<main>
+    <div id="payment-container">
+        <h2>Payment For ServiceEasy</h2>
+
+        <form id="paymentForm" action="/process-payment" method="POST">
+            <!-- Hidden fields to store the IDs -->
+            <input type="hidden" id="customerId" name="customerId" value="{{customerId}}">
+            <input type="hidden" id="storeId" name="storeId" value="{{store_id}}">
+            <input type="hidden" id="repairId" name="repairId" value="{{repair_id}}">
+            <input type="hidden" id="deviceType" name="deviceType" value="{{device_type}}">
+            <input type="hidden" id="modelName" name="modelName" value="{{model_name}}">
+            <input type="hidden" id="repairName" name="repairName" value="{{repair_name}}">
+            <input type="hidden" id="associatedPrice" name="associatedPrice" value="{{associated_price}}">
+            <input type="hidden" id="estimatedTime" name="estimatedTime" value="{{estimated_time}}">
+            <input type="hidden" id="defectiveParts" name="defectiveParts" value="{{defective_parts}}">
+            <input type="hidden" id="storeName" name="storeName" value="{{store}}">
+
+            <!-- Display Repair Information -->
+            <div class="repair-info">
+                <h3>Repair Order Details:</h3>
+                <p><strong>Device Type:</strong> {{device_type}}</p>
+                <p><strong>Model Name:</strong> {{model_name}}</p>
+                <p><strong>Repair Name:</strong> {{repair_name}}</p>
+                <p><strong>Associated Price:</strong> ${{associated_price}}</p>
+                <p><strong>Estimated Time:</strong> {{estimated_time}} days</p>
+                <p><strong>Defective Parts:</strong> {{#each defective_parts}} {{this}}, {{/each}}</p>
+            </div>
+
+            <!-- Customer Info -->
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your name" value="{{user.name}}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" value="{{user.email}}"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone" placeholder="Enter your phone" value="{{user.phone}}"
+                    required>
+            </div>
+
+            <!-- Payment Mode -->
+            <div class="form-group">
+                <label for="paymentMode">Payment Mode</label>
+                <select id="paymentMode" name="paymentMode" required>
+                    <option value="CC" {{#if payment_mode}} {{#if_eq payment_mode "CC" }}selected{{/if_eq}} {{/if}}>
+                        Credit Card (CC)</option>
+                    <option value="DC" {{#if payment_mode}} {{#if_eq payment_mode "DC" }}selected{{/if_eq}} {{/if}}>
+                        Debit Card (DC)</option>
+                    <option value="DD" {{#if payment_mode}} {{#if_eq payment_mode "DD" }}selected{{/if_eq}} {{/if}}>
+                        Direct Debit (DD)</option>
+                    <option value="cheque" {{#if payment_mode}} {{#if_eq payment_mode "cheque" }}selected{{/if_eq}}
+                        {{/if}}>Cheque</option>
+                </select>
+            </div>
+
+            <!-- Amount Info (fixed as associated price) -->
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <input type="number" id="amount" name="amount" value="{{associated_price}}" readonly required>
+            </div>
+
+            <button class="btn" id="confirmPaymentButton">Confirm Payment</button>
+        </form>
+    </div>
+</main>
+
+
+<script type="module" src="/public/js/payment.js"></script>

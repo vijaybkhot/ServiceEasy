@@ -1,235 +1,103 @@
 import mongoose from "mongoose";
-const { ObjectId } = mongoose.Types;
+import crypto from "crypto";
 import validator from "validator";
-// import { ObjectId } from "mongodb";
+
+const { ObjectId } = mongoose.Types;
 
 const exportedMethods = {
   isValidObjectId(id) {
-    if (!id) throw new Error("You must provide an id to search for");
-    if (typeof id !== "string") throw new Error("Id must be a string");
-    id = id.trim();
-    if (id.length === 0)
-      throw new Error("Id cannot be an empty string or just spaces");
-    if (!ObjectId.isValid(id))
+    if (!id || typeof id !== "string" || !ObjectId.isValid(id)) {
       throw new Error(`Invalid ObjectId string: ${id}`);
-    return id;
+    }
+    return id.trim();
   },
 
-  // Validate a string
   isValidString(val, argument, routeOrFunction) {
-    if (typeof val !== "string") {
+    if (typeof val !== "string" || !val.trim()) {
       throw new Error(
-        `${argument} must be a string in ${routeOrFunction}. Received: ${typeof val}`
+        `${argument} must be a non-empty string in ${routeOrFunction}.`
       );
     }
-    val = val.trim();
-    if (val.length === 0) {
-      throw new Error(`${argument} cannot be empty in ${routeOrFunction}.`);
-    }
-    return val;
+    return val.trim();
   },
 
-  // Validate an object array
   isValidObjectArray(val, argument, routeOrFunction) {
-    if (!Array.isArray(val)) {
-      throw new Error(`${argument} must be an array in ${routeOrFunction}.`);
-    }
-    if (val.length === 0) {
+    if (!Array.isArray(val) || val.length === 0) {
       throw new Error(
-        `${argument} must contain at least one item in ${routeOrFunction}.`
+        `${argument} must be a non-empty array in ${routeOrFunction}.`
       );
-    }
-
-    for (let [index, obj] of val.entries()) {
-      // Validate model_name
-      if (
-        !obj.model_name ||
-        typeof obj.model_name !== "string" ||
-        obj.model_name.trim().length === 0
-      ) {
-        throw new Error(
-          `model_name at index ${index} must be a valid, non-empty string in ${routeOrFunction}.`
-        );
-      }
-
-      // Validate repair_types
-      if (!Array.isArray(obj.repair_types)) {
-        throw new Error(
-          `repair_types at index ${index} in ${argument} must be an array in ${routeOrFunction}.`
-        );
-      }
-
-      for (let [repairIndex, repairType] of obj.repair_types.entries()) {
-        if (typeof repairType !== "object" || Array.isArray(repairType)) {
-          throw new Error(
-            `Each repair_type at index ${repairIndex} in repair_types must be an object in ${routeOrFunction}.`
-          );
-        }
-
-        const {
-          repair_name,
-          defective_parts,
-          associated_price,
-          estimated_time,
-        } = repairType;
-
-        // Validate repair_name
-        if (
-          !repair_name ||
-          typeof repair_name !== "string" ||
-          repair_name.trim().length === 0
-        ) {
-          throw new Error(
-            `repair_name at index ${repairIndex} must be a valid, non-empty string.`
-          );
-        }
-
-        // Validate defective_parts
-        this.isValidStringArray(
-          defective_parts,
-          "defective_parts",
-          routeOrFunction
-        );
-
-        // Validate associated_price
-        if (
-          typeof associated_price !== "number" ||
-          isNaN(associated_price) ||
-          associated_price <= 0
-        ) {
-          throw new Error(`associated_price must be a positive number.`);
-        }
-
-        // Validate estimated_time
-        if (
-          typeof estimated_time !== "number" ||
-          isNaN(estimated_time) ||
-          estimated_time <= 0
-        ) {
-          throw new Error(`estimated_time must be a positive number.`);
-        }
-      }
     }
     return val;
   },
 
-  // Validate a string array
   isValidStringArray(val, argument, routeOrFunction) {
-    if (!Array.isArray(val)) {
-      throw new Error(`${argument} must be an array in ${routeOrFunction}.`);
-    }
-    if (val.length === 0) {
-      throw new Error(
-        `${argument} must not be an empty array in ${routeOrFunction}.`
-      );
-    }
     if (
-      val.some((item) => typeof item !== "string" || item.trim().length === 0)
+      !Array.isArray(val) ||
+      val.some((item) => typeof item !== "string" || !item.trim())
     ) {
       throw new Error(
-        `${argument} must only contain non-empty strings in ${routeOrFunction}.`
+        `${argument} must contain only non-empty strings in ${routeOrFunction}.`
       );
     }
     return val.map((item) => item.trim());
   },
 
-  // Validate a number
   isValidNumber(val, argument, routeOrFunction) {
-    if (typeof val !== "number" || isNaN(val) || val <= 0) {
+    if (typeof val !== "number" || val <= 0) {
       throw new Error(
         `${argument} must be a positive number in ${routeOrFunction}.`
       );
     }
     return val;
   },
-  isValidString(val, argument, routeOrFunction) {
-    if (typeof val !== "string" || !val || val.trim().length === 0) {
-      throw new Error(
-        `${val} as ${argument} is not a valid string in the ${routeOrFunction}.`
-      );
-    }
-    return val.trim();
-  },
+
   validId(id) {
-    if (
-      typeof id === "undefined" ||
-      typeof id !== "string" ||
-      typeof id === "null"
-    )
+    try {
+      this.isValidObjectId(id);
+      return true;
+    } catch {
       return false;
-    if (id.trim().length === 0) return false;
-    if (!this.isValidObjectId(id)) return false;
-    return true;
+    }
   },
-  validLocation(location) {
-    if (
-      !location.hasOwnProperty("type") ||
-      !location.hasOwnProperty("coordinates") ||
-      !location.hasOwnProperty("address")
-    )
-      return false;
-    location.type = location.type.trim();
-    if (location.coordinates.length !== 2) return false;
-    if (
-      typeof location.coordinates[0] !== "number" ||
-      typeof location.coordinates[1] !== "number"
-    )
-      return false;
-    if (
-      location.coordinates[0] > 180 ||
-      location.coordinates[0] < -180 ||
-      location.coordinates[1] > 90 ||
-      location.coordinates[1] < -90
-    )
-      return false;
-    if (
-      location.address.length >= 300 ||
-      location.address.length < 20 ||
-      location.address.trim().length == 0
-    )
-      return false;
-    location.address = location.address.trim();
-    return true;
-  },
+
   isValidPhoneNumber(val) {
-    return validator.isMobilePhone(val, undefined, { strictMode: false });
+    if (!validator.isMobilePhone(val)) {
+      throw new Error(`Invalid phone number: ${val}`);
+    }
+    return val;
+  },
+
+  isValidDate(date) {
+    return !isNaN(new Date(date).getTime());
+  },
+
+  validLocation(location) {
+    const { type, coordinates, address } = location || {};
+    if (
+      type !== "Point" ||
+      !Array.isArray(coordinates) ||
+      coordinates.length !== 2
+    )
+      return false;
+    const [lng, lat] = coordinates;
+    if (typeof lng !== "number" || typeof lat !== "number") return false;
+    if (lng < -180 || lng > 180 || lat < -90 || lat > 90) return false;
+    if (
+      typeof address !== "string" ||
+      address.trim().length < 20 ||
+      address.trim().length > 300
+    )
+      return false;
+    return true;
+  },
+  validName(val) {
+    return /^[a-zA-Z\s]*$/.test(val) && val.trim().length > 0;
   },
   isValidStringBoolean(val) {
     return typeof val === "string" && val.trim().length > 0;
   },
-  validStore(request_body) {
-    const { name, location, phone, storeManager } = request_body;
-    return (
-      /^[a-zA-Z0-9\s\-',.]+$/.test(name) &&
-      this.validLocation(location) &&
-      this.validPhone(phone) &&
-      mongoose.isValidObjectId(storeManager.trim())
-    );
-    // throw new Error("Name of the store must be valid!");
-    // return this.validLocation(location)
-    //   throw new Error(
-    //     "Please enter a valid location in the format {coordinates[Longitude[-180,180], latitude[-90,90]] and address within 20-300 characters!"
-    //   );
-
-    // if (!this.validPhone(phone))
-    //   throw new Error(
-    //     "Please enter a valid phone number with a country code (e.g., +1234567890)!"
-    //   );
-
-    // if (!mongoose.isValidObjectId(storeManager.trim()))
-    //   throw new Error("Enter a valid Store Manager ID!");
-
-    // return {
-    //   name: name.trim(),
-    //   location,
-    //   phone: phone.trim(),
-    //   storeManager: storeManager.trim(),
-    // };
-  },
-
-  // Validate name input
-  validName(val) {
-    return /^[a-zA-Z\s]*$/.test(val) && val.trim().length > 0;
+  generateTransactionId() {
+    return crypto.randomBytes(16).toString("hex");
   },
 };
 

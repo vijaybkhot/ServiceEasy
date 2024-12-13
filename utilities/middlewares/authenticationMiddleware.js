@@ -51,3 +51,28 @@ export const hasRole = (requiredRoles) => {
     res.status(403).send("Access denied. Insufficient permissions.");
   };
 };
+
+export const redirectBasedOnRole = function (req, res, next) {
+  // Assuming you store the user role in req.user, for example from a JWT token or session
+  const userRole = req.session.user?.role; // Replace with how you're storing the user's role
+
+  if (!userRole) {
+    // If no user is logged in, redirect to login page (optional)
+    return res.redirect("/login");
+  }
+
+  // Redirect based on the user role
+  switch (userRole) {
+    case "customer":
+      return res.redirect("/dashboard/customer-dashboard");
+    case "employee":
+      return res.redirect("/dashboard/employee-dashboard");
+    case "store-manager":
+      return res.redirect("/dashboard/store-manager-dashboard");
+    case "admin":
+      return res.redirect("/dashboard/admin-dashboard");
+    default:
+      // If role is not recognized, maybe redirect to a default page or show an error
+      return res.redirect("/error");
+  }
+};

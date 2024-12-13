@@ -41,10 +41,9 @@ async function createStore(storeDetails) {
     "createStore.storeDetails.storeManager"
   );
 
-  const { name, location, phone, storeManager } = storeDetails;
+  const { name, location, phone, storeManager, employees = [] } = storeDetails;
 
-  // if (!validatorFuncs.validName(name))
-  //   throw new Error("Please enter valid Name!");
+  // Validate Store name
   const nameRegex = /^[a-zA-Z0-9\s\-',.]+$/;
   if (!nameRegex.test(name))
     throw new Error(
@@ -63,6 +62,7 @@ async function createStore(storeDetails) {
   if (!validatorFuncs.validLocation(location))
     throw new Error("Please enter valid Location!");
 
+  // Validate phone number
   if (!validatorFuncs.isValidPhoneNumber(phone))
     throw new Error("Please enter valid Phone!");
 
@@ -76,12 +76,31 @@ async function createStore(storeDetails) {
   if (storeManagerUser.role !== "store-manager")
     throw new Error("The user is not a store manager.");
 
+  // Validate employees array
+  if (!Array.isArray(employees)) throw new Error("Employees must be an array.");
+
+  // Check if all employee IDs are valid ObjectIds and correspond to valid "employee" users
+  for (let employeeId of employees) {
+    if (!validatorFuncs.validId(employeeId))
+      throw new Error(`Invalid employee ID: ${employeeId}`);
+
+    // Check if employee exists in the database
+    const employeeUser = await User.findById(employeeId);
+    if (!employeeUser)
+      throw new Error(`Employee with ID ${employeeId} does not exist.`);
+
+    // Check if the user has the "employee" role
+    if (employeeUser.role !== "employee")
+      throw new Error(`User with ID ${employeeId} is not an employee.`);
+  }
+
   try {
     const newStore = await Store.create({
       name,
       location,
       phone,
       storeManager,
+      employees,
     });
     return newStore;
   } catch (error) {
@@ -93,11 +112,12 @@ async function updateStore(storeId, storeDetails) {
   storeId = validatorFuncs.isValidString(
     storeId,
     "storeId",
-    updateStore.storeId
+    "updateStore.storeId"
   );
   if (!validatorFuncs.validId(storeId)) {
     throw new Error(`${storeId} is not valid. Provide a Valid Object ID.`);
   }
+
   const store = await Store.findById({
     _id: new ObjectId(storeId),
   });
@@ -178,6 +198,35 @@ async function updateStore(storeId, storeDetails) {
     }
   }
 
+  // Validate employees array
+  if (storeDetails.hasOwnProperty("employees")) {
+    const employees = storeDetails.employees;
+    if (!Array.isArray(employees))
+      throw new Error("Employees must be an array.");
+
+    // Check if all employee IDs are valid ObjectIds and correspond to valid "employee" users
+    for (let employeeId of employees) {
+      if (!validatorFuncs.validId(employeeId))
+        throw new Error(`Invalid employee ID: ${employeeId}`);
+
+      // Check if employee exists in the database
+      const employeeUser = await User.findById(employeeId);
+      if (!employeeUser)
+        throw new Error(`Employee with ID ${employeeId} does not exist.`);
+
+      // Check if the user has the "employee" role
+      if (employeeUser.role !== "employee")
+        throw new Error(`User with ID ${employeeId} is not an employee.`);
+    }
+
+    // Only update if the employees array has changed
+    if (
+      JSON.stringify(store.employees) !== JSON.stringify(storeDetails.employees)
+    ) {
+      updatedStoreObject.employees = storeDetails.employees;
+    }
+  }
+
   // If no fields updated, error
   if (Object.keys(updatedStoreObject).length === 0) {
     throw new Error("No changes detected to update the store.");
@@ -217,4 +266,166 @@ async function deleteStore(storeId) {
     throw new Error(error.message);
   }
 }
-export { getAll, getById, createStore, updateStore, deleteStore };
+
+async function addEmployeeToStore(storeId, employeeId) {
+  // Validate input
+  storeId = validatorFuncs.isValidString(
+    storeId,
+    "storeId",
+    "addEmployeeToStore.storeId"
+  );
+  if (!validatorFuncs.validId(storeId)) {
+    throw new Error(`${storeId} is not valid. Provide a Valid Object ID.`);
+  }
+
+  employeeId = validatorFuncs.isValidString(
+    employeeId,
+    "employeeId",
+    "addEmployeeToStore.employeeId"
+  );
+  if (!validatorFuncs.validId(employeeId)) {
+    throw new Error(`${employeeId} is not valid. Provide a Valid Object ID.`);
+  }
+
+  // Check if store exists
+  const store = await Store.findById(storeId);
+  if (!store) throw new Error(`Store with ID ${storeId} not found.`);
+
+  // Check if employee exist in the database and has role of employee
+  const employeeUser = await User.findById(employeeId);
+  if (!employeeUser) {
+    throw new Error(`Employee with ID ${employeeId} does not exist.`);
+  }
+  if (employeeUser.role !== "employee") {
+    throw new Error(`User with ID ${employeeId} is not an employee.`);
+  }
+
+  // Check if  employee is already in  store employee list
+  if (store.employees.includes(employeeId)) {
+    throw new Error(
+      `Employee with ID ${employeeId} is already part of this store.`
+    );
+  }
+
+  // Add employee to store's employee array
+  store.employees.push(employeeId);
+
+  // Save updated store
+  try {
+    const updatedStore = await store.save();
+    return updatedStore;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+async function removeEmployeeFromStore(storeId, employeeId) {
+  // Validate storeId
+  storeId = validatorFuncs.isValidString(
+    storeId,
+    "storeId",
+    "removeEmployeeFromStore.storeId"
+  );
+  if (!validatorFuncs.validId(storeId)) {
+    throw new Error(`${storeId} is not valid. Provide a Valid Object ID.`);
+  }
+
+  // Validate employeeId
+  employeeId = validatorFuncs.isValidString(
+    employeeId,
+    "employeeId",
+    "removeEmployeeFromStore.employeeId"
+  );
+  if (!validatorFuncs.validId(employeeId)) {
+    throw new Error(`${employeeId} is not valid. Provide a Valid Object ID.`);
+  }
+
+  // Check if the store exists
+  const store = await Store.findById(storeId);
+  if (!store) throw new Error(`Store with ID ${storeId} not found.`);
+
+  // Check if the employee exists in the store's employee list (looking at userId inside populated data)
+  const employeeInStore = store.employees.find(
+    (employee) => employee._id.toString() === employeeId
+  );
+  if (!employeeInStore) {
+    throw new Error(`Employee with ID ${employeeId} is not in the store.`);
+  }
+
+  // Remove the employee from the store's employee list
+  store.employees = store.employees.filter(
+    (employee) => employee.toString() !== employeeId
+  );
+
+  // Save the updated store
+  try {
+    const updatedStore = await store.save();
+    return updatedStore;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+async function changeStoreManager(storeId, storeManagerId) {
+  // Validate input
+  storeId = validatorFuncs.isValidString(
+    storeId,
+    "storeId",
+    "changeStoreManager.storeId"
+  );
+  if (!validatorFuncs.validId(storeId)) {
+    throw new Error(`${storeId} is not valid. Provide a Valid Object ID.`);
+  }
+
+  // Validate
+  storeManagerId = validatorFuncs.isValidString(
+    storeManagerId,
+    "storeManagerId",
+    "changeStoreManager.storeManagerId"
+  );
+  if (!validatorFuncs.validId(storeManagerId)) {
+    throw new Error(
+      `${storeManagerId} is not valid. Provide a Valid Object ID.`
+    );
+  }
+
+  // Check if the store exists
+  const store = await Store.findById(storeId);
+  if (!store) throw new Error(`Store with ID ${storeId} not found.`);
+
+  // Check if the new store manager exists with role "store-manager"
+  const newStoreManager = await User.findById(storeManagerId);
+  if (!newStoreManager) {
+    throw new Error(`Store Manager with ID ${storeManagerId} does not exist.`);
+  }
+  if (newStoreManager.role !== "store-manager") {
+    throw new Error(`User with ID ${storeManagerId} is not a store manager.`);
+  }
+
+  // Check if the storeManagerId is different from the current manager's ID
+  if (store.storeManager === storeManagerId) {
+    throw new Error("The store is already managed by the provided user.");
+  }
+
+  // Update store manager
+  store.storeManager = storeManagerId;
+
+  // Save updated store
+  try {
+    const updatedStore = await store.save();
+    return updatedStore;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+export {
+  getAll,
+  getById,
+  createStore,
+  updateStore,
+  deleteStore,
+  addEmployeeToStore,
+  removeEmployeeFromStore,
+  changeStoreManager,
+};

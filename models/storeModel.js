@@ -43,6 +43,12 @@ const storeSchema = new mongoose.Schema(
       required: [true, "A store must have a store manager."],
       unique: true,
     },
+    employees: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );
@@ -55,6 +61,9 @@ storeSchema.pre(/^find/, function (next) {
   this.populate({
     path: "storeManager",
     select: "name email phone",
+  }).populate({
+    path: "employees",
+    select: "name email phone role",
   });
   next();
 });

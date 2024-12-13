@@ -85,19 +85,25 @@ const serviceRequestSchema = new mongoose.Schema(
       },
     },
     feedback: {
-      rating: {
-        type: Number,
-        min: 1,
-        max: 5,
-        required: function () {
-          // Rating is required if feedback is provided
-          return this.feedback !== undefined;
+      type: {
+        rating: {
+          type: Number,
+          min: 1,
+          max: 5,
+          required: function () {
+            // Rating is required if feedback is provided
+            return (
+              this.feedback !== undefined &&
+              (this.feedback.comment !== undefined ||
+                this.feedback.rating !== undefined)
+            );
+          },
+        },
+        comment: {
+          type: String,
         },
       },
-      comment: {
-        type: String,
-        required: false,
-      },
+      default: undefined,
     },
     completedAt: { type: Date },
   },
@@ -113,6 +119,8 @@ serviceRequestSchema.pre("validate", function (next) {
     "reassigned",
     "complete",
   ];
+
+  // Ensure employee_id is set if status requires it
   if (requiredStatuses.includes(this.status) && !this.employee_id) {
     return next(
       new Error(`Employee ID is required when status is '${this.status}'.`)
@@ -120,7 +128,12 @@ serviceRequestSchema.pre("validate", function (next) {
   }
 
   // Ensure rating is provided if feedback exists
-  if (this.feedback && this.feedback.rating === undefined) {
+  if (
+    this.feedback &&
+    typeof this.feedback === "object" &&
+    this.feedback.rating === undefined &&
+    this.feedback.comment !== undefined
+  ) {
     return next(new Error("Rating is required if feedback is provided."));
   }
 

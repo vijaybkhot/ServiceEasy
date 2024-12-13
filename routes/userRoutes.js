@@ -8,11 +8,16 @@ import dataValidator from "../utilities/dataValidator.js";
 import * as userController from "../data/user.js";
 import User from "../models/userModel.js";
 import Email from "../utilities/email.js";
-import { isAuthenticated } from "../utilities/middlewares/authenticationMiddleware.js";
+import {
+  isAuthenticated,
+  redirectBasedOnRole,
+} from "../utilities/middlewares/authenticationMiddleware.js";
 
 const saltRounds = 12;
 
 const router = express.Router();
+
+router.get("/", redirectBasedOnRole);
 
 router.get("/home", async (req, res, next) => {
   res.status(200).render("users/home", {
@@ -118,7 +123,7 @@ router.get("/signup", async (req, res, next) => {
   });
 });
 
-router.post("/signup", signupLimiter, async (req, res) => {
+router.post("/signup", async (req, res) => {
   let { name, email, phone, password, role, passwordConfirm } = req.body;
   name = name.trim();
   email = email.trim();
@@ -213,6 +218,15 @@ router.get("/my-dashboard", async (req, res) => {
     return res.redirect("/login");
   }
   res.render("my-dashboard", { user: req.session.user });
+});
+
+// Get user details to the client side
+router.get("/api/user", isAuthenticated, async (req, res, next) => {
+  try {
+    res.status(200).json({ user: res.locals.user });
+  } catch (error) {
+    next(error);
+  }
 });
 
 export default router;

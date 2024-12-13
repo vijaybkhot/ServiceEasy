@@ -53,6 +53,17 @@ async function fetchAllStores() {
   }
 }
 
+// Function to fetch userdata
+async function getUserData() {
+  try {
+    const response = await axios.get("/api/user");
+    const data = response.data;
+    return data.user;
+  } catch (error) {
+    showAlert("error", `Error fetching user data: ${error.message}`);
+  }
+}
+
 // Function to get the specific repair based on selections
 function getRepairDetails(repairData, deviceType, modelName, repairName) {
   // Loop through the repair data
@@ -70,11 +81,14 @@ function getRepairDetails(repairData, deviceType, modelName, repairName) {
       );
 
       if (repair) {
-        // Return the found repair
         return {
           device_type: device.device_type,
           model_name: model.model_name,
-          repair: repair,
+          associated_price: +repair.associated_price,
+          estimated_time: +repair.estimated_time,
+          repair_name: repair.repair_name,
+          defective_parts: repair.defective_parts,
+          repair_id: repair._id,
         };
       } else {
         showAlert("error", "Repair type not found");
@@ -90,6 +104,39 @@ function getRepairDetails(repairData, deviceType, modelName, repairName) {
   }
 }
 
+async function getPaymentPage({
+  device_type,
+  model_name,
+  repair_id,
+  repair_name,
+  associated_price,
+  estimated_time,
+  defective_parts,
+  customer,
+  store_id,
+  store,
+}) {
+  try {
+    const response = await axios.get("/dashboard/payment", {
+      params: {
+        device_type,
+        model_name,
+        repair_id,
+        repair_name,
+        associated_price,
+        estimated_time,
+        defective_parts,
+        customer,
+        store_id,
+        store,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    showAlert("error", error.message);
+  }
+}
+
 if (getQuotationFormContainer) {
   newRequestButton.addEventListener("click", () => {
     getQuotationFormContainer.classList.toggle("hidden");
@@ -97,7 +144,7 @@ if (getQuotationFormContainer) {
 
   const getQuotationForm = document.getElementById("getQuotationForm");
   const quotationDisplay = document.getElementById("quotation-display");
-  const placeOrderButton = document.getElementById("placeOrderButton");
+  const checkoutButton = document.getElementById("checkoutButton");
   const deviceTypeSelect = document.getElementById("deviceType");
   const deviceModelSelect = document.getElementById("deviceModel");
   const repairTypeSelect = document.getElementById("repairType");
@@ -266,18 +313,74 @@ if (getQuotationFormContainer) {
       document.getElementById("quote-deviceModel").textContent =
         repairDetails.model_name;
       document.getElementById("quote-repairName").textContent =
-        repairDetails.repair.repair_name;
+        repairDetails.repair_name;
       document.getElementById("quote-defectiveParts").textContent =
-        repairDetails.repair.defective_parts.join(", ");
+        repairDetails.defective_parts.join(", ");
       document.getElementById(
         "quote-price"
-      ).textContent = `$${repairDetails.repair["associated_price"]}`;
+      ).textContent = `$${repairDetails.associated_price}`;
       document.getElementById(
         "quote-estimatedTime"
-      ).textContent = `${repairDetails.repair["estimated_time"]} hours`;
-    }
+      ).textContent = `${repairDetails.estimated_time} hours`;
 
-    // If all inputs are selected, submit the form
-    // getQuotationForm.submit();
+      // Checkout button event listner - get payment page
+      checkoutButton.addEventListener("click", async (event) => {
+        event.preventDefault();
+        // Check if a store is selected
+        const storeSelect = document.getElementById("storeSelect");
+        const selectedStoreOption = storeSelect.value;
+        const selectedStoreText =
+          storeSelect.options[storeSelect.selectedIndex].text;
+
+        if (!selectedStoreOption || selectedStoreOption === "") {
+          showAlert("info", "Please select a store.");
+          return;
+        }
+
+        // Get the store_id and store name
+        const store_id = selectedStoreOption;
+        const store = selectedStoreText;
+
+        // Fetch user data
+        let user = await getUserData();
+
+        const paymentData = await getPaymentPage({
+          device_type: repairDetails.device_type,
+          model_name: repairDetails.model_name,
+          repair_id: repairDetails.repair_id,
+          repair_name: repairDetails.repair_name,
+          associated_price: +repairDetails.associated_price,
+          estimated_time: +repairDetails.estimated_time,
+          defective_parts: repairDetails.defective_parts,
+          customer: user.id,
+          store_id: store_id,
+          store: store,
+        });
+
+        if (paymentData) {
+          window.location.href = `http://localhost:3000/dashboard/payment?device_type=${encodeURIComponent(
+            repairDetails.device_type
+          )}&model_name=${encodeURIComponent(
+            repairDetails.model_name
+          )}&repair_id=${
+            repairDetails.repair_id
+          }&repair_name=${encodeURIComponent(
+            repairDetails.repair_name
+          )}&associated_price=${
+            repairDetails.associated_price
+          }&estimated_time=${
+            repairDetails.estimated_time
+          }&defective_parts=${encodeURIComponent(
+            repairDetails.defective_parts
+          )}&customer=${
+            user.id
+          }&store_id=${store_id}&store=${encodeURIComponent(
+            selectedStoreText
+          )}`;
+        } else {
+          showAlert("error", "Failed to fetch payment data.");
+        }
+      });
+    }
   });
 }
