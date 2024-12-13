@@ -1,15 +1,21 @@
 import express from "express";
+import Repair from "../models/repairModel.js";
+import Store from "../models/storeModel.js";
+import {
+  isAuthenticated,
+  customerProtect,
+} from "../utilities/middlewares/authenticationMiddleware.js";
 
 const router = express.Router();
 
-// Add middlewares
-
-router.get("/customer-dashboard", async (req, res, next) => {
+// Customer dashboard
+router.get("/customer-dashboard", customerProtect, async (req, res, next) => {
   try {
     // Render dashboard
-    res.status(200).render("dashboards/customer-dashboard", {
+    return res.status(200).render("dashboards/customer-dashboard", {
       title: "Dashboard",
       cssPath: `/public/css/customer-dashboard.css`,
+      user: req.session.user,
     });
   } catch (error) {
     next(error);
@@ -19,7 +25,7 @@ router.get("/customer-dashboard", async (req, res, next) => {
 router.get("/employee-dashboard", async (req, res, next) => {
   try {
     // Render dashboard
-    res.status(200).render("dashboards/employee-dashboard", {
+    return res.status(200).render("dashboards/employee-dashboard", {
       title: "Employee Dashboard",
       cssPath: `/public/css/employee-dashboard.css`,
     });
@@ -31,7 +37,7 @@ router.get("/employee-dashboard", async (req, res, next) => {
 router.get("/store-manager-dashboard", async (req, res, next) => {
   try {
     // Render dashboard
-    res.status(200).render("dashboards/store-manager-dashboard", {
+    return res.status(200).render("dashboards/store-manager-dashboard", {
       title: "Manager Dashboard",
       cssPath: `/public/css/store-manager-dashboard.css`,
     });
@@ -43,7 +49,7 @@ router.get("/store-manager-dashboard", async (req, res, next) => {
 router.get("/admin-dashboard", async (req, res, next) => {
   try {
     // Render dashboard
-    res.status(200).render("dashboards/admin-dashboard", {
+    return res.status(200).render("dashboards/admin-dashboard", {
       title: "Admin Dashboard",
       cssPath: `/public/css/admin-dashboard.css`,
     });

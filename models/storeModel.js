@@ -13,6 +13,7 @@ const storeSchema = new mongoose.Schema(
         },
         message: "Store name cannot be blank or contain only spaces",
       },
+      unique: true,
     },
     location: {
       // GeoJSON
@@ -40,6 +41,7 @@ const storeSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: [true, "A store must have a store manager."],
+      unique: true,
     },
   },
   { timestamps: true }

@@ -38,5 +38,15 @@ const repairSchema = new mongoose.Schema({
   ],
 });
 
+// Compound unique index on device_type, model_name, and repair_name
+repairSchema.index(
+  {
+    device_type: 1,
+    "models.model_name": 1,
+    "models.repair_types.repair_name": 1,
+  },
+  { unique: true }
+);
+
 const Repair = mongoose.model("Repair", repairSchema);
 export default Repair;

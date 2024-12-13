@@ -23,12 +23,12 @@ parserMiddlewares(app);
 app.use(
   session({
     name: "AuthCookie",
-    secret: process.env.SESSION_SECRET,
+    secret: process.env?.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: { maxAge: 1000 * 60 * 60 * process.env.SESSION_TIMEOUT_HOURS },
     store: MongoStore.create({
-      mongoUrl: process.env.DATABASE.replace(
+      mongoUrl: process.env?.DATABASE.replace(
         "<PASSWORD>",
         process.env.DATABASE_PASSWORD
       ),
@@ -58,6 +58,10 @@ app.engine(
     partialsDir: path.join(process.cwd(), "views/partials"),
     helpers: {
       eq: (a, b) => a === b,
+      json: (context) => JSON.stringify(context),
+      ifEquals: function (arg1, arg2, options) {
+        return arg1 === arg2 ? options.fn(this) : options.inverse(this);
+      },
     },
   })
 );

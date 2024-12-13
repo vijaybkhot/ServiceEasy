@@ -1,0 +1,14 @@
+<div class="error-container">
+    <h1>Error {{status}}</h1>
+    <p>{{message}}</p>
+
+    {{#if status}}
+    {{#ifEquals status 403}}
+    <p>You are not authorized to access this page.</p>
+    {{else ifEquals status 401}}
+    <p>Please log in to access this page.</p>
+    {{/ifEquals}}
+    {{/if}}
+
+    <a href="/home">Go back to Home</a>
+</div>
