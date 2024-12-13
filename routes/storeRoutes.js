@@ -68,7 +68,9 @@ router.get("/:id", async (req, res) => {
     const store = await getById(id);
     res.status(200).render("stores/store", {
       title: "Store Details",
+      json: JSON.stringify,
       store,
+      errors: [],
       user: req.session.user,
     });
   } catch (error) {
