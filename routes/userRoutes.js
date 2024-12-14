@@ -100,7 +100,7 @@ router.post("/login", async (req, res) => {
       phone: user.phone,
       role: user.role,
     };
-    return res.status(200).redirect("/home");
+    return res.status(200).redirect("/dashboard");
   } catch (error) {
     errors.push("An unexpected error occurred. Please try again later.");
     return res.status(500).render("users/login", {

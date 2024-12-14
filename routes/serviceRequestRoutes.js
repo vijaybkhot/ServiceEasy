@@ -17,13 +17,13 @@ import {
 import dataValidator from "../utilities/dataValidator.js";
 import User from "../models/userModel.js";
 import Store from "../models/storeModel.js";
-import Repair from "../models/repairModel.js";
 import CustomError from "../utilities/customError.js";
 import ServiceRequest from "../models/serviceRequestModel.js";
+import Email from "../utilities/email.js";
 
 const router = express.Router();
 
-router.get("/", isAuthenticated, hasRole("admin"), async (req, res, next) => {
+router.get("/", isAuthenticated, hasRole(["admin"]), async (req, res, next) => {
   try {
     const requests = await getAllServiceRequests();
 
@@ -52,7 +52,7 @@ router.post(
       customer_id,
       employee_id = null,
       store_id,
-      repair_id,
+      repair_details,
       status = "waiting for drop-off",
       payment,
       feedback = {},
@@ -63,7 +63,6 @@ router.post(
 
       customer_id = dataValidator.isValidObjectId(customer_id);
       store_id = dataValidator.isValidObjectId(store_id);
-      repair_id = dataValidator.isValidObjectId(repair_id);
 
       // Check if IDs exist in the database
       const customer = await User.findById(customer_id);
@@ -77,28 +76,6 @@ router.post(
       if (!store) {
         return res.status(400).json({
           message: `Invalid store ID: ${store_id}.`,
-        });
-      }
-
-      // Check if the repair exists in the database using the repair_id within the nested repair_types
-      const repair = await Repair.findOne({
-        "models.repair_types._id": repair_id,
-      }).select("models.repair_types");
-
-      if (!repair) {
-        return res.status(400).json({
-          message: `Repair type with ID: ${repair_id} not found in any device model.`,
-        });
-      }
-
-      // Find the specific repair type within the repair_types array
-      const repairType = repair.models
-        .flatMap((model) => model.repair_types) // Flatten the repair_types array
-        .find((r) => r._id.toString() === repair_id.toString());
-
-      if (!repairType) {
-        return res.status(400).json({
-          message: `Repair type with ID: ${repair_id} not found.`,
         });
       }
 
@@ -194,7 +171,6 @@ router.post(
         transaction_id = payment.transaction_id;
       } else transaction_id = dataValidator.generateTransactionId();
 
-      // Check if payment_date if provided is valid date if not create a new date
       let payment_date =
         payment.payment_date && dataValidator.isValidDate(payment.payment_date)
           ? new Date(payment.payment_date)
@@ -209,14 +185,12 @@ router.post(
         }
 
         if (feedback.rating !== undefined) {
-          // Ensure rating is a number
           if (typeof feedback.rating !== "number") {
             return res.status(400).json({
               message: `Feedback rating must be a number.`,
             });
           }
 
-          // Ensure rating is between 1 and 5
           if (feedback.rating < 1 || feedback.rating > 5) {
             return res.status(400).json({
               message: `Feedback rating must be between 1 and 5.`,
@@ -225,12 +199,88 @@ router.post(
         }
       }
 
+      // Repair Details Validation
+      if (!repair_details || typeof repair_details !== "object") {
+        return res.status(400).json({
+          message: `Repair details are required and must be a valid object.`,
+        });
+      }
+
+      let {
+        device_type,
+        model_name,
+        estimated_time,
+        repair_name,
+        defective_parts,
+      } = repair_details;
+
+      if (
+        !device_type ||
+        typeof device_type !== "string" ||
+        device_type.length < 2 ||
+        device_type.length > 50
+      ) {
+        return res.status(400).json({
+          message: `Device type is required and must be a string between 2 and 50 characters.`,
+        });
+      }
+
+      if (
+        !model_name ||
+        typeof model_name !== "string" ||
+        model_name.length < 2 ||
+        model_name.length > 50
+      ) {
+        return res.status(400).json({
+          message: `Model name is required and must be a string between 2 and 50 characters.`,
+        });
+      }
+
+      if (
+        !estimated_time ||
+        typeof estimated_time !== "number" ||
+        estimated_time <= 0
+      ) {
+        return res.status(400).json({
+          message: `Estimated time is required and must be a positive number.`,
+        });
+      }
+
+      if (
+        !repair_name ||
+        typeof repair_name !== "string" ||
+        repair_name.length < 2 ||
+        repair_name.length > 50
+      ) {
+        return res.status(400).json({
+          message: `Repair name is required and must be a string between 2 and 50 characters.`,
+        });
+      }
+
+      if (!Array.isArray(defective_parts)) {
+        defective_parts = [defective_parts];
+        repair_details.defective_parts = [defective_parts];
+      }
+      console.log("defective_parts", defective_parts);
+
+      if (
+        defective_parts &&
+        (!Array.isArray(defective_parts) ||
+          !defective_parts.every(
+            (part) =>
+              typeof part === "string" && part.length > 1 && part.length <= 50
+          ))
+      ) {
+        return res.status(400).json({
+          message: `Defective parts must be an array of strings with each part name between 2 and 50 characters.`,
+        });
+      }
+
       // Create the service request object
       const newServiceRequest = {
         customer_id,
         employee_id,
         store_id,
-        repair_id,
         status,
         payment: {
           isPaid: payment.isPaid,
@@ -240,18 +290,43 @@ router.post(
           payment_date: payment_date || Date.now(),
         },
         feedback,
+        repair_details: {
+          device_type,
+          model_name,
+          estimated_time,
+          repair_name,
+          defective_parts: defective_parts || [],
+        },
       };
 
       const serviceRequest = await createServiceRequest(
         newServiceRequest.customer_id,
         newServiceRequest.employee_id,
         newServiceRequest.store_id,
-        newServiceRequest.repair_id,
+        newServiceRequest.repair_details,
         newServiceRequest.status,
         newServiceRequest.payment,
         newServiceRequest.feedback
       );
+
       if (serviceRequest) {
+        console.log("serviceRequest", serviceRequest);
+        console.log("repair_details", repair_details);
+        const orderData = {
+          orderId: serviceRequest._id.toString(),
+          storeName: store.name,
+          storeAddress: store.location.address,
+          storePhone: store.phone,
+          modelName: repair_details.model_name,
+          repairName: repair_details.repair_name,
+          defectiveParts: repair_details.defective_parts,
+          estimatedTime: repair_details.estimated_time,
+          transactionId: serviceRequest.payment.transaction_id,
+          amountPaid: serviceRequest.payment.amount,
+          paymentMethod: serviceRequest.payment.payment_mode,
+        };
+        const url = `${req.protocol}://${req.get("host")}/dashboard`;
+        await new Email(req.session.user, url, orderData).sendOrderPlaced();
         return res.status(200).json({
           message: "Service request created successfully",
           serviceRequest,
@@ -406,15 +481,84 @@ router.patch(
         }
       }
 
-      // Validate and update repair_id
-      if (upObj.repair_id) {
-        updateObject.repair_id = dataValidator.isValidObjectId(upObj.repair_id);
-        const repair = await Repair.findById(updateObject.repair_id);
-        if (!repair)
+      // Validate and update repair_details
+      if (upObj.repair_details) {
+        if (
+          typeof upObj.repair_details !== "object" ||
+          Array.isArray(upObj.repair_details)
+        ) {
           throw new CustomError({
-            message: `Invalid repair ID: ${updateObject.repair_id}.`,
+            message: "repair_details must be an object.",
             statusCode: 400,
           });
+        }
+
+        let {
+          device_type,
+          model_name,
+          estimated_time,
+          repair_name,
+          defective_parts,
+        } = upObj.repair_details;
+
+        updateObject.repair_details = {};
+
+        if (device_type) {
+          updateObject.repair_details.device_type = dataValidator.isValidString(
+            device_type,
+            "repair_details.device_type",
+            updateServiceRequest.name
+          );
+        }
+
+        if (model_name) {
+          updateObject.repair_details.model_name = dataValidator.isValidString(
+            model_name,
+            "repair_details.model_name",
+            updateServiceRequest.name
+          );
+        }
+
+        if (estimated_time) {
+          updateObject.repair_details.estimated_time =
+            dataValidator.isValidNumber(
+              estimated_time,
+              "repair_details.estimated_time",
+              updateServiceRequest.name
+            );
+        }
+
+        if (repair_name) {
+          updateObject.repair_details.repair_name = dataValidator.isValidString(
+            repair_name,
+            "repair_details.repair_name",
+            updateServiceRequest.name
+          );
+        }
+
+        if (defective_parts) {
+          if (!Array.isArray(defective_parts)) {
+            throw new CustomError({
+              message: "defective_parts must be an array of strings.",
+              statusCode: 400,
+            });
+          }
+          updateObject.repair_details.defective_parts = defective_parts.map(
+            (part) =>
+              dataValidator.isValidString(
+                part,
+                "repair_details.defective_parts",
+                updateServiceRequest.name
+              )
+          );
+        }
+      }
+      // Remove unchanged fields
+      if (
+        JSON.stringify(existingRequest.repair_details) ===
+        JSON.stringify(updateObject.repair_details)
+      ) {
+        delete updateObject.repair_details;
       }
 
       // Validate and update status
@@ -453,7 +597,7 @@ router.patch(
           });
         }
 
-        const { isPaid, amount, transaction_id, payment_mode, payment_date } =
+        let { isPaid, amount, transaction_id, payment_mode, payment_date } =
           upObj.payment;
 
         updateObject.payment = updateObject.payment || {};
@@ -538,7 +682,7 @@ router.patch(
           });
         }
 
-        const { rating, comment } = upObj.feedback;
+        let { rating, comment } = upObj.feedback;
 
         if (rating !== undefined) {
           if (typeof rating !== "number" || rating < 1 || rating > 5) {
@@ -584,10 +728,10 @@ router.patch(
       }
 
       if (
-        existingRequest.repair_id?.toString() ===
-        updateObject.repair_id?.toString()
+        JSON.stringify(existingRequest.repair_details) ===
+        JSON.stringify(updateObject.repair_details)
       ) {
-        delete updateObject.repair_id;
+        delete updateObject.repair_details;
       }
 
       if (existingRequest.status === updateObject.status) {
@@ -617,7 +761,6 @@ router.patch(
       }
 
       // Update the service request
-
       let updatedRequest = await updateServiceRequest(
         serviceRequestId,
         req.body
@@ -629,6 +772,7 @@ router.patch(
   }
 );
 
+// Route to add feedback to service request
 router.put(
   "/feedback/:id",
   isAuthenticated,

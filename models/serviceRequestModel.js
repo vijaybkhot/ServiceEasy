@@ -27,10 +27,44 @@ const serviceRequestSchema = new mongoose.Schema(
       ref: "Store",
       required: [true, "A service request must be assigned to a store."],
     },
-    repair_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Repair",
-      required: [true, "A service request must be associated with a repair."],
+    repair_details: {
+      device_type: {
+        type: String,
+        required: [
+          true,
+          "A service request must be associated with a device type.",
+        ],
+      },
+      model_name: {
+        type: String,
+        required: [true, "A service request must be associated with a model."],
+      },
+      estimated_time: {
+        type: Number,
+        required: [true, "A service request must have associated time."],
+      },
+      repair_name: {
+        type: String,
+        required: [true, "A service request repair must have a repair name."],
+      },
+      defective_parts: {
+        type: [String], // Ensures each item in the array is a string
+        required: [true, "Defective parts must be provided."],
+        validate: {
+          validator: function (value) {
+            // Check if the array is not empty and contains at least one string
+            return (
+              Array.isArray(value) &&
+              value.length > 0 &&
+              value.every(
+                (part) => typeof part === "string" && part.trim() !== ""
+              )
+            );
+          },
+          message:
+            "Defective parts must be a non-empty array of non-empty strings.",
+        },
+      },
     },
     status: {
       type: String,

@@ -1,37 +1,4 @@
 <main>
-    <section id="service-requests">
-        <h2>Your Service Requests</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Device</th>
-                    <th>Repair Type</th>
-                    <th>Price</th>
-                    <th>Date Created</th>
-                    <th>Delivery/Completion Date</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each serviceRequests}}
-                <tr class="{{#if isCompleted}}completed-request{{else}}current-request{{/if}}">
-                    <td>{{deviceType}} {{deviceModel}}</td>
-                    <td>{{repairType}}</td>
-                    <td>${{associatedPrice}}</td>
-                    <td>{{formatDate createdAt}}</td>
-                    <td>
-                        {{#if isCompleted}}
-                        {{formatDate completedAt}}
-                        {{else}}
-                        {{formatDate expectedDelivery}}
-                        {{/if}}
-                    </td>
-                    <td>{{capitalize status}}</td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-    </section>
 
     <section id="get-quotation-form" class="hidden">
         <h2>New Service Request</h2>
@@ -53,21 +20,10 @@
                 <option value="" disabled selected>Select a repair type</option>
             </select>
 
-            {{!-- <label for="priority">Priority:</label>
-            <select id="priority" name="priority">
-                <option value="regular">Regular</option>
-                <option value="fast service">Fast Service</option>
-            </select> --}}
-
-            {{!-- <label for="comments">Comments:</label>
-            <textarea id="comments" name="comments"></textarea> --}}
-
             <button type="submit">Get Quotation</button>
         </form>
     </section>
 
-
-    <!-- Quotation Display Section (Dynamically filled after form submission) -->
     <section id="quotation-display" class="hidden">
         <h2>Quotation Details</h2>
         <table>
@@ -97,7 +53,6 @@
             </tr>
         </table>
 
-        <!-- Select Store for Order Placement -->
         <label for="storeSelect">Select Store:</label>
         <select id="storeSelect" name="storeSelect" required>
             <option value="" disabled selected>Select a Store</option>
@@ -105,6 +60,84 @@
 
         <button id="checkoutButton">Check Out</button>
     </section>
+
+    <section id="in-progress-requests">
+        <h2>In-Progress Service Requests</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Device</th>
+                    <th>Repair Type</th>
+                    <th>Price</th>
+                    <th>Order Id</th>
+                    <th>Date Created</th>
+                    <th>Delivery/Completion Date</th>
+                    <th>Status Message</th>
+                    <th>Store Contact</th>
+
+                </tr>
+            </thead>
+            <tbody id="in-progress-body">
+                {{#each inProgressServiceRequests}}
+                <tr class="in-progress">
+                    <td>{{device}}</td>
+                    <td>{{repairType}}</td>
+                    <td>${{price}}</td>
+                    <td>{{orderId}}</td>
+                    <td>{{dateCreated}}</td>
+                    <td>{{deliveryDate}}</td>
+                    <td>{{statusMessage}}</td>
+                    <td>{{storeContact}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+        <div id="in-progress-pagination-controls">
+            <button id="prevInProgressPage" onclick="navigatePage('in-progress', -1)">Previous</button>
+            <span id="in-progress-page-info">Page 1</span>
+            <button id="nextInProgressPage" onclick="navigatePage('in-progress', 1)">Next</button>
+        </div>
+    </section>
+    <section id="completed-requests">
+        <h2>Completed Service Requests</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Device</th>
+                    <th>Repair Type</th>
+                    <th>Price</th>
+                    <th>Order Id</th>
+                    <th>Date Created</th>
+                    <th>Delivery/Completion Date</th>
+                    <th>Status Message</th>
+                    <th>Store Contact</th>
+
+                </tr>
+            </thead>
+            <tbody id="completed-body">
+                {{#each completedServiceRequests}}
+                <tr class="completed">
+                    <td>{{device}}</td>
+                    <td>{{repairType}}</td>
+                    <td>${{price}}</td>
+                    <td>{{orderId}}</td>
+                    <td>{{dateCreated}}</td>
+                    <td>{{deliveryDate}}</td>
+                    <td>{{statusMessage}}</td>
+                    <td>{{storeContact}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+        <div id="completed-pagination-controls">
+            <button id="prevCompletedPage" onclick="navigatePage('completed', -1)">Previous</button>
+            <span id="completed-page-info">Page 1</span>
+            <button id="nextCompletedPage" onclick="navigatePage('completed', 1)">Next</button>
+        </div>
+    </section>
+
 </main>
 
-<script type="module" src="/public/js/dashboard.js"></script>
+<script type="module" src="/public/js/customer-dashboard.js"></script>

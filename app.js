@@ -57,10 +57,21 @@ app.engine(
     layoutsDir: path.join(process.cwd(), "views/layouts"),
     partialsDir: path.join(process.cwd(), "views/partials"),
     helpers: {
+      runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true,
+      },
       eq: (a, b) => a === b,
       json: (context) => JSON.stringify(context),
       ifEquals: function (arg1, arg2, options) {
         return arg1 === arg2 ? options.fn(this) : options.inverse(this);
+      },
+      formatDate: (date) => {
+        const options = { year: "numeric", month: "long", day: "numeric" };
+        return new Date(date).toLocaleDateString("en-US", options);
+      },
+      capitalize: (str) => {
+        return str.charAt(0).toUpperCase() + str.slice(1);
       },
     },
   })

@@ -1,16 +1,16 @@
 import express from "express";
-import { createEmployeeActivity } from "./employeeActivityService"; // Path to your service function
+import { createEmployeeActivity } from "../data/employeeActivity.js";
 import { isValidObjectId } from "mongoose";
-import EmployeeActivity from "./models/EmployeeActivity"; // Path to your EmployeeActivity model
-import User from "./models/User"; // Path to your User model
-import ServiceRequest from "./models/ServiceRequest"; // Path to your ServiceRequest model
+import EmployeeActivity from "..//models/employeeActivityModel.js";
+import User from "../models/userModel.js";
+import ServiceRequest from "../models/serviceRequestModel.js";
 
 const router = express.Router();
 
 // Route to create a new employee activity
-router.post("/employee-activity", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
-    const {
+    let {
       service_request_id,
       activity_type,
       processing_employee_id,
