@@ -5,7 +5,7 @@
         <div>
             <label for="orderId">Order ID:</label>
             <input type="text" id="orderId" placeholder="Enter Order ID">
-            <button onclick="findServiceRequestByOrderId()">Find</button>
+            <button id="findButton">Find</button>
         </div>
     </section>
 
@@ -86,6 +86,8 @@
                     <td>{{customerContact}}</td>
                     <td>{{assignedEmployee}}</td>
                     <td>{{assignedEmployeePhone}}</td>
+                    <td><button onclick="openServiceRequestDetails('{{orderId}}')">View Details</button></td>
+
                 </tr>
                 {{/each}}
             </tbody>
@@ -144,6 +146,18 @@
     <section id="manage-employees">
         <h2>Manage Employees</h2>
         <button onclick="navigateToEmployeeManagement()">Go to Employee Management</button>
+    </section>
+
+    <section>
+        <div id="service-request-overlay" class="overlay hidden">
+            <div class="overlay-content">
+                <h2>Service Request Details</h2>
+                <div id="service-request-details"></div>
+
+            </div>
+
+
+        </div>
     </section>
 </main>
 

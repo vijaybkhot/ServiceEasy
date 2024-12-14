@@ -298,7 +298,11 @@ export async function getServiceRequestById(serviceRequestId) {
   serviceRequestId = dataValidator.isValidObjectId(serviceRequestId);
 
   // Check if the service request exists
-  const serviceRequest = await ServiceRequest.findById(serviceRequestId);
+  const serviceRequest = await ServiceRequest.findById(serviceRequestId)
+    .populate("employee_id")
+    .populate("customer_id")
+    .populate("store_id");
+
   if (!serviceRequest) {
     throw new CustomError({
       message: `No service request found with ID: ${serviceRequestId}.`,
@@ -667,9 +671,9 @@ export const getServiceRequestsByUser = async (user_id, role) => {
 
     // Get service requests
     const serviceRequests = await ServiceRequest.find(filter)
-      .populate("customer_id", "name email")
-      .populate("employee_id", "name email")
-      .populate("store_id", "name address phone");
+      .populate("employee_id")
+      .populate("customer_id")
+      .populate("store_id");
 
     // Return the result
     return serviceRequests;
@@ -697,7 +701,10 @@ export async function getServiceRequestByStoreId(storeId) {
   // Fetch the service request(s) related to the store
   let serviceRequests;
   try {
-    serviceRequests = await ServiceRequest.find({ store_id: storeId });
+    serviceRequests = await ServiceRequest.find({ store_id: storeId })
+      .populate("employee_id")
+      .populate("customer_id")
+      .populate("store_id");
   } catch (error) {
     throw new CustomError({
       message: `Error fetching service requests for store ID ${storeId}: ${error.message}`,

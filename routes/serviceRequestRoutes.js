@@ -388,12 +388,13 @@ router.get("/user/:id", isAuthenticated, async (req, res, next) => {
     }
 
     const serviceRequests = await getServiceRequestById(user_id, role);
-    return serviceRequests;
+    return res.status(200).json({ serviceRequests: serviceRequests });
   } catch (e) {
     next(e);
   }
 });
 
+// Get all service requests for a store
 router.get("/store/:id", isAuthenticated, async (req, res, next) => {
   try {
     const storeId = dataValidator.isValidObjectId(req.params.id);
@@ -406,19 +407,25 @@ router.get("/store/:id", isAuthenticated, async (req, res, next) => {
       });
     }
     const serviceRequests = await getServiceRequestByStoreId(storeId);
-    return serviceRequests;
+    return res.status(200).json({ serviceRequests: serviceRequests });
   } catch (e) {
-    next(e);
+    return res.status(500).json({
+      message: e.message || "Internal server error",
+    });
   }
 });
 
+// Get service request by ID:
 router.get("/:id", isAuthenticated, async (req, res, next) => {
   const serviceRequestId = dataValidator.isValidObjectId(req.params.id);
   try {
+    console.log(serviceRequestId);
     const request = await getServiceRequestById(serviceRequestId);
-    return request;
+    return res.status(200).json({ serviceRequest: request });
   } catch (e) {
-    next(e);
+    return res.status(500).json({
+      message: e.message || "Internal server error",
+    });
   }
 });
 

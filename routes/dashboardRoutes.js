@@ -41,6 +41,9 @@ router.get(
         (serviceRequest) => serviceRequest.status !== "complete"
       );
 
+      console.log(unMappedCompletedServiceRequests.length);
+      console.log(unMappedInProgressServiceRequests.length);
+
       // Get page numbers from query params
       const completedPage = parseInt(req.query.completedPage) || 1;
       const inProgressPage = parseInt(req.query.inProgressPage) || 1;
@@ -65,9 +68,6 @@ router.get(
         user: req.session.user,
         completedServiceRequests,
         inProgressServiceRequests,
-        currentCompletedPage: completedPage,
-        currentInProgressPage: inProgressPage,
-        pageSize,
       });
     } catch (error) {
       return res.status(500).json(error);
@@ -150,7 +150,7 @@ router.get(
         pageSize
       );
 
-      console.log(inProgressServiceRequests[0]);
+      console.log(pendingServiceRequests[0]);
 
       return res.status(200).render("dashboards/store-manager-dashboard", {
         title: "Manager Dashboard",
