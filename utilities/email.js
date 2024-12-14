@@ -13,11 +13,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 class Email {
-  constructor(user, url) {
+  constructor(user, url, orderData) {
     this.to = user.email;
     this.firstName = user.name.split(" ")[0];
     this.url = url;
     this.from = `${process.env.EMAIL_FROM}`;
+    this.orderData = orderData;
   }
 
   newTransport() {
@@ -57,6 +58,7 @@ class Email {
         firstName: this.firstName,
         url: this.url,
         subject,
+        orderData: this.orderData,
       });
 
       const mailOptions = {
@@ -75,6 +77,11 @@ class Email {
 
   async sendWelcome() {
     await this.send("welcome", "Welcome to the ServiceEasy Family!");
+  }
+
+  async sendOrderPlaced() {
+    const subject = "Your Repair Order Has Been Placed!";
+    await this.send("orderPlaced", subject);
   }
 }
 

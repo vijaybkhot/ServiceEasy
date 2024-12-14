@@ -5,8 +5,7 @@ async function createServiceRequest(data) {
   try {
     const response = await axios.post("/api/service-request/", data);
     if (response.status === 200) {
-      showAlert("success", "Order placed successfully!");
-      window.location.href = "/";
+      return response.data.serviceRequest;
     } else {
       // Handle unexpected response
       showAlert("error", `Unexpected response status: ${response.status}`);
@@ -34,7 +33,13 @@ if (paymentContainer) {
       let serviceRequestDetails = {
         customer_id: document.getElementById("customerId").value,
         store_id: document.getElementById("storeId").value,
-        repair_id: document.getElementById("repairId").value,
+        repair_details: {
+          device_type: document.getElementById("deviceType").value,
+          model_name: document.getElementById("modelName").value,
+          estimated_time: +document.getElementById("estimatedTime").value,
+          repair_name: document.getElementById("repairName").value,
+          defective_parts: document.getElementById("defectiveParts").value,
+        },
         payment: {
           isPaid: true,
           amount: +document.getElementById("associatedPrice").value,
@@ -42,8 +47,9 @@ if (paymentContainer) {
           payment_date: Date.now(),
         },
       };
-      let order = await createServiceRequest(serviceRequestDetails);
-      if (order) {
+      let serviceRequest = await createServiceRequest(serviceRequestDetails);
+      if (serviceRequest) {
+        console.log(serviceRequest);
       }
     });
   } else {

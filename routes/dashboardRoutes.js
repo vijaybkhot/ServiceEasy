@@ -3,21 +3,179 @@ import { isValidObjectId } from "mongoose";
 import Repair from "../models/repairModel.js";
 import User from "../models/userModel.js";
 import Store from "../models/storeModel.js";
+import * as serviceRequests from "../data/serviceRequests.js";
+import * as helpers from "../utilities/helpers.js";
 import {
   isAuthenticated,
   customerProtect,
+  redirectBasedOnRole,
+  hasRole,
 } from "../utilities/middlewares/authenticationMiddleware.js";
 
 const router = express.Router();
 
+router.get("/", redirectBasedOnRole);
+
 // Customer dashboard
-router.get("/customer-dashboard", customerProtect, async (req, res, next) => {
+router.get(
+  "/customer-dashboard",
+  isAuthenticated,
+  hasRole(["customer"]),
+  async (req, res, next) => {
+    try {
+      const userId = req.session.user.id;
+
+      // Get service requests for the user
+      const userServiceRequests =
+        await serviceRequests.getServiceRequestsByUser(
+          userId,
+          req.session.user.role
+        );
+
+      // Filter service requests into completed, pending, in-progress at managers dashboard
+      let unMappedCompletedServiceRequests = userServiceRequests.filter(
+        (serviceRequest) => serviceRequest.status === "complete"
+      );
+
+      let unMappedInProgressServiceRequests = userServiceRequests.filter(
+        (serviceRequest) => serviceRequest.status !== "complete"
+      );
+
+      // Get page numbers from query params
+      const completedPage = parseInt(req.query.completedPage) || 1;
+      const inProgressPage = parseInt(req.query.inProgressPage) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 10;
+
+      // Paginate the completed and in-progress requests
+      const completedServiceRequests = await helpers.mapServiceRequests(
+        unMappedCompletedServiceRequests,
+        completedPage,
+        pageSize
+      );
+
+      const inProgressServiceRequests = await helpers.mapServiceRequests(
+        unMappedInProgressServiceRequests,
+        inProgressPage,
+        pageSize
+      );
+
+      return res.status(200).render("dashboards/customer-dashboard", {
+        title: "Dashboard",
+        cssPath: `/public/css/customer-dashboard.css`,
+        user: req.session.user,
+        completedServiceRequests,
+        inProgressServiceRequests,
+        currentCompletedPage: completedPage,
+        currentInProgressPage: inProgressPage,
+        pageSize,
+      });
+    } catch (error) {
+      return res.status(500).json(error);
+    }
+  }
+);
+
+router.get("/employee-dashboard", async (req, res, next) => {
   try {
     // Render dashboard
-    return res.status(200).render("dashboards/customer-dashboard", {
-      title: "Dashboard",
-      cssPath: `/public/css/customer-dashboard.css`,
-      user: req.session.user,
+    return res.status(200).render("dashboards/employee-dashboard", {
+      title: "Employee Dashboard",
+      cssPath: `/public/css/employee-dashboard.css`,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get(
+  "/store-manager-dashboard",
+  isAuthenticated,
+  hasRole(["store-manager"]),
+  async (req, res, next) => {
+    try {
+      const managerId = req.session.user.id;
+      // Get store id using managerId of manager
+      let store = await Store.find({ storeManager: managerId });
+      let store_id = store[0]._id.toString();
+
+      // Get service requests for store
+      const storeServiceRequests =
+        await serviceRequests.getServiceRequestByStoreId(store_id);
+
+      const statusCategories = {
+        completed: ["complete"],
+        pending: [
+          "waiting for drop-off",
+          "pending for approval",
+          "ready for pickup",
+        ],
+        inProgress: ["in-process", "reassigned"],
+      };
+
+      // Filter service requests into completed, pending, in-progress at managers dashboard
+      let unMappedCompletedServiceRequests = storeServiceRequests.filter(
+        (serviceRequest) =>
+          statusCategories.completed.includes(serviceRequest.status)
+      );
+
+      let unMappedPendingServiceRequests = storeServiceRequests.filter(
+        (serviceRequest) =>
+          statusCategories.pending.includes(serviceRequest.status)
+      );
+      let unMappedInProgressServiceRequests = storeServiceRequests.filter(
+        (serviceRequest) =>
+          statusCategories.inProgress.includes(serviceRequest.status)
+      );
+
+      // Get page numbers from query params
+      const completedPage = parseInt(req.query.completedPage) || 1;
+      const pendingPage = parseInt(req.query.pendingPage) || 1;
+      const inProgressPage = parseInt(req.query.inProgressPage) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 10;
+
+      // Paginate the completed and in-progress requests
+      const completedServiceRequests = await helpers.mapServiceRequests(
+        unMappedCompletedServiceRequests,
+        completedPage,
+        pageSize
+      );
+      const pendingServiceRequests = await helpers.mapServiceRequests(
+        unMappedPendingServiceRequests,
+        completedPage,
+        pageSize
+      );
+      const inProgressServiceRequests = await helpers.mapServiceRequests(
+        unMappedInProgressServiceRequests,
+        inProgressPage,
+        pageSize
+      );
+
+      console.log(inProgressServiceRequests[0]);
+
+      return res.status(200).render("dashboards/store-manager-dashboard", {
+        title: "Manager Dashboard",
+        cssPath: `/public/css/store-manager-dashboard.css`,
+        user: req.session.user,
+        completedServiceRequests,
+        pendingServiceRequests,
+        inProgressServiceRequests,
+        currentCompletedPage: completedPage,
+        currentPendingPage: pendingPage,
+        currentInProgressPage: inProgressPage,
+        pageSize,
+      });
+    } catch (error) {
+      return res.status(500).json(error.message);
+    }
+  }
+);
+
+router.get("/admin-dashboard", async (req, res, next) => {
+  try {
+    // Render dashboard
+    return res.status(200).render("dashboards/admin-dashboard", {
+      title: "Admin Dashboard",
+      cssPath: `/public/css/admin-dashboard.css`,
     });
   } catch (error) {
     next(error);
@@ -25,7 +183,7 @@ router.get("/customer-dashboard", customerProtect, async (req, res, next) => {
 });
 
 // Payment route
-router.get("/payment", customerProtect, async (req, res) => {
+router.get("/payment", isAuthenticated, async (req, res, next) => {
   try {
     let {
       device_type,
@@ -178,45 +336,10 @@ router.get("/payment", customerProtect, async (req, res) => {
       store,
     });
   } catch (error) {
-    return res.status(500).json({
-      message: "An internal server error occurred.",
-      error: error.message,
-    });
-  }
-});
-
-router.get("/employee-dashboard", async (req, res, next) => {
-  try {
-    // Render dashboard
-    return res.status(200).render("dashboards/employee-dashboard", {
-      title: "Employee Dashboard",
-      cssPath: `/public/css/employee-dashboard.css`,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.get("/store-manager-dashboard", async (req, res, next) => {
-  try {
-    // Render dashboard
-    return res.status(200).render("dashboards/store-manager-dashboard", {
-      title: "Manager Dashboard",
-      cssPath: `/public/css/store-manager-dashboard.css`,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.get("/admin-dashboard", async (req, res, next) => {
-  try {
-    // Render dashboard
-    return res.status(200).render("dashboards/admin-dashboard", {
-      title: "Admin Dashboard",
-      cssPath: `/public/css/admin-dashboard.css`,
-    });
-  } catch (error) {
+    // return res.status(500).json({
+    //   message: "An internal server error occurred.",
+    //   error: error.message,
+    // });
     next(error);
   }
 });
