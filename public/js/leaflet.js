@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Initialize the map, centered around a default location
-  console.log("Leaflet script loaded and running...");
+  // console.log("Leaflet script loaded and running...");
   const map = L.map("map").setView([40.712776, -74.005974], 12); // Default center: New York City
-  console.log(map);
+  // console.log(map);
   // Add the OpenStreetMap tiles
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,

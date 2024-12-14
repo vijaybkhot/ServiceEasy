@@ -9,6 +9,7 @@ import {
   addEmployeeToStore,
   removeEmployeeFromStore,
   changeStoreManager,
+  getReviewsById,
 } from "../data/stores.js";
 import {
   isAuthenticated,
@@ -81,6 +82,21 @@ router.get("/:id", async (req, res) => {
     if (!validatorFuncs.validId(id)) {
       errors.push("Please provide a valid Store ID!");
     }
+    const reviews = await getReviewsById(id);
+    let customerReviews = []
+    let totalRatings = 0;
+    // console.log(reviews)
+    try {
+      for (let review of reviews) {
+        // console.log(review);
+        customerReviews.push({rating:review.feedback.rating,comment:review.feedback.comment, customerName:review.customer_id.name})
+        totalRatings = review.feedback.rating + totalRatings;
+      }
+      totalRatings = totalRatings / reviews.length;
+      // console.log(customerReviews);
+    } catch (error) {
+      console.log(error);
+    }
     if (errors.length > 0) {
       return res.status(400).render("stores/store", {
         title: "Store Details",
@@ -93,6 +109,8 @@ router.get("/:id", async (req, res) => {
       json: JSON.stringify,
       store,
       errors: [],
+      customerReviews:customerReviews,
+      totalRatings:totalRatings?totalRatings.toFixed(1):null,
       user: req.session.user,
     });
   } catch (error) {

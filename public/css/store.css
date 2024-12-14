@@ -51,6 +51,43 @@
   font-size: 16px;
   margin-bottom: 10px;
 }
+/* Reviews Container */
+.reviews-container {
+  width: 100%;
+  max-width: 1000px;
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #56c8eb;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.reviews-container h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #333;
+  text-align: left;
+}
+
+.reviews-container p {
+  font-size: 16px;
+  margin: 5px 0;
+}
+
+.reviews-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.reviews-list li {
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+}
+
+.reviews-list li:last-child {
+  border-bottom: none;
+}
 
 .store-info input[type="text"] {
   display: none; /* Hidden by default */

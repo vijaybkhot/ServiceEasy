@@ -91,7 +91,6 @@ const serviceRequestSchema = new mongoose.Schema(
           min: 1,
           max: 5,
           required: function () {
-            // Rating is required if feedback is provided
             return (
               this.feedback !== undefined &&
               (this.feedback.comment !== undefined ||

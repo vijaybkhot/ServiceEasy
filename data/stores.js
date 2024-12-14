@@ -2,6 +2,7 @@ import validatorFuncs from "../utilities/dataValidator.js";
 import { ObjectId } from "mongodb";
 import Store from "../models/storeModel.js";
 import User from "../models/userModel.js";
+import ServiceRequest from "../models/serviceRequestModel.js";
 
 async function getAll() {
   const stores = await Store.find();
@@ -21,6 +22,23 @@ async function getById(id) {
     return plainStore;
   } catch (error) {
     throw new Error(error.message);
+  }
+}
+
+async function getReviewsById(storeId) {
+  try {
+    const feedbacks = await ServiceRequest.find(
+      {
+        store_id: storeId,
+        feedback: { $ne: undefined },
+      },
+      { feedback: 1, customer_id: 1, }
+    )
+      .populate("customer_id", "name email")
+      .lean();
+    return feedbacks;
+  } catch (error) {
+    throw new Error("Error fetching feedbacks: " + error.message);
   }
 }
 
@@ -428,4 +446,5 @@ export {
   addEmployeeToStore,
   removeEmployeeFromStore,
   changeStoreManager,
+  getReviewsById,
 };

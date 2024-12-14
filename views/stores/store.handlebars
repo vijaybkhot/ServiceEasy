@@ -64,9 +64,52 @@
           </div>
         </div>
       </form>
+      <form class="place-service-request-form" id="place-service-request-form">
+        <input type="hidden" id="store-id" value="{{store._id}}" />
+        <label for="device-type">Select Device Type:</label>
+        <select name="device-type" id="device-type">
+          <option value="iPhone">iPhone</option>
+          <option value="Macbook">Macbook</option>
+          <option value="iPad">iPad</option>
+        </select>
+        <select name="device-model" id="device-model" required>
+          <option value="">Select a Model</option>
+        </select>
+        <select name="device-repair-type" id="device-repair-type" required>
+          <option value="">Select Type of Repair</option>
+        </select>
+        <select name="device-part" id="device-part" required>
+          <option value="">Select Defective Part</option>
+        </select>
+      </form>
+      <button class="place-service-request-button">Place a Service Request</button>
+
+      
       <div id="map-container">
         <div id="map"></div>
       </div>
     </div>
+  </div>
+  <div class="reviews-container">
+    <h2>Customer Reviews</h2>
+    <p><b>Average Rating:</b>
+      {{#if totalRatings}}
+        {{totalRatings}}/ 5
+      {{else}}
+        N/A
+      {{/if}}
+    </p>
+    {{#if customerReviews}}
+      <ul class="reviews-list">
+        {{#each customerReviews}}
+          <li>
+            <p><b>{{customerName}}</b>: <i>{{comment}}</i></p>
+            <p>Rating: {{rating}} / 5</p>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <p>No reviews available for this store.</p>
+    {{/if}}
   </div>
 </main>
