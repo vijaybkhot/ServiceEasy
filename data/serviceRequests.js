@@ -4,6 +4,7 @@ import User from "../models/userModel.js";
 import Store from "../models/storeModel.js";
 import Repair from "../models/repairModel.js";
 import CustomError from "../utilities/customError.js";
+import Stripe from "stripe";
 
 export async function createServiceRequest(
   customer_id,
@@ -275,6 +276,27 @@ export async function createServiceRequest(
   } catch (error) {
     throw new CustomError({ message: error.message, statusCode: 500 });
   }
+}
+
+export const generateClientSecret = async (data) => {
+  const { amount, name, email, phone } = data;
+  const stripe = new Stripe(process.env.SECRET_KEY);
+
+  amount = dataValidator.isValidNumber(amount);
+  name = dataValidator.isValidString(name);
+  email = dataValidator.isValidEmail(email);
+  phone = dataValidator.isValidPhoneNumber(phone);
+
+  const paymentIntentObject = await stripe.paymentIntents.create({
+    amount,
+    currency: 'usd',
+    payment_method_types: ['card'],
+    customer: name,
+    receipt_email: email,
+    phone
+  });
+
+  return paymentIntentObject.client_secret;
 }
 
 export const getAllServiceRequests = async () => {

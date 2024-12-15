@@ -14,6 +14,7 @@ import {
   updateServiceRequest,
   updateStatusById,
   modifyStatusAndAssign,
+  generateClientSecret,
 } from "../data/serviceRequests.js";
 import dataValidator from "../utilities/dataValidator.js";
 import User from "../models/userModel.js";
