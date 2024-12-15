@@ -13,6 +13,7 @@ import {
   getServiceRequestsByUser,
   updateServiceRequest,
   updateStatusById,
+  modifyStatusAndAssign,
 } from "../data/serviceRequests.js";
 import dataValidator from "../utilities/dataValidator.js";
 import User from "../models/userModel.js";
@@ -913,5 +914,88 @@ router.delete("/:id", isAuthenticated, async (req, res, next) => {
     next(e);
   }
 });
+
+// Route to modify status
+router.put(
+  "/modify-status",
+  isAuthenticated,
+  hasRole(["employee", "store-manager", "admin"]),
+  async (req, res) => {
+    const { service_request_id, current_status, outcome_status, employee_id } =
+      req.body;
+
+    try {
+      // Validate service_request_id
+      const validServiceRequestId =
+        dataValidator.isValidObjectId(service_request_id);
+      if (!validServiceRequestId) {
+        return res.status(400).json({
+          message: `Invalid service request ID: ${service_request_id}.`,
+        });
+      }
+
+      // Validate current_status
+      const validStatuses = [
+        "waiting for drop-off",
+        "in-process",
+        "pending for approval",
+        "ready for pickup",
+        "reassigned",
+        "complete",
+      ];
+      if (!validStatuses.includes(current_status)) {
+        return res.status(400).json({
+          message: `Invalid current status: ${current_status}. Must be one of ${JSON.stringify(
+            validStatuses
+          )}.`,
+        });
+      }
+
+      // Validate outcome_status only if it's provided
+      if (outcome_status && !validStatuses.includes(outcome_status)) {
+        return res.status(400).json({
+          message: `Invalid outcome status: ${outcome_status}. Must be one of ${JSON.stringify(
+            validStatuses
+          )}.`,
+        });
+      }
+
+      // Validate employee_id only if it's provided
+      if (employee_id && !dataValidator.isValidObjectId(employee_id)) {
+        return res.status(400).json({
+          message: `Invalid Employee ID: ${employee_id}.`,
+        });
+      }
+
+      // Check if employee_id is required based on current_status
+      if (
+        ["in-process", "reassigned"].includes(current_status) &&
+        !employee_id
+      ) {
+        return res.status(400).json({
+          message: `Employee ID is required when changing status to "${current_status}".`,
+        });
+      }
+
+      // Call the modifyStatusAndAssign data function
+      const serviceRequest = await modifyStatusAndAssign(
+        service_request_id,
+        current_status,
+        outcome_status,
+        employee_id
+      );
+
+      return res.status(200).json({
+        message: "Service request status updated successfully.",
+        serviceRequest,
+      });
+    } catch (error) {
+      // Handle any errors from the modifyStatusAndAssign function
+      return res.status(error.statusCode || 500).json({
+        message: error.message || "Internal server error",
+      });
+    }
+  }
+);
 
 export default router;

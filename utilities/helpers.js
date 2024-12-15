@@ -24,7 +24,6 @@ export const mapServiceRequests = async (
         ? assignedEmployeePhone
         : "N/A";
       assignedEmployee = assignedEmployee ? assignedEmployee : "Unassigned";
-      console.log("request.employee", request.employee_id);
 
       // Get customer contact
       let customerContact;
@@ -32,7 +31,6 @@ export const mapServiceRequests = async (
         customerContact = request.customer_id.phone;
       }
       customerContact = customerContact ? customerContact : "N/A";
-      console.log("request.phone", customerContact);
 
       // Device info
       const device = `${repairDetails?.model_name || "Unknown Device"}`;

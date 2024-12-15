@@ -868,3 +868,119 @@ export async function updateStatusById(serviceRequestId, newStatus) {
 
   return updatedRequest;
 }
+
+// Function to change status of service requests
+export async function modifyStatusAndAssign(
+  serviceRequestId,
+  currentStatus,
+  outcomeStatus,
+  employee_id = null
+) {
+  // Fetch the service request by ID
+  const serviceRequest = await ServiceRequest.findById(serviceRequestId);
+  if (!serviceRequest) {
+    throw new CustomError({
+      message: `Service request not found.`,
+      statusCode: 404,
+    });
+  }
+
+  // Validate current status and apply the necessary changes
+  if (currentStatus === "waiting for drop-off") {
+    // Only status change allowed is to "in-process" and requires employee_id
+    if (outcomeStatus !== "in-process") {
+      throw new CustomError({
+        message: `Invalid status change. From "waiting for drop-off", only "in-process" is allowed.`,
+        statusCode: 400,
+      });
+    }
+
+    if (!employee_id || !dataValidator.isValidObjectId(employee_id)) {
+      throw new CustomError({
+        message: `Employee ID is required and must be valid when changing the status to "in-process".`,
+        statusCode: 400,
+      });
+    }
+
+    const employee = await User.findById(employee_id);
+    if (!employee || employee.role !== "employee") {
+      throw new CustomError({
+        message: `Invalid employee ID: ${employee_id}.`,
+        statusCode: 400,
+      });
+    }
+
+    // Assign the employee_id and change the status to "in-process"
+    serviceRequest.status = "in-process";
+    serviceRequest.employee_id = employee_id;
+  } else if (currentStatus === "in-process") {
+    // Only status change allowed is to "pending for approval", no employee_id needed
+    if (outcomeStatus !== "pending for approval") {
+      throw new CustomError({
+        message: `Invalid status change. From "in-process", only "pending for approval" is allowed.`,
+        statusCode: 400,
+      });
+    }
+
+    serviceRequest.status = "pending for approval";
+    serviceRequest.employee_id = null; // No employee ID is needed in "pending for approval"
+  } else if (currentStatus === "pending for approval") {
+    // Two possible outcomes: "ready for pickup" or "reassigned"
+    if (outcomeStatus === "ready for pickup") {
+      serviceRequest.status = "ready for pickup";
+      serviceRequest.employee_id = null; // No employee_id when status is "ready for pickup"
+    } else if (outcomeStatus === "reassigned") {
+      if (!employee_id || !dataValidator.isValidObjectId(employee_id)) {
+        throw new CustomError({
+          message: `Employee ID is required and must be valid when changing status to "reassigned".`,
+          statusCode: 400,
+        });
+      }
+
+      const employee = await User.findById(employee_id);
+      if (!employee || employee.role !== "employee") {
+        throw new CustomError({
+          message: `Invalid employee ID: ${employee_id}.`,
+          statusCode: 400,
+        });
+      }
+
+      // If the employee_id is different from the current employee_id, update it
+      if (serviceRequest.employee_id !== employee_id) {
+        serviceRequest.status = "in-process"; // Change status back to "in-process"
+        serviceRequest.employee_id = employee_id; // Reassign employee
+      }
+    } else {
+      throw new CustomError({
+        message: `Invalid outcome status. Must be either "ready for pickup" or "reassigned".`,
+        statusCode: 400,
+      });
+    }
+  } else if (currentStatus === "ready for pickup") {
+    // Only possible status change is to "complete"
+    if (outcomeStatus !== "complete") {
+      throw new CustomError({
+        message: `Invalid status change. From "ready for pickup", only "complete" is allowed.`,
+        statusCode: 400,
+      });
+    }
+
+    serviceRequest.status = "complete";
+  } else {
+    throw new CustomError({
+      message: `Invalid current status: ${currentStatus}.`,
+      statusCode: 400,
+    });
+  }
+
+  try {
+    // Save the changes to the service request
+    await serviceRequest.save();
+    return serviceRequest;
+  } catch (error) {
+    throw new CustomError({
+      message: error.message,
+      statusCode: 500,
+    });
+  }
+}

@@ -10,6 +10,7 @@ import {
   removeEmployeeFromStore,
   changeStoreManager,
   getReviewsById,
+  getEmployeesWithServiceRequestCount,
 } from "../data/stores.js";
 import {
   isAuthenticated,
@@ -83,13 +84,17 @@ router.get("/:id", async (req, res) => {
       errors.push("Please provide a valid Store ID!");
     }
     const reviews = await getReviewsById(id);
-    let customerReviews = []
+    let customerReviews = [];
     let totalRatings = 0;
     // console.log(reviews)
     try {
       for (let review of reviews) {
         // console.log(review);
-        customerReviews.push({rating:review.feedback.rating,comment:review.feedback.comment, customerName:review.customer_id.name})
+        customerReviews.push({
+          rating: review.feedback.rating,
+          comment: review.feedback.comment,
+          customerName: review.customer_id.name,
+        });
         totalRatings = review.feedback.rating + totalRatings;
       }
       totalRatings = totalRatings / reviews.length;
@@ -109,8 +114,8 @@ router.get("/:id", async (req, res) => {
       json: JSON.stringify,
       store,
       errors: [],
-      customerReviews:customerReviews,
-      totalRatings:totalRatings?totalRatings.toFixed(1):null,
+      customerReviews: customerReviews,
+      totalRatings: totalRatings ? totalRatings.toFixed(1) : null,
       user: req.session.user,
     });
   } catch (error) {
@@ -401,4 +406,38 @@ router.patch(
     }
   }
 );
+
+// Route to get employee to service request count map for a given store
+router.post(
+  "/getEmployeeDetails",
+  isAuthenticated,
+  hasRole(["admin", "store-manager"]),
+  async (req, res) => {
+    try {
+      let { store_id } = req.body;
+      // Validate store_id is provided
+      store_id = store_id.trim();
+      if (!validatorFuncs.validId(store_id)) {
+        return res.status(400).json({ error: "Store ID is required" });
+      }
+
+      // Call the function to get the employees with service request count
+      const employeesWithRequestCount =
+        await getEmployeesWithServiceRequestCount(store_id);
+
+      // Return the result
+      res.status(200).json({
+        success: true,
+        employees: employeesWithRequestCount,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: error.message || "Internal server error",
+      });
+    }
+  }
+);
+
 export default router;

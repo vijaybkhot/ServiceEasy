@@ -41,9 +41,6 @@ router.get(
         (serviceRequest) => serviceRequest.status !== "complete"
       );
 
-      console.log(unMappedCompletedServiceRequests.length);
-      console.log(unMappedInProgressServiceRequests.length);
-
       // Get page numbers from query params
       const completedPage = parseInt(req.query.completedPage) || 1;
       const inProgressPage = parseInt(req.query.inProgressPage) || 1;
@@ -149,8 +146,6 @@ router.get(
         inProgressPage,
         pageSize
       );
-
-      console.log(pendingServiceRequests[0]);
 
       return res.status(200).render("dashboards/store-manager-dashboard", {
         title: "Manager Dashboard",

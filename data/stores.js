@@ -32,7 +32,7 @@ async function getReviewsById(storeId) {
         store_id: storeId,
         feedback: { $ne: undefined },
       },
-      { feedback: 1, customer_id: 1, }
+      { feedback: 1, customer_id: 1 }
     )
       .populate("customer_id", "name email")
       .lean();
@@ -437,6 +437,41 @@ async function changeStoreManager(storeId, storeManagerId) {
   }
 }
 
+// Function to get employess and service_request count mapping for a give store_id
+async function getEmployeesWithServiceRequestCount(store_id) {
+  try {
+    // Validate store_id
+    if (!ObjectId.isValid(store_id)) {
+      throw new Error("Invalid store ID");
+    }
+
+    // Get store by ID
+    const store = await Store.findById(store_id).populate("employees");
+
+    if (!store) {
+      throw new Error("Store not found");
+    }
+
+    // count the number of service requests assigned to each employee
+    const employeesWithRequestCount = await Promise.all(
+      store.employees.map(async (employee) => {
+        const requestCount = await ServiceRequest.countDocuments({
+          employee_id: employee._id,
+        });
+        return {
+          ...employee.toObject(),
+          serviceRequestCount: requestCount,
+        };
+      })
+    );
+
+    return employeesWithRequestCount;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error while fetching employees with service requests");
+  }
+}
+
 export {
   getAll,
   getById,
@@ -447,4 +482,5 @@ export {
   removeEmployeeFromStore,
   changeStoreManager,
   getReviewsById,
+  getEmployeesWithServiceRequestCount,
 };

@@ -172,6 +172,97 @@ export const fetchServiceRequestById = async function (id) {
   }
 };
 
+// Function to get employeeDetails and serviceRequest count of each employee for a storeId
+export const getEmployeeDetails = async function (storeId) {
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/stores/getEmployeeDetails",
+      {
+        store_id: storeId,
+      }
+    );
+    console.log("Employee Details:", response.data);
+    return response.data.employees;
+  } catch (error) {
+    console.error(
+      "Error fetching employee details:",
+      error.response?.data || error.message
+    );
+    showAlert("error", error.response?.data?.message || error.message);
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+};
+
+//  function to modify status route
+export const modifyStatus = async function (
+  serviceRequestId,
+  currentStatus,
+  outcomeStatus = null,
+  employeeId = null
+) {
+  try {
+    const requestBody = {
+      service_request_id: serviceRequestId,
+      current_status: currentStatus,
+      outcome_status: outcomeStatus,
+      employee_id: employeeId,
+    };
+
+    const response = await axios.put(
+      "http://localhost:3000/api/service-request/modify-status",
+      requestBody,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    console.log("Status updated successfully:", response.data);
+    return response.data.serviceRequest;
+  } catch (error) {
+    if (error.response) {
+      console.error("Error response:", error.response.data);
+      showAlert("error", error.response.data.message);
+    } else if (error.request) {
+      console.error("No response received:", error.request);
+      showAlert("error", "Server error, please try again later.");
+    } else {
+      console.error("Request error:", error.message);
+      showAlert(
+        "error",
+        "An error occurred while trying to update the status."
+      );
+    }
+  }
+};
+
+// function to create employeeActivity
+export const createEmployeeActivity = async function (activityData) {
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/api/employee-activity",
+      activityData
+    );
+    console.log("Employee Activity Created:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error creating employee activity:",
+      error.response?.data || error.message
+    );
+    showAlert("error", error.response?.data?.message || error.message);
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+};
+
 // Get date in ordinal suffix format
 export function formatDateWithOrdinalSuffix(dateStr, daysToAdd) {
   const date = new Date(dateStr);
@@ -205,10 +296,37 @@ function getOrdinalSuffix(day) {
 // Check if valid id
 export const isValidOrderId = (orderId) => /^[a-f\d]{24}$/i.test(orderId);
 
+// Load service request details
+export const loadServiceRequestDetails = async function (orderId, user) {
+  try {
+    // Fetch service request by ID
+    let serviceRequest = await fetchServiceRequestById(orderId);
+
+    // Check if service request was found
+    if (!serviceRequest) {
+      showAlert("error", "No service request found for this Order ID.");
+      return;
+    }
+
+    // Extract store ID from the service request
+    let store_id = serviceRequest.store_id._id;
+
+    // Get employee details for the store
+    let employees = await getEmployeeDetails(store_id);
+
+    // Populate the overlay with service request details and employees
+    populateServiceRequestOverlay(serviceRequest, employees, user);
+  } catch (error) {
+    // Handle error fetching the service request
+    showAlert("error", "There was an error fetching the service request.");
+  }
+};
+
 // Populate Service request for manager
 export const populateServiceRequestOverlay = function (
   serviceRequest,
-  employees
+  employees,
+  user
 ) {
   const detailsContainer = document.getElementById("service-request-details");
   let employeeSelectHTML = "";
@@ -224,15 +342,18 @@ export const populateServiceRequestOverlay = function (
         ${employees
           .map(
             (employee) =>
-              `<option value="${employee._id}">${employee.name}</option>`
+              `<option value="${employee._id}">${employee.name} (${employee.serviceRequestCount} requests)</option>`
           )
           .join("")}
       </select>
+      <label for="assignmentComment"><strong>Comment (Optional):</strong></label>
+      <textarea id="assignmentComment" rows="4" placeholder="Add any notes or comments here..."></textarea>
     `;
 
     // Assign button HTML
     assignButtonHTML = `<button id="assignEmployeeBtn">Assign Employee</button>`;
   }
+
   detailsContainer.innerHTML = `
     <p><strong>Order ID:</strong> ${serviceRequest._id.toString()}</p>
     <p><strong>Device:</strong> ${serviceRequest.repair_details.model_name}</p>
@@ -255,19 +376,21 @@ export const populateServiceRequestOverlay = function (
     <p><strong>Assigned Employee:</strong> ${
       serviceRequest.employee_id ? serviceRequest.employee_id.name : "N/A"
     }</p>
-<p><strong>Employee Contact:</strong> ${
-    serviceRequest.employee_id ? serviceRequest.employee_id.phone : "N/A"
-  }</p>
-  <button id="manageRequestBtn">Manage This Request</button>
-  <button id="closeOverlayBtn">Close</button>
-   `;
+    <p><strong>Employee Contact:</strong> ${
+      serviceRequest.employee_id ? serviceRequest.employee_id.phone : "N/A"
+    }</p>
+    ${employeeSelectHTML}
+    ${assignButtonHTML}
+    <button id="closeOverlayBtn">Close</button>
+
+  `;
 
   // Show the overlay
   const closeOverlayButton = document.getElementById("closeOverlayBtn");
   const overlay = document.getElementById("service-request-overlay");
-  const manageRequestBtn = document.getElementById("manageRequestBtn");
   const assignEmployeeBtn = document.getElementById("assignEmployeeBtn");
   const employeeSelect = document.getElementById("employeeSelect");
+
   overlay.classList.remove("hidden");
 
   // Close  overlay function
@@ -290,7 +413,7 @@ export const populateServiceRequestOverlay = function (
   });
 
   if (assignEmployeeBtn) {
-    assignEmployeeBtn.addEventListener("click", function () {
+    assignEmployeeBtn.addEventListener("click", async function () {
       const selectedEmployeeId = employeeSelect.value;
 
       if (!selectedEmployeeId) {
@@ -301,8 +424,68 @@ export const populateServiceRequestOverlay = function (
         return;
       }
 
-      // Call function to assign employee (could be an API call)
-      assignServiceRequestToEmployee(serviceRequest._id, selectedEmployeeId);
+      console.log(serviceRequest._id);
+      console.log(selectedEmployeeId);
+      showAlert("info", "Correct selection");
+
+      // Details to create employeeActivity
+      let activityData;
+      if (document.getElementById("assignmentComment").value.trim() !== "") {
+        let comment = document.getElementById("assignmentComment").value.trim();
+        assignmentComment = {
+          date: new Date(),
+          comment: comment,
+        };
+        activityData = {
+          service_request_id: serviceRequest._id,
+          activity_type: "assign/submit",
+          processing_employee_id: user.id,
+          assigned_by: serviceRequest.customer_id._id,
+          assigned_to: selectedEmployeeId,
+          comments: assignmentComment,
+          status: "completed",
+        };
+      } else {
+        activityData = {
+          service_request_id: serviceRequest._id,
+          activity_type: "assign/submit",
+          processing_employee_id: user.id,
+          assigned_by: serviceRequest.customer_id._id,
+          assigned_to: selectedEmployeeId,
+          status: "completed",
+        };
+      }
+
+      console.log(activityData);
+
+      // Details to modify status
+      let service_request_id = serviceRequest._id;
+      let current_status = serviceRequest.status;
+      let outcome_status = "in-process";
+      let employee_id = selectedEmployeeId;
+
+      // Call function to assign service request to employee
+      let modifiedServiceRequest = await modifyStatus(
+        service_request_id,
+        current_status,
+        outcome_status,
+        employee_id
+      );
+      if (!modifiedServiceRequest) {
+        showAlert("error", "Failed to modify the service request Status");
+      } else {
+        showAlert("success", "Service request assigned successfully!");
+        // Call function to create employee-Activity
+        let employeeActivity = await createEmployeeActivity(activityData);
+        if (!employeeActivity) {
+          showAlert("error", "Failed to modify the service request Status");
+        } else {
+          showAlert("success", "Service request assigned successfully!");
+          document.getElementById("orderId").value = "";
+          closeOverlay();
+          location.reload();
+        }
+      }
     });
   }
 };

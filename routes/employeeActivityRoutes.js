@@ -103,16 +103,14 @@ router.post("/", async (req, res) => {
           )}`
         );
       }
-
-      if (!comments || !comments.comment) {
-        throw new Error("Comments are required with a valid comment.");
-      }
-
-      if (
-        typeof comments.comment !== "string" ||
-        comments.comment.trim().length === 0
-      ) {
-        throw new Error("Comment must be a non-empty string.");
+      // Validate comments
+      if (comments) {
+        if (
+          typeof comments.comment !== "string" ||
+          comments.comment.trim().length === 0
+        ) {
+          throw new Error("Comment must be a non-empty string if provided.");
+        }
       }
 
       // Make sure status is 'completed' for 'assign/submit' activity type

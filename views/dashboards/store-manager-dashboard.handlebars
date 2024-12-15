@@ -1,5 +1,7 @@
 <main id="store-manager-main">
     <!-- Find Service Request Section -->
+    <input type="hidden" id="user-data" value='${JSON.stringify(req.session.user)}' />
+
     <section id="find-service-request">
         <h2>Find Service Request</h2>
         <div>
@@ -19,8 +21,8 @@
                     <th>Device</th>
                     <th>Repair Type</th>
                     <th>Price</th>
-                    <th>Date Created</th>
-                    <th>Delivery/Completion Date</th>
+                    <th>Date Created (yyyy/mm/dd)</th>
+                    <th>Delivery/Completion Date (yyyy/mm/dd)</th>
                     <th>Status Message</th>
                     <th>Customer Contact</th>
                     <th>Assigned Employee</th>
@@ -41,7 +43,7 @@
                     <td>{{customerContact}}</td>
                     <td>{{assignedEmployee}}</td>
                     <td>{{assignedEmployeePhone}}</td>
-                    <td><button onclick="openServiceRequestDetails('{{orderId}}')">View Details</button></td>
+                    <td><button class="view-details-btn" data-order-id="{{orderId}}">View Details</button></td>
                 </tr>
                 {{/each}}
             </tbody>
@@ -64,8 +66,8 @@
                     <th>Device</th>
                     <th>Repair Type</th>
                     <th>Price</th>
-                    <th>Date Created</th>
-                    <th>Delivery/Completion Date</th>
+                    <th>Date Created (yyyy/mm/dd)</th>
+                    <th>Delivery/Completion Date (yyyy/mm/dd)</th>
                     <th>Status Message</th>
                     <th>Customer Contact</th>
                     <th>Assigned Employee</th>
@@ -86,8 +88,7 @@
                     <td>{{customerContact}}</td>
                     <td>{{assignedEmployee}}</td>
                     <td>{{assignedEmployeePhone}}</td>
-                    <td><button onclick="openServiceRequestDetails('{{orderId}}')">View Details</button></td>
-
+                    <td><button class="view-details-btn" data-order-id="{{orderId}}">View Details</button></td>
                 </tr>
                 {{/each}}
             </tbody>

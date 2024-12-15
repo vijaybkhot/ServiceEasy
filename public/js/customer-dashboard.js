@@ -11,6 +11,8 @@ const getQuotationFormContainer = document.getElementById("get-quotation-form");
 const newRequestButton = document.getElementById("newRequestButton");
 
 if (getQuotationFormContainer) {
+  const user = JSON.parse(document.getElementById("user-data").dataset.user);
+  document.getElementById("user-data").remove();
   // Toggle hide/show Get Quotation form
   newRequestButton.addEventListener("click", () => {
     getQuotationFormContainer.classList.toggle("hidden");
