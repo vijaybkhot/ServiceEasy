@@ -976,4 +976,27 @@ router.put(
   }
 );
 
+router.get('/process-payment', hasRole(["customer"]), async (req, res, next) => {
+  try {
+    const { associatedPrice, name, email, phone } = req.body;
+
+    const amount = dataValidator.isValidNumber(associatedPrice);
+    name = dataValidator.isValidString(name);
+    email = dataValidator.isValidEmail(email);
+    phone = dataValidator.isValidPhoneNumber(phone);
+
+    const clientSecret = await generateClientSecret({
+      amount,
+      name,
+      email,
+      phone
+    });
+    
+    res.status.send({ clientSecret });
+
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
 export default router;
