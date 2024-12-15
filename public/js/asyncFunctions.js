@@ -61,6 +61,18 @@ export const getUserData = async function () {
   }
 };
 
+// Get user by id
+export async function getUserById(userId) {
+  try {
+    const response = await axios.get(`http://localhost:3000/user/${userId}`);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching user by ID:", error);
+    showAlert("error", error.message);
+    return { success: false, error: error.message };
+  }
+}
+
 // Function to load payment page
 export const getPaymentPage = async function ({
   device_type,
@@ -227,14 +239,21 @@ export const modifyStatus = async function (
     if (error.response) {
       console.error("Error response:", error.response.data);
       showAlert("error", error.response.data.message);
+      throw new Error(
+        error.response.data.message || "Server responded with an error."
+      );
     } else if (error.request) {
       console.error("No response received:", error.request);
       showAlert("error", "Server error, please try again later.");
+      throw new Error("Server error, no response received from server.");
     } else {
       console.error("Request error:", error.message);
       showAlert(
         "error",
         "An error occurred while trying to update the status."
+      );
+      throw new Error(
+        error.message || "An error occurred while processing the request."
       );
     }
   }
@@ -313,6 +332,7 @@ async function updateActivityStatus(activityId, status = "completed") {
   } catch (error) {
     console.error("Error updating activity status:", error);
     showAlert("error", error.message);
+    throw new Error(error.message);
   }
 }
 
@@ -374,7 +394,7 @@ export function formatDateWithOrdinalSuffix(dateStr, daysToAdd) {
   date.setDate(date.getDate() + daysToAdd);
 
   const day = date.getDate();
-  const month = date.toLocaleString("default", { month: "long" }); // e.g., July
+  const month = date.toLocaleString("default", { month: "long" });
   const year = date.getFullYear();
 
   const ordinalSuffix = getOrdinalSuffix(day);
@@ -482,7 +502,7 @@ export const loadServiceRequestDetails = async function (
 };
 
 // Populate Service request for manager/employee
-export const populateServiceRequestOverlay = function (
+export const populateServiceRequestOverlay = async function (
   serviceRequest,
   employees,
   user,
@@ -496,6 +516,8 @@ export const populateServiceRequestOverlay = function (
   let submitForApprovalHTML = "";
   let reassignHTML = "";
   let approveButtonHTML = "";
+  let submittedByEmployeeHTML = "";
+  let handOverDeviceHTML = "";
 
   // dynamic html select input and assign button if status is "Waiting for drop-off"
   if (
@@ -552,11 +574,16 @@ export const populateServiceRequestOverlay = function (
     `;
   }
 
-  // Conditionally add reassign options and approval buttons if status is "Pending for Approval"
+  // add reassign options and approval buttons if status is "Pending for Approval"
   if (
     serviceRequest.status.toLowerCase() === "pending for approval" &&
     user.role === "store-manager"
   ) {
+    // Get details of employee who submitted:
+    let assigned_by_id = currentActivity.assigned_by;
+    console.log("assigned_by_id", assigned_by_id);
+    let submittedByEmployee = await getUserById(assigned_by_id);
+    let submittedByEmployeeDetails = "";
     // Show the employee select dropdown with all employees for reassign
     employeeSelectHTML = `
       <label for="employeeSelect"><strong>Reassign to Employee:</strong></label>
@@ -580,19 +607,27 @@ export const populateServiceRequestOverlay = function (
     approveButtonHTML = `<button id="approveRequestBtn">Approve Request</button>`;
 
     // Display the employee who submitted the request (submitted by the store manager)
-    let submittedByEmployee = serviceRequest.employee_id;
+
     if (submittedByEmployee) {
-      const { name, phone } = submittedByEmployee;
+      const { name, phone, email } = submittedByEmployee;
       submittedByEmployeeHTML = `
         <div id="submittedBySection">
           <h3>Submitted By Employee</h3>
           <p><strong>Name:</strong> ${name}</p>
           <p><strong>Contact:</strong> ${phone}</p>
+          <p><strong>Name:</strong> ${email}</p>
         </div>
       `;
     }
   }
 
+  // Case for ready for pickup
+  if (
+    serviceRequest.status.toLowerCase() === "ready for pickup" &&
+    user.role === "store-manager"
+  ) {
+    handOverDeviceHTML = `<button id="handOverDeviceBtn">Hand Over Device</button>`;
+  }
   // The final details container
   detailsContainer.innerHTML = `
     <p><strong>Order ID:</strong> ${serviceRequest._id.toString()}</p>
@@ -626,6 +661,7 @@ export const populateServiceRequestOverlay = function (
     ${reassignHTML}
     ${approveButtonHTML}
     ${submittedByEmployeeHTML}
+    ${handOverDeviceHTML}
     <button id="closeOverlayBtn">Close</button>
 
   `;
@@ -636,6 +672,9 @@ export const populateServiceRequestOverlay = function (
   const assignEmployeeBtn = document.getElementById("assignEmployeeBtn");
   const employeeSelect = document.getElementById("employeeSelect");
   const submitForApprovalBtn = document.getElementById("submitForApprovalBtn");
+  const approveRequestBtn = document.getElementById("approveRequestBtn");
+  const reassignEmployeeBtn = document.getElementById("reassignEmployeeBtn");
+  const handOverDeviceBtn = document.getElementById("handOverDeviceBtn");
 
   overlay.classList.remove("hidden");
 
@@ -669,7 +708,6 @@ export const populateServiceRequestOverlay = function (
         );
         return;
       }
-      showAlert("info", "Correct selection");
 
       // Details to create employeeActivity
       let managerActivityData;
@@ -836,5 +874,157 @@ export const populateServiceRequestOverlay = function (
         }
       }
     });
+  }
+
+  // Pending for approval activities
+  if (approveRequestBtn) {
+    ///////////////////////////////////////////////
+    // Approve activity handling
+    approveRequestBtn.addEventListener("click", async () => {
+      const selectedEmployeeId = employeeSelect.value;
+      if (selectedEmployeeId) {
+        showAlert(
+          "warning",
+          "Please do not select any employee to approve request."
+        );
+        return;
+      }
+      try {
+        // Details to modify status
+        let service_request_id = serviceRequest._id;
+        let current_status = serviceRequest.status;
+        let outcome_status = "ready for pickup";
+        let employee_id = null; // No employee
+
+        // 1) Modify current activity status to completed
+        let updatedApprovalActivity = await updateActivityStatus(
+          currentActivity._id
+        );
+
+        // 2) Call function to modify the status of the service request to reassigned
+        let modifiedServiceRequest = await modifyStatus(
+          service_request_id,
+          current_status,
+          outcome_status,
+          employee_id
+        );
+
+        if (!updatedApprovalActivity || !modifiedServiceRequest) {
+          showAlert("error", "Failed to approve");
+        }
+        showAlert("success", "Service request approved successfully!");
+        closeOverlay();
+        setTimeout(() => {
+          location.reload();
+        }, 3000);
+      } catch (error) {
+        // Catch any errors from updateActivityStatus, modifyStatus, or any other unexpected errors
+        console.error("Error while approving request:", error);
+        showAlert("error", "An error occurred while approving the request.");
+        closeOverlay();
+        setTimeout(() => {
+          location.reload();
+        }, 3000);
+      }
+    });
+
+    //////////////////////////////////////////////////////
+    // Reassign activity handling
+    reassignEmployeeBtn.addEventListener("click", async () => {
+      const selectedEmployeeId = employeeSelect.value;
+      if (!selectedEmployeeId) {
+        showAlert(
+          "warning",
+          "Please select an employee to assign this service request."
+        );
+        return;
+      }
+      // Gather data
+      let managerReassignActivityData;
+      let newEmployeeActivityData = {
+        service_request_id: serviceRequest._id,
+        activity_type: "repair",
+        processing_employee_id: selectedEmployeeId,
+        assigned_by: user.id,
+        status: "in-progress",
+      };
+
+      // Data for manager reassign
+      let reassignmentComment;
+      if (document.getElementById("reassignmentComment").value.trim() !== "") {
+        let comment = document
+          .getElementById("reassignmentComment")
+          .value.trim();
+        reassignmentComment = {
+          date: new Date(),
+          comment: comment,
+        };
+        managerReassignActivityData = {
+          service_request_id: serviceRequest._id,
+          activity_type: "assign/submit",
+          processing_employee_id: user.id,
+          assigned_by: currentActivity.assigned_by,
+          assigned_to: selectedEmployeeId,
+          comments: reassignmentComment,
+          status: "completed",
+        };
+      } else {
+        managerReassignActivityData = {
+          service_request_id: serviceRequest._id,
+          activity_type: "assign/submit",
+          processing_employee_id: user.id,
+          assigned_by: currentActivity.assigned_by,
+          assigned_to: selectedEmployeeId,
+          status: "completed",
+        };
+      }
+      // Details to modify status
+      let service_request_id = serviceRequest._id;
+      let current_status = serviceRequest.status;
+      let outcome_status = "reassigned";
+      let employee_id = selectedEmployeeId;
+
+      // 1) Modify current activity status to completed
+      // Complete approval activity
+      let updatedApprovalActivity = await updateActivityStatus(
+        currentActivity._id
+      );
+
+      // 2) Call function to modfy the status of the service request to reassigned
+      let modifiedServiceRequest = await modifyStatus(
+        service_request_id,
+        current_status,
+        outcome_status,
+        employee_id
+      );
+      // 3) Create new employee repair activity for the newly selected employee
+      if (!modifiedServiceRequest) {
+        showAlert("error", "Failed to modify the service request Status");
+      } else {
+        showAlert("success", "Service request assigned successfully!");
+        // 4) Call function to create employee-Activity of repairing and manager activity of reassigning
+        let managerReassignActivity = await createEmployeeActivity(
+          managerReassignActivityData
+        );
+        let newEmployeeActivity = await createEmployeeActivity(
+          newEmployeeActivityData
+        );
+        if (!managerReassignActivity || !newEmployeeActivity) {
+          showAlert("error", "Failed to modify the service request Status");
+        } else {
+          showAlert("success", "Service request assigned successfully!");
+          document.getElementById("orderId").value = "";
+          closeOverlay();
+          setTimeout(() => {
+            location.reload();
+          }, 3000);
+        }
+      }
+    });
+  }
+
+  // Ready for pickup activities - handover device and complete service request
+  if (handOverDeviceBtn) {
+    handOverDeviceBtn.addEventListener("click", async () => {});
   }
 };

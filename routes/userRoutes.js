@@ -1,6 +1,7 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import validator from "validator";
+import { ObjectId } from "mongodb";
 import session from "express-session";
 
 import { signupLimiter } from "../utilities/middlewares/securityMiddlewares.js";
@@ -226,6 +227,24 @@ router.get("/api/user", isAuthenticated, async (req, res, next) => {
     res.status(200).json({ user: res.locals.user });
   } catch (error) {
     next(error);
+  }
+});
+
+// Get user by id route for api call
+router.get("/user/:id", async (req, res) => {
+  try {
+    let userId = req.params.id;
+
+    // Validate userId
+    if (!ObjectId.isValid(userId)) {
+      return res
+        .status(400)
+        .json({ error: `Invalid ObjectId string: ${userId}` });
+    }
+    const user = await userController.getUserById(userId);
+    res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    res.status(404).json({ success: false, error: error.message });
   }
 });
 

@@ -71,7 +71,7 @@ export async function getAllUsers() {
 }
 
 export async function getUsersByRole(role) {
-  const users = await User.find({role:role});
+  const users = await User.find({ role: role });
   const plainUsers = users.map((user) => user.toObject());
   // console.log(plainUsers)
   if (users.length === 0) {
