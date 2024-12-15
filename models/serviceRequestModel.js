@@ -11,14 +11,8 @@ const serviceRequestSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: function () {
-        // employee_id is required if status is "in-process" or later
-        const requiredStatuses = [
-          "in-process",
-          "pending for approval",
-          "ready for pickup",
-          "reassigned",
-          "complete",
-        ];
+        // employee_id is required if status is "in-process"
+        const requiredStatuses = ["in-process"];
         return requiredStatuses.includes(this.status);
       },
     },
@@ -145,13 +139,7 @@ const serviceRequestSchema = new mongoose.Schema(
 
 // Pre-validation hook to ensure employee_id is set when required by the status
 serviceRequestSchema.pre("validate", function (next) {
-  const requiredStatuses = [
-    "in-process",
-    "pending for approval",
-    "ready for pickup",
-    "reassigned",
-    "complete",
-  ];
+  const requiredStatuses = ["in-process"];
 
   // Ensure employee_id is set if status requires it
   if (requiredStatuses.includes(this.status) && !this.employee_id) {

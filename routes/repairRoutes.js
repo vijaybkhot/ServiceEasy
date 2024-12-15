@@ -16,13 +16,12 @@ import {
   getModelsForDeviceType,
 } from "../data/repairData.js";
 
-const router = express.Router();
+import {
+  isAuthenticated,
+  hasRole,
+} from "../utilities/middlewares/authenticationMiddleware.js";
 
-// // home page for repairs
-// router.get("/", async (req, res) => {
-//   let repairList = await getAllRepairs();
-//   res.json(repairList);
-// });
+const router = express.Router();
 
 // helper validation function
 const isValidRepair = (models) => {
@@ -88,6 +87,8 @@ const isValidRepair = (models) => {
     });
   });
 };
+
+router.use(isAuthenticated);
 
 // Get all repairs
 router.get("/", async (req, res) => {

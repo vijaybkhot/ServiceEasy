@@ -675,7 +675,6 @@ export const getServiceRequestsByUser = async (user_id, role) => {
       .populate("customer_id")
       .populate("store_id");
 
-    // Return the result
     return serviceRequests;
   } catch (error) {
     throw new CustomError({

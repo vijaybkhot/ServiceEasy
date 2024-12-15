@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import validatorFuncs from "../utilities/dataValidator.js";
 import { ObjectId } from "mongodb";
 import Store from "../models/storeModel.js";
@@ -492,6 +493,41 @@ async function getEmployeesWithServiceRequestCount(store_id) {
   }
 }
 
+// Function to get the store where an employee works
+async function getStoreForEmployee(employee_id) {
+  if (!mongoose.isValidObjectId(employee_id)) {
+    throw new Error(
+      `Invalid Employee ID: ${employee_id}. Please provide a valid Object ID.`
+    );
+  }
+
+  try {
+    const employee = await User.findById(employee_id);
+
+    if (!employee) {
+      throw new Error(`Employee with ID ${employee_id} not found.`);
+    }
+
+    if (employee.role !== "employee") {
+      throw new Error(
+        `User with ID ${employee_id} does not have the "employee" role.`
+      );
+    }
+
+    const store = await Store.findOne({ employees: employee_id });
+
+    // Return nothing if the employee is not found in any store
+    if (!store) {
+      return;
+    }
+
+    // Return store details
+    return store;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
 export {
   getAll,
   getById,
@@ -503,4 +539,5 @@ export {
   changeStoreManager,
   getReviewsById,
   getEmployeesWithServiceRequestCount,
+  getStoreForEmployee,
 };

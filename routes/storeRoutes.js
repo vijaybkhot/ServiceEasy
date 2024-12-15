@@ -19,6 +19,7 @@ import {
 import { getUsersByRole } from "../data/user.js";
 
 const router = express.Router();
+router.use(isAuthenticated);
 
 // Route to render the "Add Store" page
 router.get("/add", isAuthenticated, hasRole("admin"), async (req, res) => {
@@ -411,7 +412,7 @@ router.patch(
 router.post(
   "/getEmployeeDetails",
   isAuthenticated,
-  hasRole(["admin", "store-manager"]),
+  hasRole(["admin", "store-manager", "employee"]),
   async (req, res) => {
     try {
       let { store_id } = req.body;

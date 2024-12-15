@@ -2,7 +2,7 @@ import { isValidObjectId } from "mongoose";
 import EmployeeActivity from "../models/employeeActivityModel.js";
 import User from "../models/userModel.js";
 import ServiceRequest from "../models/serviceRequestModel.js";
-import * as dataValidator from "../utilities/dataValidator.js";
+import dataValidator from "../utilities/dataValidator.js";
 
 export async function createEmployeeActivity({
   service_request_id,
@@ -175,6 +175,7 @@ export async function createEmployeeActivity({
 // Get employee activities for a service request ID
 export async function getEmployeeActivitiesForServiceRequest(serviceRequestId) {
   // Validate the serviceRequestId t
+
   serviceRequestId = dataValidator.isValidObjectId(serviceRequestId);
 
   if (!serviceRequestId) {
@@ -189,13 +190,6 @@ export async function getEmployeeActivitiesForServiceRequest(serviceRequestId) {
     });
   } catch (error) {
     throw new Error(`Error getting employee activities: ${error.message}`);
-  }
-
-  // Check if any employee activities exist for the given service request ID
-  if (!employeeActivities || employeeActivities.length === 0) {
-    throw new Error(
-      `No employee activities found for service request with ID: ${serviceRequestId}`
-    );
   }
 
   return employeeActivities;
@@ -482,6 +476,10 @@ export async function updateEmployeeActivityStatus(
   }
 
   // Ensure the current status is "in-progress" before allowing a change to "completed"
+  if (employeeActivity.status === "completed") {
+    // status already completed
+    return;
+  }
   if (employeeActivity.status !== "in-progress") {
     throw new Error(
       `Status change is only allowed from "in-progress" to "completed". Current status: ${employeeActivity.status}`
@@ -541,7 +539,7 @@ export async function deleteEmployeeActivity(activityId) {
     throw new Error(`Error deleting employee activity: ${error.message}`);
   }
 
-  // If no activity was deleted (shouldn't happen if validation passed)
+  // If no activity was deleted
   if (!deletedActivity) {
     throw new Error(
       `Could not delete employee activity with ID: ${activityId}.`
@@ -549,4 +547,59 @@ export async function deleteEmployeeActivity(activityId) {
   }
 
   return deletedActivity;
+}
+
+// Get all service requests for a user(employee) using employee activities performed in the past
+export async function getServiceRequestsForEmployee(userId) {
+  // Validate the userId
+  userId = dataValidator.isValidObjectId(userId);
+
+  if (!userId) {
+    throw new Error(`Invalid User ID: ${userId}`);
+  }
+
+  let serviceRequestIds;
+
+  try {
+    // find all employee activities for the provided processing_employee_id
+    const employeeActivities = await EmployeeActivity.find({
+      processing_employee_id: userId,
+    });
+
+    if (!employeeActivities || employeeActivities.length === 0) {
+      return []; // Return an empty array if no employee activities are found
+    }
+
+    // filter all  unique service_request_ids from employee activities
+    serviceRequestIds = employeeActivities.map(
+      (activity) => activity.service_request_id
+    );
+
+    // Remove duplicates
+    serviceRequestIds = [...new Set(serviceRequestIds)];
+  } catch (error) {
+    throw new Error(`Error fetching employee activities: ${error.message}`);
+  }
+
+  let serviceRequests;
+
+  try {
+    // Find and return all service requests that match the extracted service request IDs and are completed in the past
+    serviceRequests = await ServiceRequest.find({
+      _id: { $in: serviceRequestIds },
+      status: "complete",
+    })
+      .populate("employee_id")
+      .populate("customer_id")
+      .populate("store_id");
+
+    // If no service requests are found, return an empty array instead of throwing an error
+    if (!serviceRequests || serviceRequests.length === 0) {
+      return []; // Return an empty array
+    }
+  } catch (error) {
+    throw new Error(`Error fetching service requests: ${error.message}`);
+  }
+
+  return serviceRequests;
 }

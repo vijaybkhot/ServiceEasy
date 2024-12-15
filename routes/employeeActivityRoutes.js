@@ -1,11 +1,22 @@
 import express from "express";
-import { createEmployeeActivity } from "../data/employeeActivity.js";
+import dataValidator from "../utilities/dataValidator.js";
+import {
+  createEmployeeActivity,
+  getEmployeeActivitiesForServiceRequest,
+  getServiceRequestsForEmployee,
+  updateEmployeeActivityStatus,
+} from "../data/employeeActivity.js";
 import { isValidObjectId } from "mongoose";
-import EmployeeActivity from "..//models/employeeActivityModel.js";
 import User from "../models/userModel.js";
 import ServiceRequest from "../models/serviceRequestModel.js";
+import EmployeeActivity from "../models/employeeActivityModel.js";
+import {
+  isAuthenticated,
+  hasRole,
+} from "../utilities/middlewares/authenticationMiddleware.js";
 
 const router = express.Router();
+router.use(isAuthenticated);
 
 // Route to create a new employee activity
 router.post("/", async (req, res) => {
@@ -171,6 +182,115 @@ router.post("/", async (req, res) => {
   } catch (error) {
     // Handle any errors that occur during the creation process
     return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// Route to get employee activities for a service request
+router.get(
+  "/service-requests/:serviceRequestId/",
+  hasRole(["admin", "store-manager", "employee"]),
+  async (req, res) => {
+    const { serviceRequestId } = req.params;
+
+    try {
+      const validServiceRequestId =
+        dataValidator.isValidObjectId(serviceRequestId);
+      if (!validServiceRequestId) {
+        return res.status(400).json({
+          error: `Invalid Service Request ID: ${serviceRequestId}`,
+        });
+      }
+
+      const serviceRequest = await ServiceRequest.findById(serviceRequestId);
+      if (!serviceRequest) {
+        return res.status(404).json({
+          error: `Service Request with ID ${serviceRequestId} does not exist.`,
+        });
+      }
+
+      const employeeActivities = await getEmployeeActivitiesForServiceRequest(
+        serviceRequestId
+      );
+
+      return res.status(200).json({
+        message: "Employee activities retrieved successfully.",
+        data: employeeActivities,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        error: `${error.message}`,
+      });
+    }
+  }
+);
+
+// Route to get all service requests for a user using employee activities
+router.get(
+  "/user/service-requests/:userId",
+  hasRole(["admin", "store-manager", "employee"]),
+  async (req, res) => {
+    const { userId } = req.params;
+
+    const validUserId = dataValidator.isValidObjectId(userId);
+
+    if (!validUserId) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid User ID: ${userId}`,
+      });
+    }
+
+    try {
+      const employeeActivities = await EmployeeActivity.find({
+        processing_employee_id: validUserId,
+      });
+
+      if (employeeActivities.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: `No employee activities found for User ID: ${userId}`,
+        });
+      }
+
+      const serviceRequests = await getServiceRequestsForEmployee(validUserId);
+
+      res.status(200).json({
+        success: true,
+        data: serviceRequests,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+);
+
+// Route to update employee activity status
+router.put("/update-activity-status/:activityId", async (req, res) => {
+  const { activityId } = req.params;
+  const { status } = req.body;
+  console.log(status);
+  console.log(activityId);
+
+  try {
+    // Validate and update the status using the controller function
+    const updatedActivity = await updateEmployeeActivityStatus(
+      activityId,
+      status
+    );
+    res.status(200).json({
+      success: true,
+      message: "Activity status updated successfully",
+      data: updatedActivity,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({
       success: false,
       message: error.message,
     });
