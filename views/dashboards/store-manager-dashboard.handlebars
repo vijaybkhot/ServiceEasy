@@ -1,4 +1,9 @@
 <main id="store-manager-main">
+    <div id="store-data" data-store-id="{{storeId}}" data-store-name="{{storeName}}" data-store-phone="{{storePhone}}">
+    </div>
+
+    <h1>Welcome to the {{storeName}} Dashboard!</h1>
+    <p>Store Phone: {{storePhone}}</p>
     <!-- Find Service Request Section -->
     <input type="hidden" id="user-data" value='${JSON.stringify(req.session.user)}' />
 

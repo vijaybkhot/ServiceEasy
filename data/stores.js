@@ -110,6 +110,16 @@ async function createStore(storeDetails) {
     // Check if the user has the "employee" role
     if (employeeUser.role !== "employee")
       throw new Error(`User with ID ${employeeId} is not an employee.`);
+
+    // Check if the employee is already assigned to another store
+    const existingStore = await Store.findOne({
+      employees: employeeId,
+    });
+    if (existingStore) {
+      throw new Error(
+        `Employee with ID ${employeeId} already works at another store (${existingStore.name}).`
+      );
+    }
   }
 
   try {
@@ -316,6 +326,16 @@ async function addEmployeeToStore(storeId, employeeId) {
   }
   if (employeeUser.role !== "employee") {
     throw new Error(`User with ID ${employeeId} is not an employee.`);
+  }
+
+  // Check if the employee is already assigned to another store
+  const existingStore = await Store.findOne({
+    employees: employeeId,
+  });
+  if (existingStore) {
+    throw new Error(
+      `Employee with ID ${employeeId} already works at another store (${existingStore.name}).`
+    );
   }
 
   // Check if  employee is already in  store employee list

@@ -297,7 +297,11 @@ function getOrdinalSuffix(day) {
 export const isValidOrderId = (orderId) => /^[a-f\d]{24}$/i.test(orderId);
 
 // Load service request details
-export const loadServiceRequestDetails = async function (orderId, user) {
+export const loadServiceRequestDetails = async function (
+  orderId,
+  user,
+  storeId
+) {
   try {
     // Fetch service request by ID
     let serviceRequest = await fetchServiceRequestById(orderId);
@@ -307,9 +311,17 @@ export const loadServiceRequestDetails = async function (orderId, user) {
       showAlert("error", "No service request found for this Order ID.");
       return;
     }
-
     // Extract store ID from the service request
     let store_id = serviceRequest.store_id._id;
+    if (user.role === "store-manager") {
+      if (store_id !== storeId) {
+        showAlert(
+          "warning",
+          "Access denied! You are not allowed to access this Order."
+        );
+        return;
+      }
+    }
 
     // Get employee details for the store
     let employees = await getEmployeeDetails(store_id);

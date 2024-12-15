@@ -1,11 +1,5 @@
 import { showAlert } from "./alert.js";
-import {
-  fetchServiceRequestById,
-  isValidOrderId,
-  populateServiceRequestOverlay,
-  getEmployeeDetails,
-  loadServiceRequestDetails,
-} from "./asyncFunctions.js";
+import { isValidOrderId, loadServiceRequestDetails } from "./asyncFunctions.js";
 
 // DOM elements
 const storeManagerMain = document.getElementById("store-manager-main");
@@ -13,6 +7,10 @@ const storeManagerMain = document.getElementById("store-manager-main");
 if (storeManagerMain) {
   const user = JSON.parse(document.getElementById("user-data").dataset.user);
   document.getElementById("user-data").remove();
+  const storeData = document.getElementById("store-data");
+  const storeId = storeData.dataset.storeId;
+  storeData.remove();
+
   const findButton = document.getElementById("findButton");
   const buttons = document.querySelectorAll(".view-details-btn");
 
@@ -25,7 +23,7 @@ if (storeManagerMain) {
         showAlert("error", "Invalid Order ID. Something wrong with the order.");
         return;
       }
-      await loadServiceRequestDetails(orderId, user);
+      await loadServiceRequestDetails(orderId, user, storeId);
     });
   });
 
@@ -44,6 +42,6 @@ if (storeManagerMain) {
       );
       return;
     }
-    await loadServiceRequestDetails(orderId, user);
+    await loadServiceRequestDetails(orderId, user, storeId);
   });
 }

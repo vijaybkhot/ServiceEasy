@@ -72,17 +72,21 @@ router.get(
   }
 );
 
-router.get("/employee-dashboard", async (req, res, next) => {
-  try {
-    // Render dashboard
-    return res.status(200).render("dashboards/employee-dashboard", {
-      title: "Employee Dashboard",
-      cssPath: `/public/css/employee-dashboard.css`,
-    });
-  } catch (error) {
-    next(error);
+router.get(
+  "/employee-dashboard",
+  isAuthenticated,
+  hasRole(["employee"]),
+  async (req, res, next) => {
+    try {
+      return res.status(200).render("dashboards/employee-dashboard", {
+        title: "Employee Dashboard",
+        cssPath: `/public/css/employee-dashboard.css`,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 router.get(
   "/store-manager-dashboard",
@@ -94,6 +98,7 @@ router.get(
       // Get store id using managerId of manager
       let store = await Store.find({ storeManager: managerId });
       let store_id = store[0]._id.toString();
+      store = store[0];
 
       // Get service requests for store
       const storeServiceRequests =
@@ -151,6 +156,9 @@ router.get(
         title: "Manager Dashboard",
         cssPath: `/public/css/store-manager-dashboard.css`,
         user: req.session.user,
+        storeId: store.id,
+        storeName: store.name,
+        storePhone: store.phone,
         completedServiceRequests,
         pendingServiceRequests,
         inProgressServiceRequests,
