@@ -4,7 +4,7 @@
     <button id="newRequestButton" class="new-request-btn">New Repair Order</button>
 
     <section id="get-quotation-form" class="hidden">
-        <h2>New Service Request</h2>
+        <h2>NEW SERVICE REQUEST</h2>
         <form id="getQuotationForm">
 
 
@@ -147,26 +147,31 @@
     <!-- Feedback overlay for rating and review -->
     <div id="feedback-overlay" class="overlay hidden">
         <div class="overlay-content">
-            <h2>Rate and Review</h2>
-
-            <label for="feedback-rating">Rating (1-5):</label>
-            <select id="feedback-rating">
-                <option value="" disabled selected>Select rating</option>
-                <option value="1">1 - Poor</option>
-                <option value="2">2 - Fair</option>
-                <option value="3">3 - Good</option>
-                <option value="4">4 - Very Good</option>
-                <option value="5">5 - Excellent</option>
-            </select>
-
-            <label for="feedback-comment">Review Comment:</label>
-            <textarea id="feedback-comment" rows="4" placeholder="Write your review here..."></textarea>
-
-            <button id="submit-feedback-btn">Submit Feedback</button>
-            <button id="close-feedback-overlay-btn">Close</button>
+            <h2>RATE AND REVIEW</h2>
+            <div class="feedback-row">
+                {{!-- <p>* fields are required</p> --}}
+                <label for="feedback-rating">Rating<p>*</p>(1-5):</label>
+                <select id="feedback-rating">
+                    <option value="" disabled selected>Select rating</option>
+                    <option value="1">1 - Poor</option>
+                    <option value="2">2 - Fair</option>
+                    <option value="3">3 - Good</option>
+                    <option value="4">4 - Very Good</option>
+                    <option value="5">5 - Excellent</option>
+                </select>
+            </div>
+            <div class="feedback-row">
+                <label for="feedback-comment">Review Comment<p>*</p>:</label>
+            </div>
+            <div class="feedback-row">
+                <textarea id="feedback-comment" rows="4" placeholder="Write your review here..."></textarea>
+            </div>
+            <div class="feedback-row">
+                <button id="submit-feedback-btn">Submit Feedback</button>
+                <button id="close-feedback-overlay-btn">Close</button>
+            </div>
         </div>
     </div>
-
 </main>
 
 <script type="module" src="/public/js/customer-dashboard.js"></script>

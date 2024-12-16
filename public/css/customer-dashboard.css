@@ -38,8 +38,9 @@ tr:hover {
 }
 
 th {
-  background-color: #4caf50;
+  background-color: #4c8eaf;
   color: white;
+  font-weight: 500;
 }
 
 #pagination-controls,
@@ -50,17 +51,25 @@ th {
   margin-bottom: 20px;
 }
 
+#in-progress-page-info,
+#completed-page-info{
+  color: #333;
+  margin-top: 10px;
+}
+
 button {
-  background-color: #4caf50;
+  background-color: #2C3E50;
   color: white;
+  font-size: 16px;
   padding: 10px 20px;
   border: none;
+  border-radius: 5px;
   cursor: pointer;
   margin: 0 10px;
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #34495E;
 }
 
 button:disabled {
@@ -102,7 +111,7 @@ button:disabled {
 }
 
 #get-quotation-form button {
-  width: 100%;
+  width: 70%;
   padding: 12px;
   background-color: #2980b9;
   color: white;
@@ -247,15 +256,15 @@ button:disabled {
   background-color: #fff;
   padding: 20px;
   border-radius: 10px;
-  width: 300px;
-  text-align: center;
+  width: 400px;
+  text-align: left;
 }
 
 .overlay.hidden {
   display: none;
 }
 
-#feedback-overlay button {
+/* #feedback-overlay button {
   margin-top: 10px;
   display: block;
   width: 100%;
@@ -263,6 +272,76 @@ button:disabled {
 
 #feedback-overlay textarea {
   width: 100%;
+}
+*/
+
+
+.feedback-row {
+  /* margin-bottom: 20px; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.feedback-row label {
+  font-weight: 500;
+  /* margin-bottom: 5px; */
+  display: flex;
+  align-items: center;
+}
+
+.feedback-row label p {
+  color: red;
+  /* margin-left: 5px; */
+}
+
+/* Rating and dropdown in one row */
+.feedback-row select {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #DCDDE1;
+  font-size: 14px;
+  width: 100%;
+  /* margin-top: 5px; */
+}
+
+/* Textarea for review comment */
+.feedback-row textarea {
+  width: 95%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #DCDDE1;
+  font-size: 14px;
+  resize: none;
+}
+
+/* Buttons style */
+.feedback-row button {
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  background-color: #2C3E50; 
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 20px;
+  margin-left: -1px;
+  width: 100%;
+  transition: background 0.3s ease;
+  text-align: center;
+}
+
+.feedback-row button:hover {
+  background-color: #34495E;
+}
+
+/* Button to close the overlay */
+#close-feedback-overlay-btn {
+  background-color: #E74C3C;
+}
+
+#close-feedback-overlay-btn:hover {
+  background-color: #C0392B;
 }
 
 .hidden {
