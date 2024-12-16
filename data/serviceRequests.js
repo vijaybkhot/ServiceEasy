@@ -290,7 +290,7 @@ export const generateClientSecret = async (data) => {
   });
  
   return paymentIntentObject.client_secret;
-}
+};
 
 export const getAllServiceRequests = async () => {
   try {

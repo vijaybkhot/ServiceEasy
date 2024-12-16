@@ -1025,6 +1025,40 @@ export const populateServiceRequestOverlay = async function (
 
   // Ready for pickup activities - handover device and complete service request
   if (handOverDeviceBtn) {
-    handOverDeviceBtn.addEventListener("click", async () => {});
+    handOverDeviceBtn.addEventListener("click", async () => {
+      // Change the status of service request to completed.
+      try {
+        // Details to modify status
+        let service_request_id = serviceRequest._id;
+        let current_status = serviceRequest.status;
+        let outcome_status = "complete";
+        let employee_id = null; // No employee
+
+        // 1) Call function to modify the status of the service request to reassigned
+        let modifiedServiceRequest = await modifyStatus(
+          service_request_id,
+          current_status,
+          outcome_status,
+          employee_id
+        );
+
+        if (!modifiedServiceRequest) {
+          showAlert("error", "Failed to approve");
+        }
+        showAlert("success", "Service request approved successfully!");
+        closeOverlay();
+        setTimeout(() => {
+          location.reload();
+        }, 3000);
+      } catch (error) {
+        // Catch any errors from modifyStatus, or any other unexpected errors
+        console.error("Error while approving request:", error);
+        showAlert("error", "An error occurred while approving the request.");
+        closeOverlay();
+        setTimeout(() => {
+          location.reload();
+        }, 3000);
+      }
+    });
   }
 };
