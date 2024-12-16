@@ -386,7 +386,7 @@ router.get("/user/:id", async (req, res, next) => {
       });
     }
 
-    const serviceRequests = await getServiceRequestById(user_id, role);
+    const serviceRequests = await getServiceRequestsByUser(user_id, role);
     return res.status(200).json({ serviceRequests: serviceRequests });
   } catch (e) {
     next(e);
@@ -767,9 +767,16 @@ router.patch("/:id", hasRole("admin"), async (req, res, next) => {
 });
 
 // Route to add feedback to service request
-router.put("/feedback/:id", hasRole("admin"), async (req, res, next) => {
+router.put("/feedback/:id", hasRole("customer"), async (req, res, next) => {
   try {
+    // Validate and extract the service request ID
     const serviceRequestId = dataValidator.isValidObjectId(req.params.id);
+    if (!serviceRequestId) {
+      throw new CustomError({
+        message: "Invalid service request ID.",
+        statusCode: 400,
+      });
+    }
 
     // Check if the service request exists
     const existingRequest = await ServiceRequest.findById(serviceRequestId);
@@ -780,13 +787,17 @@ router.put("/feedback/:id", hasRole("admin"), async (req, res, next) => {
       });
     }
 
+    const { feedback } = req.body;
     // Validate feedback input
-    if (typeof feedback !== "object") {
+    if (typeof feedback !== "object" || feedback === null) {
       throw new CustomError({
         message: "Feedback must be an object.",
         statusCode: 400,
       });
     }
+    console.log("req.body", req.body);
+
+    console.log("feedback", feedback);
 
     const { rating, comment } = feedback;
 
@@ -807,7 +818,7 @@ router.put("/feedback/:id", hasRole("admin"), async (req, res, next) => {
         });
       }
 
-      // Validate comment
+      // Validate comment (optional but must be a non-empty string if provided)
       if (
         comment !== undefined &&
         (typeof comment !== "string" || comment.trim().length === 0)
@@ -818,10 +829,32 @@ router.put("/feedback/:id", hasRole("admin"), async (req, res, next) => {
         });
       }
     }
-    if (await addFeedbackToServiceRequest(serviceRequestId, req.body))
-      res.status(200).redirect(req.get("referer"));
+
+    // Update the service request with the feedback
+    const feedbackUpdated = await addFeedbackToServiceRequest(
+      serviceRequestId,
+      feedback
+    );
+    if (feedbackUpdated) {
+      return res.status(200).json({
+        status: "success",
+        message: "Feedback updated successfully.",
+        data: {
+          serviceRequestId,
+          feedback: feedback,
+        },
+      });
+    } else {
+      throw new CustomError({
+        message: "Failed to update feedback.",
+        statusCode: 500,
+      });
+    }
   } catch (e) {
-    next(e);
+    res.status(e.statusCode || 500).json({
+      status: "error",
+      message: e.message || "An unexpected error occurred.",
+    });
   }
 });
 
@@ -976,27 +1009,30 @@ router.put(
   }
 );
 
-router.get('/process-payment', hasRole(["customer"]), async (req, res, next) => {
-  try {
-    const { associatedPrice, name, email, phone } = req.body;
+router.get(
+  "/process-payment",
+  hasRole(["customer"]),
+  async (req, res, next) => {
+    try {
+      const { associatedPrice, name, email, phone } = req.body;
 
-    const amount = dataValidator.isValidNumber(associatedPrice);
-    name = dataValidator.isValidString(name);
-    email = dataValidator.isValidEmail(email);
-    phone = dataValidator.isValidPhoneNumber(phone);
+      const amount = dataValidator.isValidNumber(associatedPrice);
+      name = dataValidator.isValidString(name);
+      email = dataValidator.isValidEmail(email);
+      phone = dataValidator.isValidPhoneNumber(phone);
 
-    const clientSecret = await generateClientSecret({
-      amount,
-      name,
-      email,
-      phone
-    });
-    
-    res.status.send({ clientSecret });
+      const clientSecret = await generateClientSecret({
+        amount,
+        name,
+        email,
+        phone,
+      });
 
-  } catch (error) {
-    res.status(500).send({ error: error.message });
+      res.status.send({ clientSecret });
+    } catch (error) {
+      res.status(500).send({ error: error.message });
+    }
   }
-});
+);
 
 export default router;

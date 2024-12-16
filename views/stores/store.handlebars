@@ -1,24 +1,18 @@
 <main class="main" id="store-container">
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="/public/css/store.css" />
   <link rel="stylesheet" href="/public/css/styles.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="/public/js/leaflet.js"></script>
-  <script src="/public/js/form_validate.js"></script>
-  <script src="/public/js/index.js"></script>
-  <script>const stores = [{{{json store}}}];</script>
+  <script>const stores = [{{{ json store }}}];</script>
 
   <h1>{{store.name}}</h1>
   {{#if user}}
-    {{#if (eq user.role "admin")}}
-      <button class="edit-store">Edit Store</button>
-      <button class="save-changes">Save Changes</button>
-      <button class="cancel-edit">Cancel</button>
-      <button class="del-store">Delete Store</button>
-    {{/if}}
+  {{#if (eq user.role "admin")}}
+  <button class="edit-store">Edit Store</button>
+  <button class="save-changes">Save Changes</button>
+  <button class="cancel-edit">Cancel</button>
+  <button class="del-store">Delete Store</button>
+  {{/if}}
   {{/if}}
   <div class="content-container">
     <div class="store-details-container">
@@ -26,45 +20,30 @@
         <input type="hidden" id="store-id" value="{{store._id}}" />
         <h2>
           <span id="store-name">{{store.name}}</span>
-          <input
-            type="text"
-            name="name"
-            id="store-name-input"
-            value="{{store.name}}"
-          />
+          <input type="text" name="name" id="store-name-input" value="{{store.name}}" />
         </h2>
         <p>
           <b>Address:</b>
           <span id="store-address">{{store.location.address}}</span>
-          <input
-            type="text"
-            name="address"
-            id="store-address-input"
-            value="{{store.location.address}}"
-          />
+          <input type="text" name="address" id="store-address-input" value="{{store.location.address}}" />
         </p>
         <p>
           <b>Phone:</b>
           <span id="store-phone">{{store.phone}}</span>
-          <input
-            type="text"
-            name="phone"
-            id="store-phone-input"
-            value="{{store.phone}}"
-          />
+          <input type="text" name="phone" id="store-phone-input" value="{{store.phone}}" />
         </p>
 
         <div id="error-messages">
           <div id="error-container" class="error-container">
             {{#if errors}}
-              {{#each errors}}
-                {{this}}
-              {{/each}}
+            {{#each errors}}
+            {{this}}
+            {{/each}}
             {{/if}}
           </div>
         </div>
       </form>
-      <form class="place-service-request-form" id="place-service-request-form">
+      {{!-- <form class="place-service-request-form" id="place-service-request-form">
         <input type="hidden" id="store-id" value="{{store._id}}" />
         <label for="device-type">Select Device Type:</label>
         <select name="device-type" id="device-type">
@@ -81,10 +60,10 @@
         <select name="device-part" id="device-part" required>
           <option value="">Select Defective Part</option>
         </select>
-      </form>
+      </form> --}}
       <button class="place-service-request-button">Place a Service Request</button>
 
-      
+
       <div id="map-container">
         <div id="map"></div>
       </div>
@@ -94,22 +73,25 @@
     <h2>Customer Reviews</h2>
     <p><b>Average Rating:</b>
       {{#if totalRatings}}
-        {{totalRatings}}/ 5
+      {{totalRatings}}/ 5
       {{else}}
-        N/A
+      N/A
       {{/if}}
     </p>
     {{#if customerReviews}}
-      <ul class="reviews-list">
-        {{#each customerReviews}}
-          <li>
-            <p><b>{{customerName}}</b>: <i>{{comment}}</i></p>
-            <p>Rating: {{rating}} / 5</p>
-          </li>
-        {{/each}}
-      </ul>
+    <ul class="reviews-list">
+      {{#each customerReviews}}
+      <li>
+        <p><b>{{customerName}}</b>: <i>{{comment}}</i></p>
+        <p>Rating: {{rating}} / 5</p>
+      </li>
+      {{/each}}
+    </ul>
     {{else}}
-      <p>No reviews available for this store.</p>
+    <p>No reviews available for this store.</p>
     {{/if}}
   </div>
+  <script src="/public/js/leaflet.js"></script>
+  <script src="/public/js/form_validate.js"></script>
+  <script src="/public/js/index.js"></script>
 </main>

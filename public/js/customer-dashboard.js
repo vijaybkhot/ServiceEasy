@@ -10,6 +10,51 @@ import {
 const getQuotationFormContainer = document.getElementById("get-quotation-form");
 const newRequestButton = document.getElementById("newRequestButton");
 
+// Functions to handle feedback
+
+// Function using axios to add/modify feedback to a service request
+async function addFeedback(serviceRequestId, rating, comment = "") {
+  try {
+    // Validate inputs before sending the request
+    if (!serviceRequestId) {
+      throw new Error("Service Request ID is required.");
+    }
+    if (typeof rating !== "number" || rating < 1 || rating > 5) {
+      throw new Error("Rating must be a number between 1 and 5.");
+    }
+
+    const feedbackData = {
+      feedback: {
+        rating,
+        comment,
+      },
+    };
+
+    const response = await axios.put(
+      `http://localhost:3000/api/service-request/feedback/${serviceRequestId}`,
+      feedbackData
+    );
+
+    console.log("Feedback submitted successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error submitting feedback:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+}
+
+// Update the completed request row with new feedback
+function updateTableRow(orderId, rating, reviewComment) {
+  const row = document
+    .querySelector(`.feedback-btn[data-order-id="${orderId}"]`)
+    .closest("tr");
+  row.querySelector("td:nth-child(7)").textContent = rating;
+  row.querySelector("td:nth-child(8)").textContent = reviewComment;
+}
+
 if (getQuotationFormContainer) {
   const user = JSON.parse(document.getElementById("user-data").dataset.user);
   document.getElementById("user-data").remove();
@@ -259,4 +304,59 @@ if (getQuotationFormContainer) {
       });
     }
   });
+
+  // Handle Feedback button
+  const feedbackOverlay = document.getElementById("feedback-overlay");
+  const feedbackRating = document.getElementById("feedback-rating");
+  const feedbackComment = document.getElementById("feedback-comment");
+  const submitFeedbackBtn = document.getElementById("submit-feedback-btn");
+  const closeFeedbackOverlayBtn = document.getElementById(
+    "close-feedback-overlay-btn"
+  );
+  let currentOrderId = null;
+  document.getElementById("completed-body").addEventListener("click", (e) => {
+    if (e.target && e.target.classList.contains("feedback-btn")) {
+      currentOrderId = e.target.getAttribute("data-order-id");
+      openFeedbackOverlay();
+    }
+  });
+  // Open the feedback overlay
+  function openFeedbackOverlay() {
+    feedbackRating.value = ""; // Clear the previous rating
+    feedbackComment.value = ""; // Clear the previous comment
+    feedbackOverlay.classList.remove("hidden");
+  }
+
+  // Close the feedback overlay
+  closeFeedbackOverlayBtn.addEventListener("click", () => {
+    feedbackOverlay.classList.add("hidden");
+  });
+
+  // Handle submit feedback
+  submitFeedbackBtn.addEventListener("click", async () => {
+    const rating = parseInt(feedbackRating.value);
+    const reviewComment = feedbackComment.value.trim();
+    console.log("rating", typeof rating);
+
+    if (!rating) {
+      showAlert("warning", "Please select a rating.");
+      return;
+    }
+    await submitFeedback(currentOrderId, rating, reviewComment);
+  });
+  // Function to submit feedback
+  async function submitFeedback(currentOrderId, rating, reviewComment) {
+    try {
+      const response = await addFeedback(currentOrderId, rating, reviewComment);
+
+      showAlert("success", "Feedback submitted successfully.");
+      feedbackOverlay.classList.add("hidden");
+      updateTableRow(currentOrderId, rating, reviewComment);
+    } catch (error) {
+      showAlert(
+        "error",
+        "An error occurred: " + (error.response?.data?.message || error.message)
+      );
+    }
+  }
 }

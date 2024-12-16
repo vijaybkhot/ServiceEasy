@@ -289,15 +289,15 @@ export const generateClientSecret = async (data) => {
 
   const paymentIntentObject = await stripe.paymentIntents.create({
     amount,
-    currency: 'usd',
-    payment_method_types: ['card'],
+    currency: "usd",
+    payment_method_types: ["card"],
     customer: name,
     receipt_email: email,
-    phone
+    phone,
   });
 
   return paymentIntentObject.client_secret;
-}
+};
 
 export const getAllServiceRequests = async () => {
   try {

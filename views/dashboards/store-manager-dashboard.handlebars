@@ -31,7 +31,7 @@
                     <th>Repair Type</th>
                     <th>Price</th>
                     <th>Date Created (yyyy/mm/dd)</th>
-                    <th>Delivery/Completion Date (yyyy/mm/dd)</th>
+                    <th>Expected Delivery Date (yyyy/mm/dd)</th>
                     <th>Status Message</th>
                     <th>Customer Contact</th>
                     <th>Assigned Employee</th>
@@ -76,7 +76,7 @@
                     <th>Repair Type</th>
                     <th>Price</th>
                     <th>Date Created (yyyy/mm/dd)</th>
-                    <th>Delivery/Completion Date (yyyy/mm/dd)</th>
+                    <th>Expected Delivery Date (yyyy/mm/dd)</th>
                     <th>Status Message</th>
                     <th>Customer Contact</th>
                     <th>Assigned Employee</th>
@@ -120,11 +120,13 @@
                     <th>Repair Type</th>
                     <th>Price</th>
                     <th>Date Created</th>
-                    <th>Delivery/Completion Date</th>
+                    <th>Delivered On</th>
                     <th>Status Message</th>
                     <th>Customer Contact</th>
-                    <th>Assigned Employee</th>
-                    <th>Employee Contact</th>
+                    <th>Rating</th>
+                    <th>Comment</th>
+                    <th>Details</th>
+
                 </tr>
             </thead>
             <tbody id="completed-body">
@@ -140,6 +142,8 @@
                     <td>{{customerContact}}</td>
                     <td>{{assignedEmployee}}</td>
                     <td>{{assignedEmployeePhone}}</td>
+                    <td><button class="view-details-btn" data-order-id="{{orderId}}">View Details</button></td>
+
                 </tr>
                 {{/each}}
             </tbody>
