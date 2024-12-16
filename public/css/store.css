@@ -1,77 +1,102 @@
-/* Center the main container and heading */
 #store-container {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center the div horizontally */
-  justify-content: flex-start; /* Align the content to the top */
+  align-items: center;
+  justify-content: flex-start;
   text-align: center;
   margin: 0 auto;
-  padding: 20px;
-  max-width: 1200px; /* Ensure the content container doesn't stretch too wide */
+  padding: 40px 20px;
+  max-width: 1200px;
+  background-color: #f4f4f4;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 #store-container h1 {
-  font-size: 2rem;
+  font-size: 2.5rem;
   margin-bottom: 20px;
   color: #333;
-  text-align: center;
+  font-weight: 600;
 }
 
 /* Store Details Container */
 .store-details-container {
   display: flex;
-  flex-direction: column; /* Stacked for small screens */
-  align-items: center; /* Center horizontally */
-  justify-content: flex-start; /* Start at the top */
-  gap: 20px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 30px;
   margin-top: 20px;
-  padding: 20px;
+  padding: 30px;
   max-width: 1000px;
   width: 100%;
-  box-sizing: border-box;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 /* Store Info Form */
 .store-info {
   width: 100%;
-  max-width: 500px; /* Maximum width for the form */
+  max-width: 600px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fafafa;
 }
 
 .store-info h2 {
-  font-size: 22px;
-  margin-bottom: 10px;
+  font-size: 24px;
+  margin-bottom: 15px;
   color: #333;
+  font-weight: 600;
 }
 
 .store-info p {
-  font-size: 16px;
-  margin-bottom: 10px;
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #555;
 }
+
+.store-info input[type="text"] {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  width: 100%;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.store-info input[type="text"]:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
 /* Reviews Container */
 .reviews-container {
   width: 100%;
   max-width: 1000px;
-  margin-top: 20px;
-  padding: 20px;
+  margin-top: 30px;
+  padding: 30px;
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #56c8eb;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  color: #fff;
 }
 
 .reviews-container h2 {
-  font-size: 20px;
-  margin-bottom: 10px;
+  font-size: 22px;
+  margin-bottom: 15px;
   color: #333;
-  text-align: left;
+  font-weight: 600;
 }
 
 .reviews-container p {
-  font-size: 16px;
+  font-size: 18px;
   margin: 5px 0;
 }
 
@@ -81,44 +106,72 @@
 }
 
 .reviews-list li {
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #fff;
   padding: 10px 0;
+  color: #f1f1f1;
 }
 
 .reviews-list li:last-child {
   border-bottom: none;
 }
 
-.store-info input[type="text"] {
-  display: none; /* Hidden by default */
-  margin-top: 5px;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  width: 100%; /* Adjust to fill the container */
-  font-size: 1rem;
-  box-sizing: border-box;
-  text-align: center; /* Keep text centered in the input */
+.store-info input[type="text"]:disabled {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+}
+
+.store-info input[type="text"]:disabled:hover {
+  cursor: not-allowed;
 }
 
 /* Buttons for Edit, Save, Cancel, Delete */
-.edit-store, .del-store, .cancel-edit, .save-changes {
+button {
+  background-color: #007bff;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Edit/Delete/Save/Cancel Buttons */
+.edit-store,
+.del-store,
+.cancel-edit,
+.save-changes {
   background-color: #007bff;
   margin-top: 10px;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  padding: 12px 18px;
+  border-radius: 6px;
+  color: white;
   font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .del-store {
   background-color: red;
-  color: white;
 }
 
-.cancel-edit, .save-changes {
+.cancel-edit,
+.save-changes {
   display: none;
+}
+
+.cancel-edit:hover {
+  background-color: #ff5858;
 }
 
 /* Map Container */
@@ -126,46 +179,60 @@
   flex: 1;
   min-width: 400px;
   max-width: 600px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 #map-container #map {
   width: 100%;
-  height: 500px; /* Set the height of the map */
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  height: 500px;
+  border-radius: 10px;
 }
 
 /* Responsive Layout for Larger Screens */
 @media (min-width: 768px) {
   .store-details-container {
-    flex-direction: row; /* Align store info and map side by side */
-    justify-content: space-between; /* Space between them */
+    flex-direction: row;
+    justify-content: space-between;
   }
 
-  /* Ensures store info takes up less space when in row layout */
   .store-info {
-    max-width: 500px; /* Maximum width for the form */
+    max-width: 400px;
   }
 
   #map-container {
-    max-width: 600px; /* Ensure map doesn’t stretch too wide */
+    max-width: 700px;
   }
 }
 
 /* General Button Styles for Store Actions */
 button {
   cursor: pointer;
-  border-radius: 5px;
-  padding: 10px 15px;
+  border-radius: 6px;
+  padding: 12px 18px;
   font-size: 1rem;
   transition: background-color 0.3s;
 }
 
 button:hover {
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 button:disabled {
-  background-color: #ccc;
+  background-color: #ddd;
   cursor: not-allowed;
+}
+
+#error-messages {
+  color: #ff4c4c;
+  margin-top: 15px;
+}
+
+#error-container {
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f8d7da;
+  color: #721c24;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

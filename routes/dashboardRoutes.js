@@ -43,6 +43,7 @@ router.get(
         (serviceRequest) => serviceRequest.status !== "complete"
       );
 
+      console.log(unMappedCompletedServiceRequests[0]);
       // Get page numbers from query params
       const completedPage = parseInt(req.query.completedPage) || 1;
       const inProgressPage = parseInt(req.query.inProgressPage) || 1;
