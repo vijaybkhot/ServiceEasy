@@ -57,7 +57,7 @@ router.post("/", hasRole("customer", "admin"), async (req, res) => {
     payment,
     feedback = {},
   } = req.body;
-  
+
   try {
     // Input validation
 
@@ -1093,22 +1093,25 @@ router.put(
   }
 );
 
-router.post('/process-payment', hasRole(["customer"]), async (req, res, next) => {
-  try {
-    const { associatedPrice, name, email, phone } = req.body;
-  
-    const clientSecret = await generateClientSecret({
-      amount: associatedPrice,
-      name,
-      email,
-      phone
-    });
-  
-    res.status(200).json({ clientSecret: clientSecret });
+router.post(
+  "/process-payment",
+  hasRole(["customer"]),
+  async (req, res, next) => {
+    try {
+      const { associatedPrice, name, email, phone } = req.body;
 
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+      const clientSecret = await generateClientSecret({
+        amount: associatedPrice,
+        name,
+        email,
+        phone,
+      });
+
+      res.status(200).json({ clientSecret: clientSecret });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
-});
+);
 
 export default router;

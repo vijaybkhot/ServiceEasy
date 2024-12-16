@@ -256,9 +256,9 @@ router.get(
 //  Admin dashboard
 router.get("/admin-dashboard", hasRole(["admin"]), async (req, res, next) => {
   try {
-    // Get all service requests
+    // Get all service requests, stores
     const allServiceRequests = await serviceRequests.getAllServiceRequests();
-    console.log(allServiceRequests.length);
+    const stores = await Store.find({}).lean();
 
     // Filter service requests into completed, pending
     let unMappedCompletedServiceRequests = allServiceRequests.filter(
@@ -298,6 +298,7 @@ router.get("/admin-dashboard", hasRole(["admin"]), async (req, res, next) => {
       title: "Admin Dashboard",
       cssPath: `/public/css/admin-dashboard.css`,
       user: req.session.user,
+      stores,
       completedServiceRequests,
       inProgressServiceRequests,
       currentCompletedPage: completedPage,

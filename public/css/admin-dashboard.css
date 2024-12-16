@@ -367,3 +367,24 @@ label {
 .hidden {
   display: none;
 }
+
+.change-store-manager input,
+.change-store-manager select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: #f9f9f9;
+  color: #333;
+  margin-bottom: 20px;
+  transition: all 0.3s ease-in-out;
+}
+
+.change-store-manager input:focus,
+.change-store-manager select:focus {
+  border-color: #4caf50;
+  background-color: #fff;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+  outline: none;
+}

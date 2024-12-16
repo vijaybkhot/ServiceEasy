@@ -29,7 +29,7 @@ export const fetchAllRepairs = async function () {
 export const fetchAllStores = async function () {
   try {
     const response = await axios.get("http://localhost:3000/stores/jsonStores");
-    const stores = response.data.stores;
+    const stores = response.data;
     return stores;
   } catch (error) {
     if (error.response) {
@@ -319,6 +319,29 @@ export const fetchEmployeeActivities = async function (serviceRequest) {
   }
 };
 
+// function to change store manager
+export const changeStoreManager = async function (storeId, newManagerId) {
+  try {
+    // Construct the URL for the request
+    const url = `http://localhost:3000/stores/${storeId}/manager/${newManagerId}`;
+
+    // patch request using axios
+    const response = await axios.patch(url, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    console.log("Store manager changed successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error changing store manager:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
+};
+
 // function to update activity status from in-progress to completed
 async function updateActivityStatus(activityId, status = "completed") {
   try {
@@ -560,10 +583,7 @@ export const populateServiceRequestOverlay = async function (
   let handOverDeviceHTML = "";
   let reviewHTML = "";
 
-  if (
-    serviceRequest.status.toLowerCase() === "complete" &&
-    serviceRequest.feedback?.rating
-  ) {
+  if (serviceRequest.status.toLowerCase() === "complete") {
     reviewHTML = `
       <div class="review-section">
         <h3>Customer Feedback</h3>
@@ -572,7 +592,9 @@ export const populateServiceRequestOverlay = async function (
         <div class="rating-container">
           <strong>Rating:</strong>
           <div class="stars" id="customerRating">
-            ${serviceRequest.feedback.rating} Stars
+            ${
+              serviceRequest.feedback ? serviceRequest.feedback.rating : "N/A"
+            } Stars
           </div>
         </div>
   
@@ -580,7 +602,9 @@ export const populateServiceRequestOverlay = async function (
         <div class="review-comment">
           <strong>Review:</strong>
           <p id="customerReview">${
-            serviceRequest.feedback?.comment || "No review provided."
+            serviceRequest.feedback
+              ? serviceRequest.feedback.comment
+              : "No review posted."
           }</p>
         </div>
       </div>

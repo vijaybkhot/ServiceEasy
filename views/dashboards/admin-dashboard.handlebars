@@ -19,7 +19,14 @@
     </section>
 
     {{!-- Report Section --}}
-    <section id="store-report">
+    <button id="generateReportsBtn">Generate Reports</button>
+    <button id="completedServiceRequestsBtn">View Completed Service Requests</button>
+    <button id="inProgressServiceRequestsBtn">View In Progress Service Requests</button>
+    <button id="changeStoreManagerBtn">Change Store Manager</button>
+
+
+
+    <section id="store-report" class="hidden">
         <h2>Store Reports</h2>
         <!-- General Summary Report -->
         <div id="general-report">
@@ -62,7 +69,7 @@
     </section>
 
     <!-- Store In-Progress Service Requests Section -->
-    <section id="in-progress-requests">
+    <section id="in-progress-requests" class="hidden">
         <h2>In-Progress Service Requests At The Store</h2>
         <table>
             <thead>
@@ -100,7 +107,7 @@
     </section>
 
     <!-- Completed Service Requests Section -->
-    <section id="completed-requests">
+    <section id="completed-requests" class="hidden">
         <h2>Completed Service Requests</h2>
         <table>
             <thead>
@@ -137,6 +144,44 @@
             <button id="prevCompletedPage" onclick="navigatePage('completed', -1)">Previous</button>
             <span id="completed-page-info">Page 1</span>
             <button id="nextCompletedPage" onclick="navigatePage('completed', 1)">Next</button>
+        </div>
+    </section>
+
+    <section id="change-store-manager" class="hidden">
+        <h2>Change Store Manager Section</h2>
+
+        <!-- Store Selection Dropdown -->
+        <div>
+            <label for="storeSelect">Select Store:</label>
+            <select id="storeSelect">
+                <option value="" disabled selected>Select a store</option>
+                {{#each stores}}
+                <option value="{{this._id}}">{{this.name}}</option>
+                {{/each}}
+            </select>
+        </div>
+
+        <!-- Current Store Manager Display -->
+        <div id="current-store-manager-container" class="hidden">
+            <h3>Current Store Manager</h3>
+            <p id="currentStoreManager">Select a store to view the current manager</p>
+        </div>
+
+        <!-- New Store Manager Selection Dropdown -->
+        <div id="new-store-manager-container" class="hidden">
+            <h3>Select New Store Manager</h3>
+            <label for="managerSelect">Available Managers:</label>
+            <select id="managerSelect">
+                <option value="" disabled selected>Select a new manager</option>
+                {{#each availableManagers}}
+                <option value="{{this._id}}">{{this.name}}</option>
+                {{/each}}
+            </select>
+        </div>
+
+        <!-- Confirm Button -->
+        <div id="confirm-change-container" class="hidden">
+            <button id="confirmStoreManagerChange">Confirm Store Manager Change</button>
         </div>
     </section>
 
