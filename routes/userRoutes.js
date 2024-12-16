@@ -36,6 +36,7 @@ router.get("/login", async (req, res, next) => {
     title: "Log into ServiceEasy",
     cssPath: "/public/css/login.css",
     errors: [],
+    onLoginPage:true,
   });
 });
 
@@ -121,6 +122,7 @@ router.get("/signup", async (req, res, next) => {
     title: "Signup for ServiceEasy",
     cssPath: "/public/css/signup.css",
     errors: [],
+    onSignupPage: true,
   });
 });
 
