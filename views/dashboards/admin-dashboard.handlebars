@@ -5,7 +5,7 @@
     <div id="store-data" data-store-id="{{storeId}}" data-store-name="{{storeName}}" data-store-phone="{{storePhone}}">
     </div>
 
-    <h1>Welcome to the Admin Dashboard!</h1>
+    <h1>Welcome {{user.name}}, to the Admin Dashboard!</h1>
     <input type="hidden" id="user-data" value='${JSON.stringify(req.session.user)}' />
 
     <!-- Find Service Request Section -->
@@ -18,8 +18,18 @@
         </div>
     </section>
 
+    <button id="generateReportsBtn">Generate Reports</button>
+    <button id="completedServiceRequestsBtn">Completed Service Requests</button>
+    <button id="inProgressServiceRequestsBtn">In Progress Service Requests</button>
+    <button id="changeStoreManagerBtn">Change Store Manager</button>
+    <button id="employeeManagementBtn">Manage Store Employees</button>
+    <button id="manageUserRoleBtn">Manage User Roles</button>
+
+
+
+
     {{!-- Report Section --}}
-    <section id="store-report">
+    <section id="store-report" class="hidden">
         <h2>Store Reports</h2>
         <!-- General Summary Report -->
         <div id="general-report">
@@ -62,7 +72,7 @@
     </section>
 
     <!-- Store In-Progress Service Requests Section -->
-    <section id="in-progress-requests">
+    <section id="in-progress-requests" class="hidden">
         <h2>In-Progress Service Requests At The Store</h2>
         <table>
             <thead>
@@ -92,15 +102,11 @@
                 {{/each}}
             </tbody>
         </table>
-        <div id="in-progress-pagination-controls">
-            <button id="prevInProgressPage" onclick="navigatePage('in-progress', -1)">Previous</button>
-            <span id="in-progress-page-info">Page 1</span>
-            <button id="nextInProgressPage" onclick="navigatePage('in-progress', 1)">Next</button>
-        </div>
+
     </section>
 
     <!-- Completed Service Requests Section -->
-    <section id="completed-requests">
+    <section id="completed-requests" class="hidden">
         <h2>Completed Service Requests</h2>
         <table>
             <thead>
@@ -133,11 +139,120 @@
             </tbody>
         </table>
 
-        <div id="completed-pagination-controls">
-            <button id="prevCompletedPage" onclick="navigatePage('completed', -1)">Previous</button>
-            <span id="completed-page-info">Page 1</span>
-            <button id="nextCompletedPage" onclick="navigatePage('completed', 1)">Next</button>
+
+    </section>
+
+    <section id="change-store-manager" class="hidden">
+        <h2>Change Store Manager Section</h2>
+
+        <!-- Store Selection Dropdown -->
+        <div>
+            <label for="storeSelect">Select Store:</label>
+            <select id="storeSelect">
+                <option value="" disabled selected>Select a store</option>
+                {{#each stores}}
+                <option value="{{this._id}}">{{this.name}}</option>
+                {{/each}}
+            </select>
         </div>
+
+        <!-- Current Store Manager Display -->
+        <div id="current-store-manager-container" class="hidden">
+            <h3>Current Store Manager</h3>
+            <p id="currentStoreManager">Select a store to view the current manager</p>
+        </div>
+
+        <!-- New Store Manager Selection Dropdown -->
+        <div id="new-store-manager-container" class="hidden">
+            <h3>Select New Store Manager</h3>
+            <label for="managerSelect">Available Managers:</label>
+            <select id="managerSelect">
+                <option value="" disabled selected>Select a new manager</option>
+                {{#each availableManagers}}
+                <option value="{{this._id}}">{{this.name}}</option>
+                {{/each}}
+            </select>
+        </div>
+
+        <!-- Confirm Button -->
+        <div id="confirm-change-container" class="hidden">
+            <button id="confirmStoreManagerChange">Confirm Store Manager Change</button>
+        </div>
+    </section>
+
+    {{!-- Manage store employees across all stores--}}
+    <section id="manage-store-employees" class="hidden">
+        <h2>Manage Store Employees</h2>
+
+        <!-- Store selection dropdown -->
+        <select id="storeSelectEmployees">
+            <option value="" disabled selected>Select a store</option>
+            {{#each stores}}
+            <option value="{{this._id}}">{{this.name}}</option>
+            {{/each}}
+        </select>
+        <!-- Current Employees -->
+        <div id="current-employees-container" class="hidden">
+            <h3>Current Employees</h3>
+            <label for="currentEmployeesSelect">Employees in this Store:</label>
+            <select id="currentEmployeesSelect">
+                <option value="" disabled selected>Select current employees</option>
+            </select>
+            <button id="removeEmployeeBtn" class="hidden">Remove Employee</button>
+        </div>
+
+        <!-- Available unassigned employees -->
+        <div id="unassigned-employees-container" class="hidden">
+            <h3>Available Employees To Add To The Store</h3>
+            <label for="unassignedEmployeesSelect">Unassigned Employees:</label>
+            <select id="unassignedEmployeesSelect">
+                <option value="" disabled selected>Select available employees</option>
+            </select>
+            <button id="addEmployeeBtn" class="hidden">Add Employee to Store</button>
+        </div>
+
+    </section>
+
+    {{!-- Section to manage user roles --}}
+    <section id="manage-user-roles" class="hidden">
+        <h2>Manage User Roles</h2>
+
+        <!-- Search by email -->
+        <div class="form-container">
+            <label for="userEmail">Enter User Email:</label>
+            <input type="email" id="userEmail" placeholder="Enter user email" required>
+            <button id="searchUserBtn">Search</button>
+        </div>
+
+        <!-- Result of search -->
+        <div id="searchResultContainer" class="hidden">
+            <h3>User Details</h3>
+            <div id="userDetails">
+                <!-- User details will be displayed here -->
+                <p><strong>Name:</strong> <span id="userName"></span></p>
+                <p><strong>Email:</strong> <span id="userEmailDetails"></span></p>
+                <p><strong>Phone:</strong> <span id="userPhone"></span></p>
+                <p><strong>Current Role:</strong> <span id="userRole"></span></p>
+            </div>
+            <p id="userNotFoundMessage" class="hidden">User not found. Please check the email and try again.</p>
+        </div>
+
+        <!-- Role management -->
+        <div id="role-management-container" class="hidden">
+            <h3>Change User Role</h3>
+
+            <label for="userRoleSelect">Select New Role:</label>
+            <select id="userRoleSelect">
+                <option value="" disabled selected>Select user role</option>
+                <option value="customer">Customer</option>
+                <option value="employee">Employee</option>
+                <option value="store-manager">Store Manager</option>
+                <option value="admin">Admin</option>
+            </select>
+
+            <button id="changeRoleBtn">Change Role</button>
+        </div>
+
     </section>
 
     <section>

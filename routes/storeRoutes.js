@@ -12,6 +12,7 @@ import {
   getReviewsById,
   getEmployeesWithServiceRequestCount,
 } from "../data/stores.js";
+import User from "../models/userModel.js";
 import {
   isAuthenticated,
   hasRole,
@@ -51,10 +52,32 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Route to fetch all stores in JSON
+// Route to fetch all stores in JSON - also get managers without stores
 router.get("/jsonStores", async (req, res) => {
   try {
     const stores = await getAll();
+
+    const storeManagers = await User.find({ role: "store-manager" });
+
+    const managersWithoutStore = storeManagers.filter((manager) => {
+      // Check if the manager is not assigned to any store by comparing their _id with storeManager in stores
+      return !stores.some(
+        (store) =>
+          store.storeManager._id &&
+          store.storeManager._id.toString() === manager._id.toString()
+      );
+    });
+
+    // Unassigned employees
+    const employees = await User.find({ role: "employee" });
+
+    const unassignedEmployees = employees.filter((employee) => {
+      return !stores.some((store) => {
+        return store.employees.some(
+          (emp) => emp._id.toString() === employee._id.toString()
+        );
+      });
+    });
 
     if (!stores) {
       return res.status(404).json({ error: "No stores found" });
@@ -63,6 +86,8 @@ router.get("/jsonStores", async (req, res) => {
     return res.status(200).json({
       success: true,
       stores: stores,
+      managersWithoutStore: managersWithoutStore,
+      unassignedEmployees: unassignedEmployees,
     });
   } catch (error) {
     console.error("Error fetching stores:", error);

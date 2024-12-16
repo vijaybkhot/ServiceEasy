@@ -207,7 +207,8 @@ if (getQuotationFormContainer) {
     // Display quotation form
     if (repairDetails) {
       const storeSelect = document.getElementById("storeSelect");
-      const stores = await fetchAllStores();
+      const storeData = await fetchAllStores();
+      const stores = storeData.stores;
 
       storeSelect.innerHTML = "";
 

@@ -10,6 +10,7 @@ import * as userController from "../data/user.js";
 import User from "../models/userModel.js";
 import Email from "../utilities/email.js";
 import {
+  hasRole,
   isAuthenticated,
   redirectBasedOnRole,
 } from "../utilities/middlewares/authenticationMiddleware.js";
@@ -36,7 +37,7 @@ router.get("/login", async (req, res, next) => {
     title: "Log into ServiceEasy",
     cssPath: "/public/css/login.css",
     errors: [],
-    onLoginPage:true,
+    onLoginPage: true,
   });
 });
 
@@ -233,7 +234,7 @@ router.get("/api/user", isAuthenticated, async (req, res, next) => {
 });
 
 // Get user by id route for api call
-router.get("/user/:id", async (req, res) => {
+router.get("/user/:id", isAuthenticated, async (req, res) => {
   try {
     let userId = req.params.id;
 
@@ -247,6 +248,71 @@ router.get("/user/:id", async (req, res) => {
     res.status(200).json({ success: true, data: user });
   } catch (error) {
     res.status(404).json({ success: false, error: error.message });
+  }
+});
+
+// Route to get user by email
+router.get("/search-user", hasRole("admin"), async (req, res) => {
+  let { email } = req.query;
+
+  email = dataValidator.isValidString(email, "email", "login route");
+
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ message: "Please enter a valid email." });
+  }
+
+  try {
+    const user = await userController.searchUserByEmail(email);
+
+    return res.status(200).json({ user });
+  } catch (error) {
+    return res.status(404).json({ message: error.message });
+  }
+});
+
+// Function to update user role
+router.put("/update-user-role", hasRole("admin"), async (req, res) => {
+  let { userId, newRole } = req.body;
+
+  // Validate userId and newRole inputs
+  if (!userId || !newRole) {
+    return res
+      .status(400)
+      .json({ message: "userId and newRole are required." });
+  }
+
+  try {
+    userId = dataValidator.isValidString(
+      userId,
+      "userId",
+      "updateUserRole route"
+    );
+
+    // Validate newRole format
+    newRole = dataValidator.isValidString(
+      newRole,
+      "role",
+      "updateUserRole route"
+    );
+    newRole = newRole.trim();
+
+    if (!["customer", "employee", "store-manager", "admin"].includes(newRole)) {
+      return res.status(400).json({
+        message: `User role ${newRole} is not valid. User should be either ["customer", "employee", "store-manager", "admin"].`,
+      });
+    }
+
+    const updatedUser = await userController.updateUserRole(userId, newRole);
+
+    return res
+      .status(200)
+      .json({ message: "User role updated successfully", user: updatedUser });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
   }
 });
 

@@ -29,7 +29,7 @@ export const fetchAllRepairs = async function () {
 export const fetchAllStores = async function () {
   try {
     const response = await axios.get("http://localhost:3000/stores/jsonStores");
-    const stores = response.data.stores;
+    const stores = response.data;
     return stores;
   } catch (error) {
     if (error.response) {
@@ -72,6 +72,90 @@ export async function getUserById(userId) {
     return { success: false, error: error.message };
   }
 }
+
+// Get user by email
+// Function to validate email using a regular expression
+function validateEmail(email) {
+  const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailPattern.test(email);
+}
+
+// Function to search for a user by email
+export const searchUserByEmail = async function (email) {
+  if (!email) {
+    showAlert("error", "Email is required.");
+    return;
+  }
+
+  if (!validateEmail(email)) {
+    showAlert("error", "Please enter a valid email.");
+    return;
+  }
+
+  try {
+    const response = await axios.get(`http://localhost:3000/search-user/`, {
+      params: { email },
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      showAlert("error", "No user found with this email.");
+    } else {
+      showAlert("error", "An error occurred while searching for the user.");
+    }
+    console.error("Error:", error.message);
+  }
+};
+
+// Change user roles
+export const updateUserRole = async function (userId, newRole) {
+  // Validate userId
+  if (!userId || typeof userId !== "string" || userId.trim() === "") {
+    console.error(
+      "Error: userId is required and should be a non-empty string."
+    );
+    return;
+  }
+
+  // Validate newRole
+  if (!newRole || typeof newRole !== "string" || newRole.trim() === "") {
+    console.error(
+      "Error: newRole is required and should be a non-empty string."
+    );
+    return;
+  }
+
+  const validRoles = ["customer", "employee", "store-manager", "admin"];
+  if (!validRoles.includes(newRole.trim())) {
+    console.error(
+      "Error: Invalid role. Role should be one of the following: ['customer', 'employee', 'store-manager', 'admin']"
+    );
+    return;
+  }
+
+  try {
+    // Axios put request
+    const response = await axios.put(`http://localhost:3000/update-user-role`, {
+      userId,
+      newRole,
+    });
+
+    console.log("User role updated:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating user role:",
+      error.response ? error.response.data.message : error.message
+    );
+    showAlert(
+      "error",
+      error.response ? error.response.data.message : error.message
+    );
+  }
+};
 
 // Function to load payment page
 export const getPaymentPage = async function ({
@@ -319,6 +403,74 @@ export const fetchEmployeeActivities = async function (serviceRequest) {
   }
 };
 
+// function to change store manager
+export const changeStoreManager = async function (storeId, newManagerId) {
+  try {
+    // Construct the URL for the request
+    const url = `http://localhost:3000/stores/${storeId}/manager/${newManagerId}`;
+
+    // patch request using axios
+    const response = await axios.patch(url, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    console.log("Store manager changed successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error changing store manager:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
+};
+
+// Function to remove employee from store
+export const removeEmployeeFromStore = async function (storeId, employeeId) {
+  try {
+    const response = await axios.delete(
+      `http://localhost:3000/stores/${storeId}/employees/${employeeId}`
+    );
+
+    console.log(response.data.message);
+    return response.data.store;
+  } catch (error) {
+    if (error.response) {
+      console.error("Error:", error.response.data);
+      showAlert(
+        "error",
+        `Error: ${error.response.data.errors || error.response.data.error}`
+      );
+    } else {
+      console.error("Error:", error.message);
+      showAlert("error", "An unexpected error occurred.");
+    }
+  }
+};
+
+// Function to add an employee to store
+export const addEmployeetoStore = async function (storeId, employeeId) {
+  try {
+    const response = await axios.post(
+      `http://localhost:3000/stores/${storeId}/employees/${employeeId}`
+    );
+    console.log(response.data.message);
+    return response.data.store;
+  } catch (error) {
+    if (error.response) {
+      console.error("Error:", error.response.data);
+      showAlert(
+        "error",
+        `Error: ${error.response.data.errors || error.response.data.error}`
+      );
+    } else {
+      console.error("Error:", error.message);
+      showAlert("error", "An unexpected error occurred.");
+    }
+  }
+};
+
 // function to update activity status from in-progress to completed
 async function updateActivityStatus(activityId, status = "completed") {
   try {
@@ -424,6 +576,47 @@ export async function fetchReportData() {
       storeReportHTML;
   } catch (error) {
     console.error("Error fetching report:", error);
+  }
+}
+
+// Function to fetch report for a store
+export async function fetchStoreReportData(storeId) {
+  console.log(storeId);
+  try {
+    if (!storeId || typeof storeId !== "string") {
+      throw new Error("Invalid storeId: storeId must be a non-empty string.");
+    }
+
+    const objectIdPattern = /^[a-f\d]{24}$/i;
+    if (!objectIdPattern.test(storeId)) {
+      throw new Error(
+        `Invalid storeId: "${storeId}" does not match a valid ObjectId format.`
+      );
+    }
+
+    const response = await axios.get(
+      `http://localhost:3000/api/service-request/generate-store-report/${storeId}`
+    );
+    const data = response.data.storeReport;
+
+    if (!data) {
+      throw new Error("No data available for this store report.");
+    }
+
+    // Update data on page
+    document.getElementById("store-specific-report").innerHTML = `
+      <h3>Store Report for ${data.storeName}</h3>
+      <p>Total Requests: ${data.totalRequests}</p>
+      <p>Completed Requests: ${data.completedRequests}</p>
+      <p>In-Progress Requests: ${data.inProgressRequests}</p>
+      <p>Total Price: $${data.totalPrice.toFixed(2)}</p>
+      <p>Average Rating: ${data.avgRating.toFixed(2)}</p>
+    `;
+  } catch (error) {
+    console.error("Error fetching store report:", error);
+    document.getElementById("store-report").innerHTML = `
+      <p style="color: red;">Error: ${error.message}</p>
+    `;
   }
 }
 
@@ -560,10 +753,7 @@ export const populateServiceRequestOverlay = async function (
   let handOverDeviceHTML = "";
   let reviewHTML = "";
 
-  if (
-    serviceRequest.status.toLowerCase() === "complete" &&
-    serviceRequest.feedback?.rating
-  ) {
+  if (serviceRequest.status.toLowerCase() === "complete") {
     reviewHTML = `
       <div class="review-section">
         <h3>Customer Feedback</h3>
@@ -572,7 +762,9 @@ export const populateServiceRequestOverlay = async function (
         <div class="rating-container">
           <strong>Rating:</strong>
           <div class="stars" id="customerRating">
-            ${serviceRequest.feedback.rating} Stars
+            ${
+              serviceRequest.feedback ? serviceRequest.feedback.rating : "N/A"
+            } Stars
           </div>
         </div>
   
@@ -580,7 +772,9 @@ export const populateServiceRequestOverlay = async function (
         <div class="review-comment">
           <strong>Review:</strong>
           <p id="customerReview">${
-            serviceRequest.feedback?.comment || "No review provided."
+            serviceRequest.feedback
+              ? serviceRequest.feedback.comment
+              : "No review posted."
           }</p>
         </div>
       </div>

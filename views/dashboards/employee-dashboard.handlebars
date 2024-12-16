@@ -9,6 +9,7 @@
     <p>Store Phone: {{storePhone}}</p>
     <input type="hidden" id="user-data" value='${JSON.stringify(req.session.user)}' />
 
+    <section class="button-container"></section>
     <!-- Find Service Request Section -->
     <section id="find-service-request">
         <h2>Find Service Request</h2>
@@ -52,12 +53,6 @@
                 {{/each}}
             </tbody>
         </table>
-
-        <div id="pending-pagination-controls">
-            <button id="prevInProgressPage" onclick="navigatePage('pending', -1)">Previous</button>
-            <span id="pending-page-info">Page 1</span>
-            <button id="nextInProgressPage" onclick="navigatePage('pending', 1)">Next</button>
-        </div>
     </section>
 
     <!-- Past Completed Service Requests Section -->
@@ -90,11 +85,7 @@
             </tbody>
         </table>
 
-        <div id="completed-pagination-controls">
-            <button id="prevCompletedPage" onclick="navigatePage('completed', -1)">Previous</button>
-            <span id="completed-page-info">Page 1</span>
-            <button id="nextCompletedPage" onclick="navigatePage('completed', 1)">Next</button>
-        </div>
+
     </section>
 
     <section>
