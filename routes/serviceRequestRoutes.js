@@ -57,7 +57,7 @@ router.post("/", hasRole("customer", "admin"), async (req, res) => {
     payment,
     feedback = {},
   } = req.body;
-
+  
   try {
     // Input validation
 
@@ -326,7 +326,7 @@ router.post("/", hasRole("customer", "admin"), async (req, res) => {
         paymentMethod: serviceRequest.payment.payment_mode,
       };
       const url = `${req.protocol}://${req.get("host")}/dashboard`;
-      await new Email(req.session.user, url, orderData).sendOrderPlaced();
+      // await new Email(req.session.user, url, orderData).sendOrderPlaced();
       return res.status(200).json({
         message: "Service request created successfully",
         serviceRequest,
@@ -976,26 +976,21 @@ router.put(
   }
 );
 
-router.get('/process-payment', hasRole(["customer"]), async (req, res, next) => {
+router.post('/process-payment', hasRole(["customer"]), async (req, res, next) => {
   try {
     const { associatedPrice, name, email, phone } = req.body;
-
-    const amount = dataValidator.isValidNumber(associatedPrice);
-    name = dataValidator.isValidString(name);
-    email = dataValidator.isValidEmail(email);
-    phone = dataValidator.isValidPhoneNumber(phone);
-
+  
     const clientSecret = await generateClientSecret({
-      amount,
+      amount: associatedPrice,
       name,
       email,
       phone
     });
-    
-    res.status.send({ clientSecret });
+  
+    res.status(200).json({ clientSecret: clientSecret });
 
   } catch (error) {
-    res.status(500).send({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 

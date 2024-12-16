@@ -51,9 +51,14 @@ const exportedMethods = {
     return val;
   },
 
-  isValidEmail(email) {
+  isValidEmail(email, argument, routeOrFunction) {
+    email = this.isValidString(email, argument, routeOrFunction);
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailPattern.test(email);
+    if(emailPattern.test(email))
+      throw new Error(
+        `${argument} must be a valid email in ${routeOrFunction}.`
+      );
+    return email;
   },
 
   validId(id) {
