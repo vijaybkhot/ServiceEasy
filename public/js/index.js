@@ -79,125 +79,131 @@ if (storeContainer) {
   const phoneSpan = document.querySelector("#store-phone");
 
   // Toggle Edit Mode
-  editButton.addEventListener("click", (event) => {
-    nameSpan.style.display = "none";
-    addressSpan.style.display = "none";
-    phoneSpan.style.display = "none";
+  if (editButton) {
+    editButton.addEventListener("click", (event) => {
+      nameSpan.style.display = "none";
+      addressSpan.style.display = "none";
+      phoneSpan.style.display = "none";
 
-    nameInput.style.display = "block";
-    // nameTag.style.display = "block";
-    addressInput.style.display = "block";
-    phoneInput.style.display = "block";
+      nameInput.style.display = "block";
+      // nameTag.style.display = "block";
+      addressInput.style.display = "block";
+      phoneInput.style.display = "block";
 
-    editButton.style.display = "none";
-    saveButton.style.display = "inline-block";
-    cancelButton.style.display = "inline-block";
-  });
+      editButton.style.display = "none";
+      saveButton.style.display = "inline-block";
+      cancelButton.style.display = "inline-block";
+    });
+  }
 
   // Cancel Edit Mode
-  cancelButton.addEventListener("click", (event) => {
-    nameSpan.style.display = "block";
-    addressSpan.style.display = "block";
-    phoneSpan.style.display = "block";
+  if (cancelButton) {
+    cancelButton.addEventListener("click", (event) => {
+      nameSpan.style.display = "block";
+      addressSpan.style.display = "block";
+      phoneSpan.style.display = "block";
 
-    nameInput.style.display = "none";
-    addressInput.style.display = "none";
-    phoneInput.style.display = "none";
+      nameInput.style.display = "none";
+      addressInput.style.display = "none";
+      phoneInput.style.display = "none";
 
-    editButton.style.display = "inline-block";
-    saveButton.style.display = "none";
-    cancelButton.style.display = "none";
-    const errorContainer = document.querySelector("#error-container");
-    errorContainer.innerHTML = ""; // Clear existing errors
+      editButton.style.display = "inline-block";
+      saveButton.style.display = "none";
+      cancelButton.style.display = "none";
+      const errorContainer = document.querySelector("#error-container");
+      errorContainer.innerHTML = ""; // Clear existing errors
+    });
+  }
 
-  });
+  if (saveButton) {
+    saveButton.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const errors = [];
+      const errorContainer = document.querySelector("#error-container");
 
-  saveButton.addEventListener("click", async (event) => {
-    event.preventDefault();
-    const errors = [];
-    const errorContainer = document.querySelector("#error-container");
-
-    const nameValue = nameInput.value.trim();
-    const addressValue = addressInput.value.trim();
-    const phoneValue = phoneInput.value.trim();
-    console.log(nameValue);
-    // Validation rules
-    if (!nameValue || !/^[a-zA-Z0-9\s\-',.]+$/.test(nameValue)) {
-      errors.push(
-        "Store name is required and should contain valid characters."
-      );
-    }
-    if (
-      addressValue.length < 20 ||
-      addressValue.length > 300 ||
-      addressValue.trim() === ""
-    ) {
-      errors.push("Store Address must be between 20-300 characters.");
-    }
-    if (!phoneValue) {
-      errors.push("Phone number should be provided!");
-    }
-
-    // Clear and show errors if validation fails
-    errorContainer.innerHTML = ""; // Clear existing errors
-    if (errors.length > 0) {
-      errors.forEach((error) => {
-        const errorElement = document.createElement("p");
-        errorElement.textContent = error;
-        errorElement.style.color = "red";
-        errorContainer.appendChild(errorElement);
-      });
-      return; // Stop execution if there are errors
-    }
-    const updatedStore = {
-      name: nameInput.value,
-      address: addressInput.value,
-      phone: phoneInput.value,
-    };
-
-    // const storeId = "{{store._id}}";
-
-    try {
-      const response = await fetch(`/stores/${storeId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedStore),
-      });
-
-      if (response.ok) {
-        nameSpan.textContent = nameInput.value;
-        addressSpan.textContent = addressInput.value;
-        phoneSpan.textContent = phoneInput.value;
-
-        cancelButton.click();
-      } else {
-        console.error("Failed to update store");
+      const nameValue = nameInput.value.trim();
+      const addressValue = addressInput.value.trim();
+      const phoneValue = phoneInput.value.trim();
+      console.log(nameValue);
+      // Validation rules
+      if (!nameValue || !/^[a-zA-Z0-9\s\-',.]+$/.test(nameValue)) {
+        errors.push(
+          "Store name is required and should contain valid characters."
+        );
       }
-    } catch (error) {
-      console.error("Error updating store:", error);
-    }
-  });
+      if (
+        addressValue.length < 20 ||
+        addressValue.length > 300 ||
+        addressValue.trim() === ""
+      ) {
+        errors.push("Store Address must be between 20-300 characters.");
+      }
+      if (!phoneValue) {
+        errors.push("Phone number should be provided!");
+      }
 
-  deleteButton.addEventListener("click", async (event) => {
-    if (confirm("Are you sure you want to delete this store?")) {
-      // const storeId = "{{store._id}}"; // Get the current store's ID
+      // Clear and show errors if validation fails
+      errorContainer.innerHTML = ""; // Clear existing errors
+      if (errors.length > 0) {
+        errors.forEach((error) => {
+          const errorElement = document.createElement("p");
+          errorElement.textContent = error;
+          errorElement.style.color = "red";
+          errorContainer.appendChild(errorElement);
+        });
+        return; // Stop execution if there are errors
+      }
+      const updatedStore = {
+        name: nameInput.value,
+        address: addressInput.value,
+        phone: phoneInput.value,
+      };
+
+      // const storeId = "{{store._id}}";
+
       try {
         const response = await fetch(`/stores/${storeId}`, {
-          method: "DELETE",
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedStore),
         });
+
         if (response.ok) {
-          alert("Store deleted successfully!");
-          window.location.href = "/stores"; // Redirect to all stores page
+          nameSpan.textContent = nameInput.value;
+          addressSpan.textContent = addressInput.value;
+          phoneSpan.textContent = phoneInput.value;
+
+          cancelButton.click();
         } else {
-          console.error("Failed to delete store");
+          console.error("Failed to update store");
         }
       } catch (error) {
-        console.error("Error deleting store:", error);
+        console.error("Error updating store:", error);
       }
-    }
-  });
+    });
+  }
+  if (deleteButton) {
+    deleteButton.addEventListener("click", async (event) => {
+      if (confirm("Are you sure you want to delete this store?")) {
+        // const storeId = "{{store._id}}"; // Get the current store's ID
+        try {
+          const response = await fetch(`/stores/${storeId}`, {
+            method: "DELETE",
+          });
+          if (response.ok) {
+            alert("Store deleted successfully!");
+            window.location.href = "/stores"; // Redirect to all stores page
+          } else {
+            console.error("Failed to delete store");
+          }
+        } catch (error) {
+          console.error("Error deleting store:", error);
+        }
+      }
+    });
+  }
 }
 
 // const editStoreButton = document.querySelector(".edit-store");
