@@ -7,6 +7,8 @@ import {
   changeStoreManager,
   removeEmployeeFromStore,
   addEmployeetoStore,
+  searchUserByEmail,
+  updateUserRole,
 } from "./asyncFunctions.js";
 
 // DOM elements
@@ -28,6 +30,7 @@ if (adminMain) {
   const manageEmployeesSection = document.getElementById(
     "manage-store-employees"
   );
+  const manageUserRolesSection = document.getElementById("manage-user-roles");
 
   //  Doms for select input
   const storeSelect = document.getElementById("storeSelect");
@@ -49,6 +52,8 @@ if (adminMain) {
   const employeeManagementBtn = document.getElementById(
     "employeeManagementBtn"
   );
+  const manageUserRoleBtn = document.getElementById("manageUserRoleBtn");
+  const searchUserBtn = document.getElementById("searchUserBtn");
 
   // Generate Reports
   fetchReportData();
@@ -91,6 +96,7 @@ if (adminMain) {
     inProgressRequests,
     changeStoreManagerSection,
     manageEmployeesSection,
+    manageUserRolesSection,
   };
 
   const buttons = {
@@ -99,6 +105,7 @@ if (adminMain) {
     inProgressServiceRequestsBtn,
     changeStoreManagerBtn,
     employeeManagementBtn,
+    manageUserRoleBtn,
   };
 
   const toggleSectionVisibility = (sectionToShow) => {
@@ -134,6 +141,8 @@ if (adminMain) {
         toggleSectionVisibility(changeStoreManagerSection);
       } else if (clickedButton === employeeManagementBtn) {
         toggleSectionVisibility(manageEmployeesSection);
+      } else if (clickedButton === manageUserRoleBtn) {
+        toggleSectionVisibility(manageUserRolesSection);
       }
     });
   });
@@ -191,19 +200,23 @@ if (adminMain) {
           "warning",
           "Please select a new manager to assign to the store."
         );
+        return;
       }
-      const confirmation = window.confirm(
-        "Are you sure you want to assign this manager to the store?"
-      );
-      if (!confirmation) return;
+
       // Call function to change manager
       let managerChange = await changeStoreManager(storeId, newManager);
       managerSelect.selectedIndex = 0;
       storeSelect.selectedIndex = 0;
       if (managerChange) {
         showAlert("success", "Manager change successful.");
+        setTimeout(() => {
+          location.reload();
+        }, 3000);
       } else {
         showAlert("error", "Failed to change manager.");
+        setTimeout(() => {
+          location.reload();
+        }, 3000);
       }
     });
   });
@@ -286,11 +299,17 @@ if (adminMain) {
           currentEmployeesSelect.selectedIndex = 0;
           storeSelectEmployees.selectedIndex = 0;
           unassignedEmployeesSelect.selectedIndex = 0;
+          setTimeout(() => {
+            location.reload();
+          }, 3000);
         }
         if (!employeeRemove) {
           currentEmployeesSelect.selectedIndex = 0;
           storeSelectEmployees.selectedIndex = 0;
           unassignedEmployeesSelect.selectedIndex = 0;
+          setTimeout(() => {
+            location.reload();
+          }, 3000);
         }
       } catch (error) {
         console.error("Error removing employee:", error);
@@ -298,6 +317,9 @@ if (adminMain) {
         currentEmployeesSelect.selectedIndex = 0;
         storeSelectEmployees.selectedIndex = 0;
         unassignedEmployeesSelect.selectedIndex = 0;
+        setTimeout(() => {
+          location.reload();
+        }, 3000);
       }
     });
 
@@ -319,15 +341,84 @@ if (adminMain) {
           currentEmployeesSelect.selectedIndex = 0;
           storeSelectEmployees.selectedIndex = 0;
           unassignedEmployeesSelect.selectedIndex = 0;
+          setTimeout(() => {
+            location.reload();
+          }, 3000);
         } else {
           currentEmployeesSelect.selectedIndex = 0;
           storeSelectEmployees.selectedIndex = 0;
           unassignedEmployeesSelect.selectedIndex = 0;
+          setTimeout(() => {
+            location.reload();
+          }, 3000);
         }
       } catch (error) {
         console.error("Error adding employee:", error);
         showAlert("error", "Failed to add employee. Please try again.");
+        setTimeout(() => {
+          location.reload();
+        }, 3000);
       }
     });
+  });
+
+  // Manage search button for changing user roles
+  searchUserBtn.addEventListener("click", async function () {
+    const email = document.getElementById("userEmail").value;
+    const resultContainer = document.getElementById("searchResultContainer");
+    const userNotFoundMessage = document.getElementById("userNotFoundMessage");
+    const userDetails = document.getElementById("userDetails");
+    const userRoleSelect = document.getElementById("userRoleSelect");
+    const changeRoleBtn = document.getElementById("changeRoleBtn");
+
+    try {
+      const { user } = await searchUserByEmail(email);
+
+      if (user) {
+        document.getElementById("userName").textContent = user.name;
+        document.getElementById("userEmailDetails").textContent = user.email;
+        document.getElementById("userPhone").textContent = user.phone;
+        document.getElementById("userRole").textContent = user.role;
+
+        // Show role management section
+        resultContainer.classList.remove("hidden");
+        userNotFoundMessage.classList.add("hidden");
+        userDetails.classList.remove("hidden");
+        document
+          .getElementById("role-management-container")
+          .classList.remove("hidden");
+
+        // Handle change role button
+        changeRoleBtn.addEventListener("click", async function () {
+          const newRole = userRoleSelect.value;
+          let roleUpdate = await updateUserRole(user._id, newRole);
+          if (
+            roleUpdate &&
+            roleUpdate.message === "User role updated successfully"
+          ) {
+            showAlert("success", "User role updated successfully!");
+            document.getElementById("userEmail").textContent = "";
+            userRoleSelect.selectedIndex = 0;
+            setTimeout(() => {
+              location.reload();
+            }, 3000);
+          } else {
+            showAlert("error", "Failed to update user role");
+            userRoleSelect.selectedIndex = 0;
+          }
+        });
+      } else {
+        // Show message if user not found
+        resultContainer.classList.remove("hidden");
+        userNotFoundMessage.classList.remove("hidden");
+        userDetails.classList.add("hidden");
+        document
+          .getElementById("role-management-container")
+          .classList.add("hidden");
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      showAlert("error", "An error occurred while fetching the user.");
+    }
   });
 }

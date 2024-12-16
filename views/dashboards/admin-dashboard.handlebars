@@ -5,7 +5,7 @@
     <div id="store-data" data-store-id="{{storeId}}" data-store-name="{{storeName}}" data-store-phone="{{storePhone}}">
     </div>
 
-    <h1>Welcome to the Admin Dashboard!</h1>
+    <h1>Welcome {{user.name}} to the Admin Dashboard!</h1>
     <input type="hidden" id="user-data" value='${JSON.stringify(req.session.user)}' />
 
     <!-- Find Service Request Section -->
@@ -24,7 +24,7 @@
     <button id="inProgressServiceRequestsBtn">In Progress Service Requests</button>
     <button id="changeStoreManagerBtn">Change Store Manager</button>
     <button id="employeeManagementBtn">Manage Store Employees</button>
-    <button id="changeUserRoleBtn">Manage User Roles</button>
+    <button id="manageUserRoleBtn">Manage User Roles</button>
 
 
 
@@ -220,6 +220,47 @@
             <button id="addEmployeeBtn" class="hidden">Add Employee to Store</button>
         </div>
 
+    </section>
+
+    {{!-- Section to manage user roles --}}
+    <section id="manage-user-roles" class="hidden">
+        <h2>Manage User Roles</h2>
+
+        <!-- Search by email -->
+        <div class="form-container">
+            <label for="userEmail">Enter User Email:</label>
+            <input type="email" id="userEmail" placeholder="Enter user email" required>
+            <button id="searchUserBtn">Search</button>
+        </div>
+
+        <!-- Result of search -->
+        <div id="searchResultContainer" class="hidden">
+            <h3>User Details</h3>
+            <div id="userDetails">
+                <!-- User details will be displayed here -->
+                <p><strong>Name:</strong> <span id="userName"></span></p>
+                <p><strong>Email:</strong> <span id="userEmailDetails"></span></p>
+                <p><strong>Phone:</strong> <span id="userPhone"></span></p>
+                <p><strong>Current Role:</strong> <span id="userRole"></span></p>
+            </div>
+            <p id="userNotFoundMessage" class="hidden">User not found. Please check the email and try again.</p>
+        </div>
+
+        <!-- Role management -->
+        <div id="role-management-container" class="hidden">
+            <h3>Change User Role</h3>
+
+            <label for="userRoleSelect">Select New Role:</label>
+            <select id="userRoleSelect">
+                <option value="" disabled selected>Select user role</option>
+                <option value="customer">Customer</option>
+                <option value="employee">Employee</option>
+                <option value="store-manager">Store Manager</option>
+                <option value="admin">Admin</option>
+            </select>
+
+            <button id="changeRoleBtn">Change Role</button>
+        </div>
 
     </section>
 

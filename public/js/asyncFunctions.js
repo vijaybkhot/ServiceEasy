@@ -73,6 +73,90 @@ export async function getUserById(userId) {
   }
 }
 
+// Get user by email
+// Function to validate email using a regular expression
+function validateEmail(email) {
+  const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailPattern.test(email);
+}
+
+// Function to search for a user by email
+export const searchUserByEmail = async function (email) {
+  if (!email) {
+    showAlert("error", "Email is required.");
+    return;
+  }
+
+  if (!validateEmail(email)) {
+    showAlert("error", "Please enter a valid email.");
+    return;
+  }
+
+  try {
+    const response = await axios.get(`http://localhost:3000/search-user/`, {
+      params: { email },
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      showAlert("error", "No user found with this email.");
+    } else {
+      showAlert("error", "An error occurred while searching for the user.");
+    }
+    console.error("Error:", error.message);
+  }
+};
+
+// Change user roles
+export const updateUserRole = async function (userId, newRole) {
+  // Validate userId
+  if (!userId || typeof userId !== "string" || userId.trim() === "") {
+    console.error(
+      "Error: userId is required and should be a non-empty string."
+    );
+    return;
+  }
+
+  // Validate newRole
+  if (!newRole || typeof newRole !== "string" || newRole.trim() === "") {
+    console.error(
+      "Error: newRole is required and should be a non-empty string."
+    );
+    return;
+  }
+
+  const validRoles = ["customer", "employee", "store-manager", "admin"];
+  if (!validRoles.includes(newRole.trim())) {
+    console.error(
+      "Error: Invalid role. Role should be one of the following: ['customer', 'employee', 'store-manager', 'admin']"
+    );
+    return;
+  }
+
+  try {
+    // Axios put request
+    const response = await axios.put(`http://localhost:3000/update-user-role`, {
+      userId,
+      newRole,
+    });
+
+    console.log("User role updated:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating user role:",
+      error.response ? error.response.data.message : error.message
+    );
+    showAlert(
+      "error",
+      error.response ? error.response.data.message : error.message
+    );
+  }
+};
+
 // Function to load payment page
 export const getPaymentPage = async function ({
   device_type,
