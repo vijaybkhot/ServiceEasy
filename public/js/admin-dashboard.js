@@ -1,16 +1,22 @@
 import { showAlert } from "./alert.js";
-import { isValidOrderId, loadServiceRequestDetails } from "./asyncFunctions.js";
+import {
+  isValidOrderId,
+  loadServiceRequestDetails,
+  fetchReportData,
+} from "./asyncFunctions.js";
 
 // DOM elements
-const storeManagerMain = document.getElementById("store-manager-main");
+const adminMain = document.getElementById("admin-main");
 
-if (storeManagerMain) {
+if (adminMain) {
   const user = JSON.parse(document.getElementById("user-data").dataset.user);
   document.getElementById("user-data").remove();
   const storeData = document.getElementById("store-data");
   const storeId = storeData.dataset.storeId;
   const findButton = document.getElementById("findButton");
   const buttons = document.querySelectorAll(".view-details-btn");
+
+  fetchReportData();
 
   // Event listners for the view details buttons
   buttons.forEach((button) => {

@@ -414,6 +414,90 @@ router.get("/store/:id", async (req, res, next) => {
   }
 });
 
+// Route to generate reports across all stores
+
+router.get(
+  "/generate-reports",
+  isAuthenticated,
+  hasRole("admin"),
+  async (req, res) => {
+    try {
+      // Get all service requests across stores
+      const allRequests = await ServiceRequest.find();
+
+      // Aggregate data for the report
+      const totalRequests = allRequests.length;
+      const completedRequests = allRequests.filter(
+        (request) => request.status === "complete"
+      ).length;
+      const inProgressRequests = allRequests.filter(
+        (request) => request.status !== "complete"
+      ).length;
+      const totalPrice = allRequests.reduce(
+        (sum, request) => sum + request.payment.amount,
+        0
+      );
+      const avgRating = allRequests.filter(
+        (request) => request.feedback?.rating
+      ).length
+        ? allRequests
+            .filter((request) => request.feedback?.rating)
+            .reduce((sum, request) => sum + request.feedback?.rating, 0) /
+          allRequests.filter((request) => request.feedback?.rating).length
+        : 0;
+
+      // Group by store to get the total requests per store
+      const stores = await Store.find();
+      const storeReport = stores.map((store) => {
+        const storeRequests = allRequests.filter(
+          (request) => request.store_id.toString() === store._id.toString()
+        );
+
+        // Filter requests with valid feedback and rating
+        const ratedRequests = storeRequests.filter(
+          (request) => request.feedback?.rating != null
+        );
+
+        // Calculate the average rating if there are any rated requests
+        const storeAvgRating = ratedRequests.length
+          ? ratedRequests.reduce(
+              (sum, request) => sum + request.feedback?.rating,
+              0
+            ) / ratedRequests.length
+          : 0;
+
+        return {
+          storeName: store.name,
+          totalRequests: storeRequests.length,
+          completedRequests: storeRequests.filter(
+            (request) => request.status === "complete"
+          ).length,
+          inProgressRequests: storeRequests.filter(
+            (request) => request.status !== "complete"
+          ).length,
+          totalPrice: storeRequests.reduce(
+            (sum, request) => sum + request.payment?.amount,
+            0
+          ),
+          avgRating: storeAvgRating,
+        };
+      });
+
+      res.status(200).json({
+        totalRequests,
+        completedRequests,
+        inProgressRequests,
+        totalPrice,
+        avgRating,
+        storeReport,
+      });
+    } catch (err) {
+      console.error("Error generating report:", err);
+      res.status(500).send("Server error");
+    }
+  }
+);
+
 // Get service request by ID:
 router.get("/:id", async (req, res, next) => {
   const serviceRequestId = dataValidator.isValidObjectId(req.params.id);
@@ -1025,6 +1109,6 @@ router.post('/process-payment', hasRole(["customer"]), async (req, res, next) =>
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-);
+});
 
 export default router;

@@ -18,7 +18,10 @@ async function createServiceRequest(data) {
 
 async function getClientSecret(data) {
   try {
-    const response = await axios.post("/api/service-request/process-payment", data);
+    const response = await axios.post(
+      "/api/service-request/process-payment",
+      data
+    );
     if (response.status === 200) {
       return response.data.clientSecret;
     } else {
@@ -38,15 +41,15 @@ if (paymentContainer) {
   const stripe = Stripe('pk_test_51QWLC1A9qyCU5Oav4hkg12tcJk13Lc1brMnPGvM2LSjnJO3gk7bTfjTi4vIKFd2wVYUtxy8ylZFcx8EOrTfhbcqb00eMel4IY7');
   const elements = stripe.elements();
 
-  const card = elements.create('card', {
+  const card = elements.create("card", {
     style: {
       base: {
-        color: '#32325d',
+        color: "#32325d",
         fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-        fontSize: '16px',
-        '::placeholder': { color: '#aab7c4' },
+        fontSize: "16px",
+        "::placeholder": { color: "#aab7c4" },
       },
-      invalid: { color: '#fa755a' },
+      invalid: { color: "#fa755a" },
     },
   });
   if(cardElement)

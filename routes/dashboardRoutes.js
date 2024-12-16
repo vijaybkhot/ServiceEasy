@@ -34,7 +34,7 @@ router.get(
           req.session.user.role
         );
 
-      // Filter service requests into completed, pending, in-progress at managers dashboard
+      // Filter service requests into completed, in-progress at customers dashboard
       let unMappedCompletedServiceRequests = userServiceRequests.filter(
         (serviceRequest) => serviceRequest.status === "complete"
       );
@@ -43,7 +43,6 @@ router.get(
         (serviceRequest) => serviceRequest.status !== "complete"
       );
 
-      console.log(unMappedCompletedServiceRequests[0]);
       // Get page numbers from query params
       const completedPage = parseInt(req.query.completedPage) || 1;
       const inProgressPage = parseInt(req.query.inProgressPage) || 1;
@@ -254,12 +253,55 @@ router.get(
 );
 
 //  Admin dashboard
-router.get("/admin-dashboard", async (req, res, next) => {
+router.get("/admin-dashboard", hasRole(["admin"]), async (req, res, next) => {
   try {
+    // Get all service requests
+    const allServiceRequests = await serviceRequests.getAllServiceRequests();
+    console.log(allServiceRequests.length);
+
+    // Filter service requests into completed, pending
+    let unMappedCompletedServiceRequests = allServiceRequests.filter(
+      (serviceRequest) => serviceRequest.status === "complete"
+    );
+
+    let unMappedInProgressServiceRequests = allServiceRequests.filter(
+      (serviceRequest) => serviceRequest.status !== "complete"
+    );
+
+    // Get page numbers from query params
+    const completedPage = parseInt(req.query.completedPage) || 1;
+    const inProgressPage = parseInt(req.query.inProgressPage) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
+
+    // Paginate the completed and in-progress requests
+    let completedServiceRequests;
+    if (unMappedCompletedServiceRequests) {
+      completedServiceRequests = await helpers.mapServiceRequests(
+        unMappedCompletedServiceRequests,
+        completedPage,
+        pageSize
+      );
+    }
+
+    let inProgressServiceRequests;
+    if (unMappedInProgressServiceRequests) {
+      inProgressServiceRequests = await helpers.mapServiceRequests(
+        unMappedInProgressServiceRequests,
+        inProgressPage,
+        pageSize
+      );
+    }
+
     // Render dashboard
     return res.status(200).render("dashboards/admin-dashboard", {
       title: "Admin Dashboard",
       cssPath: `/public/css/admin-dashboard.css`,
+      user: req.session.user,
+      completedServiceRequests,
+      inProgressServiceRequests,
+      currentCompletedPage: completedPage,
+      currentInProgressPage: inProgressPage,
+      pageSize,
     });
   } catch (error) {
     next(error);
