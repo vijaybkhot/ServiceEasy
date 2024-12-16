@@ -1,40 +1,30 @@
-{{!-- <header>
-    <div class="left">
-        {{#if user}}
-        <p>Welcome, {{user.name}}!</p>
-        {{else}}
-        <p>Welcome, Guest!</p>
-        {{/if}}
-    </div>
-
-    <h1>{{title}}</h1>
-
-    <div class="right">
-        {{#if user}}
-        <button id="trackOrderButton" class="track-order-btn">Track Repair Order</button>
-        <a href="/logout" class="logout-btn">Logout</a>
-        {{else}}
-        <a href="/login" class="login-btn">Log In</a>
-        <a href="/signup" class="signup-btn">Sign Up</a>
-        <button id="trackOrderButton" class="track-order-btn">Track Repair Order</button>
-        {{/if}}
-    </div>
-</header> --}}
-
 <header>
     <nav class="navbar">
       <div class="logo">
         <a href="/home"><img src="/public/images/logo_dark.png" alt="ServiceEasy Logo"></a>
       </div>
       <ul class="nav-links">
+        {{#if user}}
+          <li><a href="/dashboard">DASHBOARD</a></li>
+        {{/if}}
+        
         <li><a href="/stores">FIND STORES NEAR ME</a></li>
-        <li><a href="/repair">PHONE REPAIR</a></li>
-        <li><a href="/login">LOGIN</a></li>
-        <li><a href="/signup">SIGN UP</a></li>
+        <li><a href="/repair">TRACK REPAIR</a></li>
+        
+        {{#unless user}}
+          {{#unless onLoginPage}}
+            <li><a href="/login">LOGIN</a></li>
+          {{/unless}}
+
+          {{#unless onSignupPage}}
+            <li><a href="/signup">SIGN UP</a></li>
+           {{/unless}}
+      {{/unless}}
+
+      {{#if user}}
+        <li><a href="/logout">LOGOUT</a></li>
+      {{/if}}
       </ul>
-      <div class="search-icon">
-        <i class="fas fa-search"></i>
-      </div>
     </nav>
-      {{!-- <div id="user-data" data-user='{{{json user}}}'></div> --}}
+      <div id="user-data" data-user='{{{json user}}}'></div>
 </header>
