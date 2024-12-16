@@ -342,6 +342,51 @@ export const changeStoreManager = async function (storeId, newManagerId) {
   }
 };
 
+// Function to remove employee from store
+export const removeEmployeeFromStore = async function (storeId, employeeId) {
+  try {
+    const response = await axios.delete(
+      `http://localhost:3000/stores/${storeId}/employees/${employeeId}`
+    );
+
+    console.log(response.data.message);
+    return response.data.store;
+  } catch (error) {
+    if (error.response) {
+      console.error("Error:", error.response.data);
+      showAlert(
+        "error",
+        `Error: ${error.response.data.errors || error.response.data.error}`
+      );
+    } else {
+      console.error("Error:", error.message);
+      showAlert("error", "An unexpected error occurred.");
+    }
+  }
+};
+
+// Function to add an employee to store
+export const addEmployeetoStore = async function (storeId, employeeId) {
+  try {
+    const response = await axios.post(
+      `http://localhost:3000/stores/${storeId}/employees/${employeeId}`
+    );
+    console.log(response.data.message);
+    return response.data.store;
+  } catch (error) {
+    if (error.response) {
+      console.error("Error:", error.response.data);
+      showAlert(
+        "error",
+        `Error: ${error.response.data.errors || error.response.data.error}`
+      );
+    } else {
+      console.error("Error:", error.message);
+      showAlert("error", "An unexpected error occurred.");
+    }
+  }
+};
+
 // function to update activity status from in-progress to completed
 async function updateActivityStatus(activityId, status = "completed") {
   try {

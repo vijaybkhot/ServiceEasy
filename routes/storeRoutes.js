@@ -68,6 +68,17 @@ router.get("/jsonStores", async (req, res) => {
       );
     });
 
+    // Unassigned employees
+    const employees = await User.find({ role: "employee" });
+
+    const unassignedEmployees = employees.filter((employee) => {
+      return !stores.some((store) => {
+        return store.employees.some(
+          (emp) => emp._id.toString() === employee._id.toString()
+        );
+      });
+    });
+
     if (!stores) {
       return res.status(404).json({ error: "No stores found" });
     }
@@ -76,6 +87,7 @@ router.get("/jsonStores", async (req, res) => {
       success: true,
       stores: stores,
       managersWithoutStore: managersWithoutStore,
+      unassignedEmployees: unassignedEmployees,
     });
   } catch (error) {
     console.error("Error fetching stores:", error);

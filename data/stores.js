@@ -384,16 +384,28 @@ async function removeEmployeeFromStore(storeId, employeeId) {
   if (!store) throw new Error(`Store with ID ${storeId} not found.`);
 
   // Check if the employee exists in the store's employee list (looking at userId inside populated data)
-  const employeeInStore = store.employees.find(
+  const employeeInStore = store.employees?.find(
     (employee) => employee._id.toString() === employeeId
   );
+
   if (!employeeInStore) {
     throw new Error(`Employee with ID ${employeeId} is not in the store.`);
   }
 
+  // Check if the employee has any service request assigned
+  const activeServiceRequest = await ServiceRequest.findOne({
+    employee_id: employeeId,
+  });
+
+  if (activeServiceRequest) {
+    throw new Error(
+      `Employee with name ${employeeInStore.name} is assigned to a service request and cannot be removed.`
+    );
+  }
+
   // Remove the employee from the store's employee list
   store.employees = store.employees.filter(
-    (employee) => employee.toString() !== employeeId
+    (employee) => employee._id.toString() !== employeeId
   );
 
   // Save the updated store

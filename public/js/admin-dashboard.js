@@ -5,6 +5,8 @@ import {
   fetchReportData,
   fetchAllStores,
   changeStoreManager,
+  removeEmployeeFromStore,
+  addEmployeetoStore,
 } from "./asyncFunctions.js";
 
 // DOM elements
@@ -29,6 +31,7 @@ if (adminMain) {
 
   //  Doms for select input
   const storeSelect = document.getElementById("storeSelect");
+  const storeSelectEmployees = document.getElementById("storeSelectEmployees");
 
   // Buttons
   const findButton = document.getElementById("findButton");
@@ -81,74 +84,7 @@ if (adminMain) {
     await loadServiceRequestDetails(orderId, user, storeId);
   });
 
-  // Event Listner for generate reports button
-  //   generateReportsBtn.addEventListener("click", async () => {
-  //     if (storeReport.classList.contains("hidden")) {
-  //       inProgressRequests.classList.add("hidden");
-  //       completedRequests.classList.add("hidden");
-  //       storeReport.classList.remove("hidden");
-  //       setTimeout(() => {
-  //         storeReport.scrollIntoView({
-  //           behavior: "smooth",
-  //           block: "start",
-  //         });
-  //       }, 50);
-  //     } else {
-  //       storeReport.classList.add("hidden");
-  //     }
-  //   });
-
-  //   // Event Listner for View Completed Service Requests Button
-  //   completedServiceRequestsBtn.addEventListener("click", () => {
-  //     if (completedRequests.classList.contains("hidden")) {
-  //       inProgressRequests.classList.add("hidden");
-  //       storeReport.classList.add("hidden");
-  //       completedRequests.classList.remove("hidden");
-  //       setTimeout(() => {
-  //         completedRequests.scrollIntoView({
-  //           behavior: "smooth",
-  //           block: "start",
-  //         });
-  //       }, 50);
-  //     } else {
-  //       completedRequests.classList.add("hidden");
-  //     }
-  //   });
-
-  //   inProgressServiceRequestsBtn.addEventListener("click", () => {
-  //     if (inProgressRequests.classList.contains("hidden")) {
-  //       inProgressRequests.classList.remove("hidden");
-  //       completedRequests.classList.add("hidden");
-  //       storeReport.classList.add("hidden");
-  //       setTimeout(() => {
-  //         inProgressRequests.scrollIntoView({
-  //           behavior: "smooth",
-  //           block: "start",
-  //         });
-  //       }, 50);
-  //     } else {
-  //       inProgressRequests.classList.add("hidden");
-  //     }
-  //   });
-
-  //   // Handle changing store managers
-  //   changeStoreManagerBtn.addEventListener("click", () => {
-  //     if (changeStoreManagerSection.classList.contains("hidden")) {
-  //       changeStoreManagerSection.classList.remove("hidden");
-  //       inProgressRequests.classList.add("hidden");
-  //       completedRequests.classList.add("hidden");
-  //       storeReport.classList.add("hidden");
-  //       setTimeout(() => {
-  //         changeStoreManagerSection.scrollIntoView({
-  //           behavior: "smooth",
-  //           block: "start",
-  //         });
-  //       }, 50);
-  //     } else {
-  //       changeStoreManagerSection.classList.add("hidden");
-  //     }
-  //   });
-
+  // Handle view of all sections on the page
   const sections = {
     storeReport,
     completedRequests,
@@ -202,6 +138,7 @@ if (adminMain) {
     });
   });
 
+  // Handle events for change store manager section
   storeSelect.addEventListener("change", async function () {
     const storeId = this.value;
     let storesAndManagerData = await fetchAllStores();
@@ -261,13 +198,135 @@ if (adminMain) {
       if (!confirmation) return;
       // Call function to change manager
       let managerChange = await changeStoreManager(storeId, newManager);
+      managerSelect.selectedIndex = 0;
+      storeSelect.selectedIndex = 0;
       if (managerChange) {
         showAlert("success", "Manager change successful.");
       } else {
         showAlert("error", "Failed to change manager.");
-        setTimeout(() => {
-          location.reload();
-        }, 3000);
+      }
+    });
+  });
+
+  // Handle events for employee management section
+  storeSelectEmployees.addEventListener("change", async function () {
+    const storeId = this.value;
+    let storesAndEmployeeData = await fetchAllStores();
+    let allStores = storesAndEmployeeData.stores;
+    let unassignedEmployees = storesAndEmployeeData.unassignedEmployees;
+
+    if (!storeId) {
+      showAlert(
+        "warning",
+        "Please select a store to change or view store manager"
+      );
+      return;
+    }
+
+    const currStore = allStores.find((store) => store._id === storeId);
+    let currStoreEmployees = currStore.employees;
+
+    const currentEmployeeContainer = document.getElementById(
+      "current-employees-container"
+    );
+    currentEmployeeContainer.classList.remove("hidden");
+    const currentEmployeesSelect = document.getElementById(
+      "currentEmployeesSelect"
+    );
+    const removeEmployeeBtn = document.getElementById("removeEmployeeBtn");
+    removeEmployeeBtn.classList.remove("hidden");
+    const unassignedEmployeesContainer = document.getElementById(
+      "unassigned-employees-container"
+    );
+    unassignedEmployeesContainer.classList.remove("hidden");
+    const addEmployeeBtn = document.getElementById("addEmployeeBtn");
+    addEmployeeBtn.classList.remove("hidden");
+    const unassignedEmployeesSelect = document.getElementById(
+      "unassignedEmployeesSelect"
+    );
+    // Populate the current employees dropdown
+    currentEmployeesSelect.innerHTML =
+      '<option value="" disabled selected>Select a current employee</option>';
+    currStoreEmployees.forEach((employee) => {
+      const option = document.createElement("option");
+      option.value = employee._id;
+      option.textContent = employee.name;
+      currentEmployeesSelect.appendChild(option);
+    });
+
+    // Populate the unassigned employees dropdown
+    unassignedEmployeesSelect.innerHTML =
+      '<option value="" disabled selected>Select available employee to add to store</option>';
+    unassignedEmployees.forEach((employee) => {
+      const option = document.createElement("option");
+      option.value = employee._id;
+      option.textContent = employee.name;
+      unassignedEmployeesSelect.appendChild(option);
+    });
+
+    // Handle remove button event
+    removeEmployeeBtn.addEventListener("click", async function () {
+      let selectedRemoveEmployee = currentEmployeesSelect.value;
+
+      if (!selectedRemoveEmployee || !storeId) {
+        showAlert(
+          "warning",
+          "Please select a store and an employee to remove."
+        );
+        return;
+      }
+      try {
+        let employeeRemove = await removeEmployeeFromStore(
+          storeId,
+          selectedRemoveEmployee
+        );
+
+        if (employeeRemove) {
+          showAlert("success", "Employee removed successfully.");
+          currentEmployeesSelect.selectedIndex = 0;
+          storeSelectEmployees.selectedIndex = 0;
+          unassignedEmployeesSelect.selectedIndex = 0;
+        }
+        if (!employeeRemove) {
+          currentEmployeesSelect.selectedIndex = 0;
+          storeSelectEmployees.selectedIndex = 0;
+          unassignedEmployeesSelect.selectedIndex = 0;
+        }
+      } catch (error) {
+        console.error("Error removing employee:", error);
+        showAlert("error", error.message);
+        currentEmployeesSelect.selectedIndex = 0;
+        storeSelectEmployees.selectedIndex = 0;
+        unassignedEmployeesSelect.selectedIndex = 0;
+      }
+    });
+
+    // Handle add employee button
+    addEmployeeBtn.addEventListener("click", async function () {
+      let selectedAddEmployee = unassignedEmployeesSelect.value;
+      if (!selectedAddEmployee || !storeId) {
+        showAlert("warning", "Please select a store and an employee to add.");
+        return;
+      }
+      console.log(selectedAddEmployee);
+      try {
+        let employeeAdd = await addEmployeetoStore(
+          storeId,
+          selectedAddEmployee
+        );
+        if (employeeAdd) {
+          showAlert("success", "Employee added successfully.");
+          currentEmployeesSelect.selectedIndex = 0;
+          storeSelectEmployees.selectedIndex = 0;
+          unassignedEmployeesSelect.selectedIndex = 0;
+        } else {
+          currentEmployeesSelect.selectedIndex = 0;
+          storeSelectEmployees.selectedIndex = 0;
+          unassignedEmployeesSelect.selectedIndex = 0;
+        }
+      } catch (error) {
+        console.error("Error adding employee:", error);
+        showAlert("error", "Failed to add employee. Please try again.");
       }
     });
   });

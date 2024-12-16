@@ -20,10 +20,12 @@
 
     {{!-- Report Section --}}
     <button id="generateReportsBtn">Generate Reports</button>
-    <button id="completedServiceRequestsBtn">View Completed Service Requests</button>
-    <button id="inProgressServiceRequestsBtn">View In Progress Service Requests</button>
+    <button id="completedServiceRequestsBtn">Completed Service Requests</button>
+    <button id="inProgressServiceRequestsBtn">In Progress Service Requests</button>
     <button id="changeStoreManagerBtn">Change Store Manager</button>
     <button id="employeeManagementBtn">Manage Store Employees</button>
+    <button id="changeUserRoleBtn">Manage User Roles</button>
+
 
 
 
@@ -192,35 +194,33 @@
         <h2>Manage Store Employees</h2>
 
         <!-- Store selection dropdown -->
-        <div>
-            <label for="storeSelectEmployees">Select Store:</label>
-            <select id="storeSelectEmployees">
-                <option value="" disabled selected>Select a store</option>
-                {{#each stores}}
-                <option value="{{this._id}}">{{this.name}}</option>
-                {{/each}}
-            </select>
-        </div>
-
-        <!-- Current employees in the store -->
+        <select id="storeSelectEmployees">
+            <option value="" disabled selected>Select a store</option>
+            {{#each stores}}
+            <option value="{{this._id}}">{{this.name}}</option>
+            {{/each}}
+        </select>
+        <!-- Current Employees -->
         <div id="current-employees-container" class="hidden">
             <h3>Current Employees</h3>
             <label for="currentEmployeesSelect">Employees in this Store:</label>
-            <select id="currentEmployeesSelect" multiple>
-                <option value="" disabled>Select current employees</option>
+            <select id="currentEmployeesSelect">
+                <option value="" disabled selected>Select current employees</option>
             </select>
             <button id="removeEmployeeBtn" class="hidden">Remove Employee</button>
         </div>
 
         <!-- Available unassigned employees -->
         <div id="unassigned-employees-container" class="hidden">
-            <h3>Available Employees</h3>
+            <h3>Available Employees To Add To The Store</h3>
             <label for="unassignedEmployeesSelect">Unassigned Employees:</label>
-            <select id="unassignedEmployeesSelect" multiple>
-                <option value="" disabled>Select available employees</option>
+            <select id="unassignedEmployeesSelect">
+                <option value="" disabled selected>Select available employees</option>
             </select>
             <button id="addEmployeeBtn" class="hidden">Add Employee to Store</button>
         </div>
+
+
     </section>
 
     <section>
