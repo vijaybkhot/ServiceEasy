@@ -23,13 +23,16 @@ if (adminMain) {
   const changeStoreManagerSection = document.getElementById(
     "change-store-manager"
   );
+  const manageEmployeesSection = document.getElementById(
+    "manage-store-employees"
+  );
 
   //  Doms for select input
   const storeSelect = document.getElementById("storeSelect");
 
   // Buttons
   const findButton = document.getElementById("findButton");
-  const buttons = document.querySelectorAll(".view-details-btn");
+  const viewDetailsbtns = document.querySelectorAll(".view-details-btn");
   const generateReportsBtn = document.getElementById("generateReportsBtn");
   const completedServiceRequestsBtn = document.getElementById(
     "completedServiceRequestsBtn"
@@ -40,12 +43,15 @@ if (adminMain) {
   const changeStoreManagerBtn = document.getElementById(
     "changeStoreManagerBtn"
   );
+  const employeeManagementBtn = document.getElementById(
+    "employeeManagementBtn"
+  );
 
   // Generate Reports
   fetchReportData();
 
-  // Event listners for the view details buttons
-  buttons.forEach((button) => {
+  // Event listners for the view details viewDetailsbtns
+  viewDetailsbtns.forEach((button) => {
     button.addEventListener("click", async function () {
       const orderId = this.getAttribute("data-order-id");
 
@@ -76,71 +82,124 @@ if (adminMain) {
   });
 
   // Event Listner for generate reports button
-  generateReportsBtn.addEventListener("click", async () => {
-    if (storeReport.classList.contains("hidden")) {
-      inProgressRequests.classList.add("hidden");
-      completedRequests.classList.add("hidden");
-      storeReport.classList.remove("hidden");
-      setTimeout(() => {
-        storeReport.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 50);
-    } else {
-      storeReport.classList.add("hidden");
-    }
-  });
+  //   generateReportsBtn.addEventListener("click", async () => {
+  //     if (storeReport.classList.contains("hidden")) {
+  //       inProgressRequests.classList.add("hidden");
+  //       completedRequests.classList.add("hidden");
+  //       storeReport.classList.remove("hidden");
+  //       setTimeout(() => {
+  //         storeReport.scrollIntoView({
+  //           behavior: "smooth",
+  //           block: "start",
+  //         });
+  //       }, 50);
+  //     } else {
+  //       storeReport.classList.add("hidden");
+  //     }
+  //   });
 
-  // Event Listner for View Completed Service Requests Button
-  completedServiceRequestsBtn.addEventListener("click", () => {
-    if (completedRequests.classList.contains("hidden")) {
-      inProgressRequests.classList.add("hidden");
-      storeReport.classList.add("hidden");
-      completedRequests.classList.remove("hidden");
-      setTimeout(() => {
-        completedRequests.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 50);
-    } else {
-      completedRequests.classList.add("hidden");
-    }
-  });
+  //   // Event Listner for View Completed Service Requests Button
+  //   completedServiceRequestsBtn.addEventListener("click", () => {
+  //     if (completedRequests.classList.contains("hidden")) {
+  //       inProgressRequests.classList.add("hidden");
+  //       storeReport.classList.add("hidden");
+  //       completedRequests.classList.remove("hidden");
+  //       setTimeout(() => {
+  //         completedRequests.scrollIntoView({
+  //           behavior: "smooth",
+  //           block: "start",
+  //         });
+  //       }, 50);
+  //     } else {
+  //       completedRequests.classList.add("hidden");
+  //     }
+  //   });
 
-  inProgressServiceRequestsBtn.addEventListener("click", () => {
-    if (inProgressRequests.classList.contains("hidden")) {
-      inProgressRequests.classList.remove("hidden");
-      completedRequests.classList.add("hidden");
-      storeReport.classList.add("hidden");
-      setTimeout(() => {
-        inProgressRequests.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 50);
-    } else {
-      inProgressRequests.classList.add("hidden");
-    }
-  });
+  //   inProgressServiceRequestsBtn.addEventListener("click", () => {
+  //     if (inProgressRequests.classList.contains("hidden")) {
+  //       inProgressRequests.classList.remove("hidden");
+  //       completedRequests.classList.add("hidden");
+  //       storeReport.classList.add("hidden");
+  //       setTimeout(() => {
+  //         inProgressRequests.scrollIntoView({
+  //           behavior: "smooth",
+  //           block: "start",
+  //         });
+  //       }, 50);
+  //     } else {
+  //       inProgressRequests.classList.add("hidden");
+  //     }
+  //   });
 
-  // Handle changing store managers
-  changeStoreManagerBtn.addEventListener("click", () => {
-    if (changeStoreManagerSection.classList.contains("hidden")) {
-      changeStoreManagerSection.classList.remove("hidden");
-      inProgressRequests.classList.add("hidden");
-      completedRequests.classList.add("hidden");
-      storeReport.classList.add("hidden");
-      setTimeout(() => {
-        changeStoreManagerSection.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 50);
-    } else {
-      changeStoreManagerSection.classList.add("hidden");
-    }
+  //   // Handle changing store managers
+  //   changeStoreManagerBtn.addEventListener("click", () => {
+  //     if (changeStoreManagerSection.classList.contains("hidden")) {
+  //       changeStoreManagerSection.classList.remove("hidden");
+  //       inProgressRequests.classList.add("hidden");
+  //       completedRequests.classList.add("hidden");
+  //       storeReport.classList.add("hidden");
+  //       setTimeout(() => {
+  //         changeStoreManagerSection.scrollIntoView({
+  //           behavior: "smooth",
+  //           block: "start",
+  //         });
+  //       }, 50);
+  //     } else {
+  //       changeStoreManagerSection.classList.add("hidden");
+  //     }
+  //   });
+
+  const sections = {
+    storeReport,
+    completedRequests,
+    inProgressRequests,
+    changeStoreManagerSection,
+    manageEmployeesSection,
+  };
+
+  const buttons = {
+    generateReportsBtn,
+    completedServiceRequestsBtn,
+    inProgressServiceRequestsBtn,
+    changeStoreManagerBtn,
+    employeeManagementBtn,
+  };
+
+  const toggleSectionVisibility = (sectionToShow) => {
+    // Hide all sections
+    Object.values(sections).forEach((section) =>
+      section.classList.add("hidden")
+    );
+
+    // Show the selected section
+    sectionToShow.classList.remove("hidden");
+
+    // Scroll to the section smoothly
+    setTimeout(() => {
+      sectionToShow.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 50);
+  };
+
+  // Add event listeners to buttons
+  Object.keys(buttons).forEach((buttonKey) => {
+    buttons[buttonKey].addEventListener("click", (event) => {
+      const clickedButton = event.target;
+
+      if (clickedButton === generateReportsBtn) {
+        toggleSectionVisibility(storeReport);
+      } else if (clickedButton === completedServiceRequestsBtn) {
+        toggleSectionVisibility(completedRequests);
+      } else if (clickedButton === inProgressServiceRequestsBtn) {
+        toggleSectionVisibility(inProgressRequests);
+      } else if (clickedButton === changeStoreManagerBtn) {
+        toggleSectionVisibility(changeStoreManagerSection);
+      } else if (clickedButton === employeeManagementBtn) {
+        toggleSectionVisibility(manageEmployeesSection);
+      }
+    });
   });
 
   storeSelect.addEventListener("change", async function () {
