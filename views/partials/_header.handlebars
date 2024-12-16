@@ -1,4 +1,4 @@
-<header>
+{{!-- <header>
     <div class="left">
         {{#if user}}
         <p>Welcome, {{user.name}}!</p>
@@ -20,5 +20,21 @@
         <button id="trackOrderButton" class="track-order-btn">Track Repair Order</button>
         {{/if}}
     </div>
-    <div id="user-data" data-user='{{{json user}}}'></div>
-</header>
+</header> --}}
+
+<header>
+    <nav class="navbar">
+      <div class="logo">
+        <a href="/home"><img src="/public/images/logo_dark.png" alt="ServiceEasy Logo"></a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="/stores">FIND STORES NEAR ME</a></li>
+        <li><a href="/repair">PHONE REPAIR</a></li>
+        <li><a href="/login">LOGIN</a></li>
+        <li><a href="/signup">SIGN UP</a></li>
+      </ul>
+      <div class="search-icon">
+        <i class="fas fa-search"></i>
+      </div>
+    </nav>
+  </header>
