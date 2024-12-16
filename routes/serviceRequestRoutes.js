@@ -415,7 +415,6 @@ router.get("/store/:id", async (req, res, next) => {
 });
 
 // Route to generate reports across all stores
-
 router.get(
   "/generate-reports",
   isAuthenticated,
@@ -498,8 +497,68 @@ router.get(
   }
 );
 
+// Route to generate reports for a given store
+router.get(
+  "/generate-store-report/:storeId",
+  isAuthenticated,
+  hasRole("store-manager"), // Assuming store-manager role has access to their store report
+  async (req, res) => {
+    try {
+      let { storeId } = req.params;
+      storeId = dataValidator.isValidObjectId(storeId);
+
+      // Check if storeId is valid (if needed, you can add additional validation)
+      const store = await Store.findById(storeId);
+      if (!store) {
+        return res.status(404).json({ message: "Store not found" });
+      }
+
+      // Get all service requests for the specified store
+      const storeRequests = await ServiceRequest.find({ store_id: storeId });
+
+      // Aggregate data for the report
+      const totalRequests = storeRequests.length;
+      const completedRequests = storeRequests.filter(
+        (request) => request.status === "complete"
+      ).length;
+      const inProgressRequests = storeRequests.filter(
+        (request) => request.status !== "complete"
+      ).length;
+      const totalPrice = storeRequests.reduce(
+        (sum, request) => sum + request.payment.amount,
+        0
+      );
+      const avgRating = storeRequests.filter(
+        (request) => request.feedback?.rating
+      ).length
+        ? storeRequests
+            .filter((request) => request.feedback?.rating)
+            .reduce((sum, request) => sum + request.feedback?.rating, 0) /
+          storeRequests.filter((request) => request.feedback?.rating).length
+        : 0;
+
+      // Generate the report for the specific store
+      const storeReport = {
+        storeName: store.name,
+        totalRequests,
+        completedRequests,
+        inProgressRequests,
+        totalPrice,
+        avgRating,
+      };
+
+      res.status(200).json({
+        storeReport,
+      });
+    } catch (err) {
+      console.error("Error generating store report:", err);
+      res.status(500).send("Server error");
+    }
+  }
+);
+
 // Get service request by ID:
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", isAuthenticated, async (req, res, next) => {
   const serviceRequestId = dataValidator.isValidObjectId(req.params.id);
   try {
     console.log(serviceRequestId);
@@ -512,6 +571,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
+// Route to update service request
 router.patch("/:id", hasRole("admin"), async (req, res, next) => {
   try {
     const serviceRequestId = dataValidator.isValidObjectId(req.params.id);
@@ -989,26 +1049,31 @@ router.patch("/status/:id", hasRole("employee"), async (req, res, next) => {
   }
 });
 
-router.delete("/:id", async (req, res, next) => {
-  try {
-    let serviceRequestId = dataValidator.isValidObjectId(req.params.id);
+router.delete(
+  "/:id",
+  isAuthenticated,
+  hasRole(["admin"]),
+  async (req, res, next) => {
+    try {
+      let serviceRequestId = dataValidator.isValidObjectId(req.params.id);
 
-    const serviceRequest = await ServiceRequest.findById(serviceRequestId);
-    if (!serviceRequest) {
-      throw new CustomError({
-        message: `No service request found with ID: ${serviceRequestId}.`,
-        statusCode: 404,
-      });
+      const serviceRequest = await ServiceRequest.findById(serviceRequestId);
+      if (!serviceRequest) {
+        throw new CustomError({
+          message: `No service request found with ID: ${serviceRequestId}.`,
+          statusCode: 404,
+        });
+      }
+
+      if (await deleteServiceRequestById(serviceRequestId))
+        res.status(200).redirect(req.get("referer"));
+    } catch (e) {
+      next(e);
     }
-
-    if (await deleteServiceRequestById(serviceRequestId))
-      res.status(200).redirect(req.get("referer"));
-  } catch (e) {
-    next(e);
   }
-});
+);
 
-// Route to modify status
+// Route to modify status of a service request from a current status to a given status
 router.put(
   "/modify-status",
   hasRole(["employee", "store-manager", "admin"]),
@@ -1093,6 +1158,7 @@ router.put(
   }
 );
 
+// Route to generate client secret for Stripe payment
 router.post(
   "/process-payment",
   hasRole(["customer"]),

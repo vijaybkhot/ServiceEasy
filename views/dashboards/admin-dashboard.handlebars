@@ -5,7 +5,7 @@
     <div id="store-data" data-store-id="{{storeId}}" data-store-name="{{storeName}}" data-store-phone="{{storePhone}}">
     </div>
 
-    <h1>Welcome {{user.name}} to the Admin Dashboard!</h1>
+    <h1>Welcome {{user.name}}, to the Admin Dashboard!</h1>
     <input type="hidden" id="user-data" value='${JSON.stringify(req.session.user)}' />
 
     <!-- Find Service Request Section -->
@@ -18,7 +18,6 @@
         </div>
     </section>
 
-    {{!-- Report Section --}}
     <button id="generateReportsBtn">Generate Reports</button>
     <button id="completedServiceRequestsBtn">Completed Service Requests</button>
     <button id="inProgressServiceRequestsBtn">In Progress Service Requests</button>
@@ -29,7 +28,7 @@
 
 
 
-
+    {{!-- Report Section --}}
     <section id="store-report" class="hidden">
         <h2>Store Reports</h2>
         <!-- General Summary Report -->
@@ -103,11 +102,7 @@
                 {{/each}}
             </tbody>
         </table>
-        <div id="in-progress-pagination-controls">
-            <button id="prevInProgressPage" onclick="navigatePage('in-progress', -1)">Previous</button>
-            <span id="in-progress-page-info">Page 1</span>
-            <button id="nextInProgressPage" onclick="navigatePage('in-progress', 1)">Next</button>
-        </div>
+
     </section>
 
     <!-- Completed Service Requests Section -->
@@ -144,11 +139,7 @@
             </tbody>
         </table>
 
-        <div id="completed-pagination-controls">
-            <button id="prevCompletedPage" onclick="navigatePage('completed', -1)">Previous</button>
-            <span id="completed-page-info">Page 1</span>
-            <button id="nextCompletedPage" onclick="navigatePage('completed', 1)">Next</button>
-        </div>
+
     </section>
 
     <section id="change-store-manager" class="hidden">

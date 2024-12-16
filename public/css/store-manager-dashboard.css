@@ -367,3 +367,26 @@ label {
 .hidden {
   display: none;
 }
+
+#button-container {
+  display: flex; /* Enables flexbox */
+  justify-content: center; /* Centers the buttons horizontally */
+  align-items: center; /* Centers the buttons vertically (if container has height) */
+  gap: 20px; /* Space between buttons */
+  margin: 20px 0; /* Adds space above and below the button container */
+}
+
+#button-container button {
+  padding: 10px 20px; /* Adds padding to buttons */
+  font-size: 16px; /* Makes the button text readable */
+  border: none; /* Removes default border */
+  border-radius: 5px; /* Rounds button corners */
+  background-color: #007bff; /* Primary blue color */
+  color: white; /* White text color */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s; /* Smooth background color transition */
+}
+
+#button-container button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}

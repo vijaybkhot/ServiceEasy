@@ -579,6 +579,47 @@ export async function fetchReportData() {
   }
 }
 
+// Function to fetch report for a store
+export async function fetchStoreReportData(storeId) {
+  console.log(storeId);
+  try {
+    if (!storeId || typeof storeId !== "string") {
+      throw new Error("Invalid storeId: storeId must be a non-empty string.");
+    }
+
+    const objectIdPattern = /^[a-f\d]{24}$/i;
+    if (!objectIdPattern.test(storeId)) {
+      throw new Error(
+        `Invalid storeId: "${storeId}" does not match a valid ObjectId format.`
+      );
+    }
+
+    const response = await axios.get(
+      `http://localhost:3000/api/service-request/generate-store-report/${storeId}`
+    );
+    const data = response.data.storeReport;
+
+    if (!data) {
+      throw new Error("No data available for this store report.");
+    }
+
+    // Update data on page
+    document.getElementById("store-specific-report").innerHTML = `
+      <h3>Store Report for ${data.storeName}</h3>
+      <p>Total Requests: ${data.totalRequests}</p>
+      <p>Completed Requests: ${data.completedRequests}</p>
+      <p>In-Progress Requests: ${data.inProgressRequests}</p>
+      <p>Total Price: $${data.totalPrice.toFixed(2)}</p>
+      <p>Average Rating: ${data.avgRating.toFixed(2)}</p>
+    `;
+  } catch (error) {
+    console.error("Error fetching store report:", error);
+    document.getElementById("store-report").innerHTML = `
+      <p style="color: red;">Error: ${error.message}</p>
+    `;
+  }
+}
+
 // Get date in ordinal suffix format
 export function formatDateWithOrdinalSuffix(dateStr, daysToAdd) {
   const date = new Date(dateStr);

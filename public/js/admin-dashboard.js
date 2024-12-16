@@ -56,7 +56,7 @@ if (adminMain) {
   const searchUserBtn = document.getElementById("searchUserBtn");
 
   // Generate Reports
-  fetchReportData();
+  await fetchReportData();
 
   // Event listners for the view details viewDetailsbtns
   viewDetailsbtns.forEach((button) => {
