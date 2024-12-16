@@ -8,61 +8,41 @@
   <h1>{{store.name}}</h1>
   {{#if user}}
   {{#if (eq user.role "admin")}}
-  <button class="edit-store">Edit Store</button>
-  <button class="save-changes">Save Changes</button>
-  <button class="cancel-edit">Cancel</button>
-  <button class="del-store">Delete Store</button>
+  <div class="admin-buttons">
+    <button class="edit-store">Edit Store</button>
+    <button class="save-changes">Save Changes</button>
+    <button class="cancel-edit">Cancel</button>
+    <button class="del-store">Delete Store</button>   
+ </div>
   {{/if}}
   {{/if}}
   <div class="content-container">
     <div class="store-details-container">
-      <form class="store-info" id="store-info-form">
-        <input type="hidden" id="store-id" value="{{store._id}}" />
-        <h2>
+        <div class="store-info">
+       <h2>
           <span id="store-name">{{store.name}}</span>
-          <input type="text" name="name" id="store-name-input" value="{{store.name}}" />
         </h2>
         <p>
           <b>Address:</b>
           <span id="store-address">{{store.location.address}}</span>
-          <input type="text" name="address" id="store-address-input" value="{{store.location.address}}" />
         </p>
         <p>
           <b>Phone:</b>
           <span id="store-phone">{{store.phone}}</span>
-          <input type="text" name="phone" id="store-phone-input" value="{{store.phone}}" />
         </p>
 
+        {{#if errors}}
         <div id="error-messages">
-          <div id="error-container" class="error-container">
-            {{#if errors}}
-            {{#each errors}}
-            {{this}}
-            {{/each}}
-            {{/if}}
-          </div>
+          {{#each errors}}
+          <div id="error-container" class="error-container">{{this}}</div>
+          {{/each}}
         </div>
-      </form>
-      {{!-- <form class="place-service-request-form" id="place-service-request-form">
-        <input type="hidden" id="store-id" value="{{store._id}}" />
-        <label for="device-type">Select Device Type:</label>
-        <select name="device-type" id="device-type">
-          <option value="iPhone">iPhone</option>
-          <option value="Macbook">Macbook</option>
-          <option value="iPad">iPad</option>
-        </select>
-        <select name="device-model" id="device-model" required>
-          <option value="">Select a Model</option>
-        </select>
-        <select name="device-repair-type" id="device-repair-type" required>
-          <option value="">Select Type of Repair</option>
-        </select>
-        <select name="device-part" id="device-part" required>
-          <option value="">Select Defective Part</option>
-        </select>
-      </form> --}}
+        {{/if}}
+  
+      {{#if (eq user.role "customer")}}
       <button class="place-service-request-button">Place a Service Request</button>
-
+      {{/if}}
+    </div>
 
       <div id="map-container">
         <div id="map"></div>

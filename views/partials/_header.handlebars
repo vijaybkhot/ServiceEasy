@@ -8,9 +8,16 @@
           <li><a href="/dashboard">DASHBOARD</a></li>
         {{/if}}
         
-        <li><a href="/stores">FIND STORES NEAR ME</a></li>
-        <li><a href="/repair">TRACK REPAIR</a></li>
-        
+        {{#if (eq user.role "admin")}}
+          <li><a href="/stores">MANAGE STORES</a></li>
+        {{else}}
+          <li><a href="/stores">FIND STORES NEAR ME</a></li>
+        {{/if}}
+  
+        {{#unless (eq user.role "admin")}}
+            <li><a href="/dashboard">TRACK REPAIR</a></li>
+        {{/unless}}  
+
         {{#unless user}}
           {{#unless onLoginPage}}
             <li><a href="/login">LOGIN</a></li>

@@ -90,7 +90,7 @@
 .view-store-button {
   margin-top: 20px;
   padding: 10px 15px;
-  background-color: #007bff;
+  background-color: #288ea7;
   color: white;
   border: none;
   text-transform: uppercase;
@@ -113,6 +113,7 @@
   border-radius: 4px;
   cursor: pointer;
   margin-bottom: 20px;
+  text-transform: uppercase;
   transition: background-color 0.3s ease;
 }
 
