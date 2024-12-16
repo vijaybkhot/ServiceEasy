@@ -1,0 +1,169 @@
+<main id="store-manager-main">
+    {{#if error}}
+    <h1>{{error}}</h1>
+    {{else}}
+    <div id="store-data" data-store-id="{{storeId}}" data-store-name="{{storeName}}" data-store-phone="{{storePhone}}">
+    </div>
+
+    <h1>Welcome to the {{storeName}} Dashboard!</h1>
+    <p>Store Phone: {{storePhone}}</p>
+    <input type="hidden" id="user-data" value='${JSON.stringify(req.session.user)}' />
+
+    <!-- Find Service Request Section -->
+
+    <section id="find-service-request">
+        <h2>Find Service Request</h2>
+        <div>
+            <label for="orderId">Order ID:</label>
+            <input type="text" id="orderId" placeholder="Enter Order ID">
+            <button id="findButton">Find</button>
+        </div>
+    </section>
+
+    <!--   service requests pending at the manger -->
+    <section id="pending-requests">
+        <h2>Requests Pending Manager Action</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Device</th>
+                    <th>Repair Type</th>
+                    <th>Price</th>
+                    <th>Date Created (yyyy/mm/dd)</th>
+                    <th>Delivery/Completion Date (yyyy/mm/dd)</th>
+                    <th>Status Message</th>
+                    <th>Customer Contact</th>
+                    <th>Assigned Employee</th>
+                    <th>Employee Contact</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody id="pending-body">
+                {{#each pendingServiceRequests}}
+                <tr class="pending">
+                    <td>{{orderId}}</td>
+                    <td>{{device}}</td>
+                    <td>{{repairType}}</td>
+                    <td>${{price}}</td>
+                    <td>{{dateCreated}}</td>
+                    <td>{{deliveryDate}}</td>
+                    <td>{{statusMessage}}</td>
+                    <td>{{customerContact}}</td>
+                    <td>{{assignedEmployee}}</td>
+                    <td>{{assignedEmployeePhone}}</td>
+                    <td><button class="view-details-btn" data-order-id="{{orderId}}">View Details</button></td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+        <div id="pending-pagination-controls">
+            <button id="prevInProgressPage" onclick="navigatePage('pending', -1)">Previous</button>
+            <span id="pending-page-info">Page 1</span>
+            <button id="nextInProgressPage" onclick="navigatePage('pending', 1)">Next</button>
+        </div>
+    </section>
+
+    <!-- Store In-Progress Service Requests Section -->
+    <section id="in-progress-requests">
+        <h2>In-Progress Service Requests At The Store</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Device</th>
+                    <th>Repair Type</th>
+                    <th>Price</th>
+                    <th>Date Created (yyyy/mm/dd)</th>
+                    <th>Delivery/Completion Date (yyyy/mm/dd)</th>
+                    <th>Status Message</th>
+                    <th>Customer Contact</th>
+                    <th>Assigned Employee</th>
+                    <th>Employee Contact</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody id="in-progress-body">
+                {{#each inProgressServiceRequests}}
+                <tr class="in-progress">
+                    <td>{{orderId}}</td>
+                    <td>{{device}}</td>
+                    <td>{{repairType}}</td>
+                    <td>${{price}}</td>
+                    <td>{{dateCreated}}</td>
+                    <td>{{deliveryDate}}</td>
+                    <td>{{statusMessage}}</td>
+                    <td>{{customerContact}}</td>
+                    <td>{{assignedEmployee}}</td>
+                    <td>{{assignedEmployeePhone}}</td>
+                    <td><button class="view-details-btn" data-order-id="{{orderId}}">View Details</button></td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <div id="in-progress-pagination-controls">
+            <button id="prevInProgressPage" onclick="navigatePage('in-progress', -1)">Previous</button>
+            <span id="in-progress-page-info">Page 1</span>
+            <button id="nextInProgressPage" onclick="navigatePage('in-progress', 1)">Next</button>
+        </div>
+    </section>
+
+    <!-- Completed Service Requests Section -->
+    <section id="completed-requests">
+        <h2>Completed Service Requests</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Device</th>
+                    <th>Repair Type</th>
+                    <th>Price</th>
+                    <th>Date Created</th>
+                    <th>Delivery/Completion Date</th>
+                    <th>Status Message</th>
+                    <th>Customer Contact</th>
+                    <th>Assigned Employee</th>
+                    <th>Employee Contact</th>
+                </tr>
+            </thead>
+            <tbody id="completed-body">
+                {{#each completedServiceRequests}}
+                <tr class="completed">
+                    <td>{{orderId}}</td>
+                    <td>{{device}}</td>
+                    <td>{{repairType}}</td>
+                    <td>${{price}}</td>
+                    <td>{{dateCreated}}</td>
+                    <td>{{deliveryDate}}</td>
+                    <td>{{statusMessage}}</td>
+                    <td>{{customerContact}}</td>
+                    <td>{{assignedEmployee}}</td>
+                    <td>{{assignedEmployeePhone}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+        <div id="completed-pagination-controls">
+            <button id="prevCompletedPage" onclick="navigatePage('completed', -1)">Previous</button>
+            <span id="completed-page-info">Page 1</span>
+            <button id="nextCompletedPage" onclick="navigatePage('completed', 1)">Next</button>
+        </div>
+    </section>
+
+    <section>
+        <div id="service-request-overlay" class="overlay hidden">
+            <div class="overlay-content">
+                <h2>Service Request Details</h2>
+                <div id="service-request-details"></div>
+
+            </div>
+
+
+        </div>
+    </section>
+    {{/if}}
+</main>
+
+<script type="module" src="/public/js/store-manager-dashboard.js"></script>

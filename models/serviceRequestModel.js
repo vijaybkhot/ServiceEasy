@@ -11,14 +11,8 @@ const serviceRequestSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: function () {
-        // employee_id is required if status is "in-process" or later
-        const requiredStatuses = [
-          "in-process",
-          "pending for approval",
-          "ready for pickup",
-          "reassigned",
-          "complete",
-        ];
+        // employee_id is required if status is "in-process"
+        const requiredStatuses = ["in-process"];
         return requiredStatuses.includes(this.status);
       },
     },
@@ -27,10 +21,44 @@ const serviceRequestSchema = new mongoose.Schema(
       ref: "Store",
       required: [true, "A service request must be assigned to a store."],
     },
-    repair_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Repair",
-      required: [true, "A service request must be associated with a repair."],
+    repair_details: {
+      device_type: {
+        type: String,
+        required: [
+          true,
+          "A service request must be associated with a device type.",
+        ],
+      },
+      model_name: {
+        type: String,
+        required: [true, "A service request must be associated with a model."],
+      },
+      estimated_time: {
+        type: Number,
+        required: [true, "A service request must have associated time."],
+      },
+      repair_name: {
+        type: String,
+        required: [true, "A service request repair must have a repair name."],
+      },
+      defective_parts: {
+        type: [String], // Ensures each item in the array is a string
+        required: [true, "Defective parts must be provided."],
+        validate: {
+          validator: function (value) {
+            // Check if the array is not empty and contains at least one string
+            return (
+              Array.isArray(value) &&
+              value.length > 0 &&
+              value.every(
+                (part) => typeof part === "string" && part.trim() !== ""
+              )
+            );
+          },
+          message:
+            "Defective parts must be a non-empty array of non-empty strings.",
+        },
+      },
     },
     status: {
       type: String,
@@ -91,7 +119,6 @@ const serviceRequestSchema = new mongoose.Schema(
           min: 1,
           max: 5,
           required: function () {
-            // Rating is required if feedback is provided
             return (
               this.feedback !== undefined &&
               (this.feedback.comment !== undefined ||
@@ -112,13 +139,7 @@ const serviceRequestSchema = new mongoose.Schema(
 
 // Pre-validation hook to ensure employee_id is set when required by the status
 serviceRequestSchema.pre("validate", function (next) {
-  const requiredStatuses = [
-    "in-process",
-    "pending for approval",
-    "ready for pickup",
-    "reassigned",
-    "complete",
-  ];
+  const requiredStatuses = ["in-process"];
 
   // Ensure employee_id is set if status requires it
   if (requiredStatuses.includes(this.status) && !this.employee_id) {

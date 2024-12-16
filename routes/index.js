@@ -3,6 +3,7 @@ import serviceRequestRouter from "./serviceRequestRoutes.js";
 import storeRouter from "./storeRoutes.js";
 import dashboardRouter from "./dashboardRoutes.js";
 import repairRouter from "./repairRoutes.js";
+import employeeActivityRouter from "./employeeActivityRoutes.js";
 
 export { userRouter, serviceRequestRouter, storeRouter, repairRouter };
 const constructorMethod = (app) => {
@@ -11,6 +12,7 @@ const constructorMethod = (app) => {
   app.use("/stores", storeRouter);
   app.use("/dashboard", dashboardRouter);
   app.use("/api/repairs", repairRouter);
+  app.use("/api/employee-activity", employeeActivityRouter);
 
   app.use("*", (req, res) => {
     res.status(404).json({ Error: "Page Not found" });

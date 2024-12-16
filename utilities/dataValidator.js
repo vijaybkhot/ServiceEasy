@@ -51,6 +51,11 @@ const exportedMethods = {
     return val;
   },
 
+  isValidEmail(email) {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+  },
+
   validId(id) {
     try {
       this.isValidObjectId(id);

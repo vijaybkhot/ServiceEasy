@@ -4,21 +4,21 @@ import User from "../models/userModel.js";
 import Store from "../models/storeModel.js";
 import Repair from "../models/repairModel.js";
 import CustomError from "../utilities/customError.js";
+import Stripe from "stripe";
 
 export async function createServiceRequest(
   customer_id,
   employee_id = null,
   store_id,
-  repair_id,
+  repair_details,
   status = "waiting for drop-off",
   payment,
   feedback = {}
 ) {
+  console.log(repair_details);
   // Input validation
-
   customer_id = dataValidator.isValidObjectId(customer_id);
   store_id = dataValidator.isValidObjectId(store_id);
-  repair_id = dataValidator.isValidObjectId(repair_id);
 
   // Check if IDs exist in the database
   const customer = await User.findById(customer_id);
@@ -35,26 +35,85 @@ export async function createServiceRequest(
       statusCode: 400,
     });
 
-  // Check if the repair exists in the database using the repair_id within the nested repair_types
-  const repair = await Repair.findOne({
-    "models.repair_types._id": repair_id,
-  }).select("models.repair_types");
-
-  if (!repair) {
+  // Validate repair_details
+  if (
+    !repair_details ||
+    typeof repair_details !== "object" ||
+    Array.isArray(repair_details) ||
+    repair_details === null
+  ) {
     throw new CustomError({
-      message: `Repair type with ID: ${repair_id} not found in any device model.`,
+      message: `repair_details must be a valid object.`,
       statusCode: 400,
     });
   }
 
-  // Find the specific repair type within the repair_types array
-  const repairType = repair.models
-    .flatMap((model) => model.repair_types) // Flatten the repair_types array
-    .find((r) => r._id.toString() === repair_id.toString());
+  let {
+    device_type,
+    model_name,
+    estimated_time,
+    repair_name,
+    defective_parts,
+  } = repair_details;
 
-  if (!repairType) {
+  if (
+    !device_type ||
+    typeof device_type !== "string" ||
+    device_type.trim() === ""
+  ) {
     throw new CustomError({
-      message: `Repair type with ID: ${repair_id} not found.`,
+      message: `Device type is required in repair_details.`,
+      statusCode: 400,
+    });
+  }
+
+  if (
+    !model_name ||
+    typeof model_name !== "string" ||
+    model_name.trim() === ""
+  ) {
+    throw new CustomError({
+      message: `Model name is required in repair_details.`,
+      statusCode: 400,
+    });
+  }
+
+  if (
+    estimated_time === undefined ||
+    typeof estimated_time !== "number" ||
+    estimated_time <= 0
+  ) {
+    throw new CustomError({
+      message: `Estimated time is required in repair_details and must be a positive number.`,
+      statusCode: 400,
+    });
+  }
+
+  if (
+    !repair_name ||
+    typeof repair_name !== "string" ||
+    repair_name.trim() === ""
+  ) {
+    throw new CustomError({
+      message: `Repair name is required in repair_details.`,
+      statusCode: 400,
+    });
+  }
+
+  if (!Array.isArray(defective_parts) || defective_parts.length === 0) {
+    throw new CustomError({
+      message: `Defective parts must be an array with at least one part listed.`,
+      statusCode: 400,
+    });
+  }
+
+  if (
+    !defective_parts.every(
+      (part) => typeof part === "string" && part.trim() !== ""
+    )
+  ) {
+    throw new CustomError({
+      message: `Each defective part must be a non-empty string.`,
       statusCode: 400,
     });
   }
@@ -135,7 +194,6 @@ export async function createServiceRequest(
   // Generate transaction_id
   let transaction_id;
   if (payment.transaction_id) {
-    // Check if it's a string and within an acceptable length
     if (
       typeof payment.transaction_id !== "string" ||
       payment.transaction_id.length < 5 ||
@@ -149,7 +207,6 @@ export async function createServiceRequest(
     transaction_id = payment.transaction_id;
   } else transaction_id = dataValidator.generateTransactionId();
 
-  // Ensure payment_mode is provided and valid
   const validPaymentModes = ["CC", "DC", "DD", "cheque", "cash", "other"];
   if (!validPaymentModes.includes(payment_mode))
     throw new CustomError({
@@ -158,7 +215,7 @@ export async function createServiceRequest(
       )}.`,
       statusCode: 400,
     });
-  // Check if payment_date if provided is valid date if not create a new date
+
   let payment_date =
     payment.payment_date && dataValidator.isValidDate(payment.payment_date)
       ? new Date(payment.payment_date)
@@ -174,7 +231,6 @@ export async function createServiceRequest(
     }
 
     if (feedback.rating !== undefined) {
-      // Ensure rating is a number
       if (typeof feedback.rating !== "number") {
         throw new CustomError({
           message: `Feedback rating must be a number.`,
@@ -182,7 +238,6 @@ export async function createServiceRequest(
         });
       }
 
-      // Ensure rating is between 1 and 5
       if (feedback.rating < 1 || feedback.rating > 5) {
         throw new CustomError({
           message: `Feedback rating must be between 1 and 5.`,
@@ -190,7 +245,6 @@ export async function createServiceRequest(
         });
       }
     }
-  } else {
   }
 
   // Create the service request object
@@ -198,17 +252,24 @@ export async function createServiceRequest(
     customer_id,
     employee_id,
     store_id,
-    repair_id,
+    repair_details: {
+      device_type,
+      model_name,
+      estimated_time,
+      repair_name,
+      defective_parts,
+    },
     status,
     payment: {
       isPaid: payment.isPaid,
       amount: payment.amount,
       transaction_id: transaction_id,
-      payment_mode: payment.payment_mode || "CC", // Default to "CC" if not provided
+      payment_mode: payment.payment_mode || "CC",
       payment_date: payment_date || Date.now(),
     },
     ...(feedback && Object.keys(feedback).length > 0 && { feedback }),
   };
+
   try {
     const serviceRequest = await ServiceRequest.create(newServiceRequest);
     return serviceRequest;
@@ -217,12 +278,33 @@ export async function createServiceRequest(
   }
 }
 
+export const generateClientSecret = async (data) => {
+  const { amount, name, email, phone } = data;
+  const stripe = new Stripe(process.env.SECRET_KEY);
+
+  amount = dataValidator.isValidNumber(amount);
+  name = dataValidator.isValidString(name);
+  email = dataValidator.isValidEmail(email);
+  phone = dataValidator.isValidPhoneNumber(phone);
+
+  const paymentIntentObject = await stripe.paymentIntents.create({
+    amount,
+    currency: 'usd',
+    payment_method_types: ['card'],
+    customer: name,
+    receipt_email: email,
+    phone
+  });
+
+  return paymentIntentObject.client_secret;
+}
+
 export const getAllServiceRequests = async () => {
   try {
     const serviceRequests = await ServiceRequest.find()
       .populate("customer_id", "name email")
       .populate("employee_id", "name email")
-      .populate("store_id", "name address");
+      .populate("store_id", "name address phone");
 
     return serviceRequests;
   } catch (error) {
@@ -238,7 +320,11 @@ export async function getServiceRequestById(serviceRequestId) {
   serviceRequestId = dataValidator.isValidObjectId(serviceRequestId);
 
   // Check if the service request exists
-  const serviceRequest = await ServiceRequest.findById(serviceRequestId);
+  const serviceRequest = await ServiceRequest.findById(serviceRequestId)
+    .populate("employee_id")
+    .populate("customer_id")
+    .populate("store_id");
+
   if (!serviceRequest) {
     throw new CustomError({
       message: `No service request found with ID: ${serviceRequestId}.`,
@@ -299,16 +385,16 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
       });
   }
 
-  // Validate and update repair_id
-  if (upObj.repair_id) {
-    updateObject.repair_id = dataValidator.isValidObjectId(upObj.repair_id);
-    const repair = await Repair.findById(updateObject.repair_id);
-    if (!repair)
-      throw new CustomError({
-        message: `Invalid repair ID: ${updateObject.repair_id}.`,
-        statusCode: 400,
-      });
-  }
+  // // Validate and update repair_id
+  // if (upObj.repair_id) {
+  //   updateObject.repair_id = dataValidator.isValidObjectId(upObj.repair_id);
+  //   const repair = await Repair.findById(updateObject.repair_id);
+  //   if (!repair)
+  //     throw new CustomError({
+  //       message: `Invalid repair ID: ${updateObject.repair_id}.`,
+  //       statusCode: 400,
+  //     });
+  // }
 
   // Validate and update status
   if (upObj.status) {
@@ -351,7 +437,6 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
 
     updateObject.payment = {};
 
-    // Validate isPaid
     if (isPaid !== undefined) {
       if (typeof isPaid !== "boolean") {
         throw new CustomError({
@@ -362,7 +447,6 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
       updateObject.payment.isPaid = isPaid;
     }
 
-    // If isPaid is true, validate other payment details
     if (isPaid === true) {
       if (amount !== undefined) {
         if (typeof amount !== "number" || amount < 0) {
@@ -371,7 +455,7 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
             statusCode: 400,
           });
         }
-        updateObject.payment.amount = amount; // Update amount in the payment object
+        updateObject.payment.amount = amount;
       }
 
       if (transaction_id !== undefined) {
@@ -385,7 +469,7 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
             statusCode: 400,
           });
         }
-        updateObject.payment.transaction_id = transaction_id; // Update transaction_id
+        updateObject.payment.transaction_id = transaction_id;
       }
 
       if (payment_mode !== undefined) {
@@ -398,7 +482,7 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
             statusCode: 400,
           });
         }
-        updateObject.payment.payment_mode = payment_mode; // Update payment_mode
+        updateObject.payment.payment_mode = payment_mode;
       }
 
       if (payment_date !== undefined) {
@@ -409,92 +493,89 @@ export async function updateServiceRequest(serviceRequestId, upObj) {
             statusCode: 400,
           });
         }
-        updateObject.payment.payment_date = date; // Update payment_date
+        updateObject.payment.payment_date = date;
       }
-    } else if (isPaid === false) {
-      // If isPaid is false, reset the payment details
-      updateObject.payment.amount = undefined;
-      updateObject.payment.transaction_id = undefined;
-      updateObject.payment.payment_mode = undefined;
-      updateObject.payment.payment_date = undefined;
     }
   }
 
-  // Validate and update feedback
-  if (upObj.feedback) {
-    if (typeof upObj.feedback !== "object" || Array.isArray(upObj.feedback)) {
+  // Validate and update repair_details
+  if (upObj.repair_details) {
+    if (
+      typeof upObj.repair_details !== "object" ||
+      Array.isArray(upObj.repair_details)
+    ) {
       throw new CustomError({
-        message: "Feedback must be an object.",
+        message: "repair_details must be an object.",
         statusCode: 400,
       });
     }
 
-    const { rating, comment } = upObj.feedback;
+    const {
+      device_type,
+      model_name,
+      estimated_time,
+      repair_name,
+      defective_parts,
+    } = upObj.repair_details;
 
-    if (rating !== undefined) {
-      if (typeof rating !== "number" || rating < 1 || rating > 5) {
+    updateObject.repair_details = {};
+
+    if (device_type) {
+      updateObject.repair_details.device_type = dataValidator.isValidString(
+        device_type,
+        "repair_details.device_type",
+        updateServiceRequest.name
+      );
+    }
+
+    if (model_name) {
+      updateObject.repair_details.model_name = dataValidator.isValidString(
+        model_name,
+        "repair_details.model_name",
+        updateServiceRequest.name
+      );
+    }
+
+    if (estimated_time) {
+      updateObject.repair_details.estimated_time = dataValidator.isValidNumber(
+        estimated_time,
+        "repair_details.estimated_time",
+        updateServiceRequest.name
+      );
+    }
+
+    if (repair_name) {
+      updateObject.repair_details.repair_name = dataValidator.isValidString(
+        repair_name,
+        "repair_details.repair_name",
+        updateServiceRequest.name
+      );
+    }
+
+    if (defective_parts) {
+      if (!Array.isArray(defective_parts)) {
         throw new CustomError({
-          message: `Feedback rating must be a number between 1 and 5.`,
+          message: "defective_parts must be an array of strings.",
           statusCode: 400,
         });
       }
-      updateObject.feedback = updateObject.feedback || {};
-      updateObject.feedback.rating = rating;
-    }
-
-    if (comment) {
-      updateObject.feedback = updateObject.feedback || {};
-      updateObject.feedback.comment = dataValidator.isValidString(
-        comment,
-        "feedback.comment",
-        updateServiceRequest.name
+      updateObject.repair_details.defective_parts = defective_parts.map(
+        (part) =>
+          dataValidator.isValidString(
+            part,
+            "repair_details.defective_parts",
+            updateServiceRequest.name
+          )
       );
     }
   }
 
-  // Remove fields that are not being updated
+  // Remove unchanged fields
   if (
-    existingRequest.customer_id?.toString() ===
-    updateObject.customer_id?.toString()
+    JSON.stringify(existingRequest.repair_details) ===
+    JSON.stringify(updateObject.repair_details)
   ) {
-    delete updateObject.customer_id;
-  }
-
-  if (
-    existingRequest.employee_id?.toString() ===
-    updateObject.employee_id?.toString()
-  ) {
-    delete updateObject.employee_id;
-  }
-
-  if (
-    existingRequest.store_id?.toString() === updateObject.store_id?.toString()
-  ) {
-    delete updateObject.store_id;
-  }
-
-  if (
-    existingRequest.repair_id?.toString() === updateObject.repair_id?.toString()
-  ) {
-    delete updateObject.repair_id;
-  }
-
-  if (existingRequest.status === updateObject.status) {
-    delete updateObject.status;
-  }
-
-  if (
-    JSON.stringify(existingRequest.payment) ===
-    JSON.stringify(updateObject.payment)
-  ) {
-    delete updateObject.payment;
-  }
-
-  if (
-    JSON.stringify(existingRequest.feedback) ===
-    JSON.stringify(updateObject.feedback)
-  ) {
-    delete updateObject.feedback;
+    delete updateObject.repair_details;
   }
 
   // Throw error if no fields were updated
@@ -612,11 +693,10 @@ export const getServiceRequestsByUser = async (user_id, role) => {
 
     // Get service requests
     const serviceRequests = await ServiceRequest.find(filter)
-      .populate("customer_id", "name email")
-      .populate("employee_id", "name email")
-      .populate("store_id", "name address");
+      .populate("employee_id")
+      .populate("customer_id")
+      .populate("store_id");
 
-    // Return the result
     return serviceRequests;
   } catch (error) {
     throw new CustomError({
@@ -642,7 +722,10 @@ export async function getServiceRequestByStoreId(storeId) {
   // Fetch the service request(s) related to the store
   let serviceRequests;
   try {
-    serviceRequests = await ServiceRequest.find({ store_id: storeId });
+    serviceRequests = await ServiceRequest.find({ store_id: storeId })
+      .populate("employee_id")
+      .populate("customer_id")
+      .populate("store_id");
   } catch (error) {
     throw new CustomError({
       message: `Error fetching service requests for store ID ${storeId}: ${error.message}`,
@@ -805,4 +888,120 @@ export async function updateStatusById(serviceRequestId, newStatus) {
   }
 
   return updatedRequest;
+}
+
+// Function to change status of service requests
+export async function modifyStatusAndAssign(
+  serviceRequestId,
+  currentStatus,
+  outcomeStatus,
+  employee_id = null
+) {
+  // Fetch the service request by ID
+  const serviceRequest = await ServiceRequest.findById(serviceRequestId);
+  if (!serviceRequest) {
+    throw new CustomError({
+      message: `Service request not found.`,
+      statusCode: 404,
+    });
+  }
+
+  // Validate current status and apply the necessary changes
+  if (currentStatus === "waiting for drop-off") {
+    // Only status change allowed is to "in-process" and requires employee_id
+    if (outcomeStatus !== "in-process") {
+      throw new CustomError({
+        message: `Invalid status change. From "waiting for drop-off", only "in-process" is allowed.`,
+        statusCode: 400,
+      });
+    }
+
+    if (!employee_id || !dataValidator.isValidObjectId(employee_id)) {
+      throw new CustomError({
+        message: `Employee ID is required and must be valid when changing the status to "in-process".`,
+        statusCode: 400,
+      });
+    }
+
+    const employee = await User.findById(employee_id);
+    if (!employee || employee.role !== "employee") {
+      throw new CustomError({
+        message: `Invalid employee ID: ${employee_id}.`,
+        statusCode: 400,
+      });
+    }
+
+    // Assign the employee_id and change the status to "in-process"
+    serviceRequest.status = "in-process";
+    serviceRequest.employee_id = employee_id;
+  } else if (currentStatus === "in-process") {
+    // Only status change allowed is to "pending for approval", no employee_id needed
+    if (outcomeStatus !== "pending for approval") {
+      throw new CustomError({
+        message: `Invalid status change. From "in-process", only "pending for approval" is allowed.`,
+        statusCode: 400,
+      });
+    }
+
+    serviceRequest.status = "pending for approval";
+    serviceRequest.employee_id = null; // No employee ID is needed in "pending for approval"
+  } else if (currentStatus === "pending for approval") {
+    // Two possible outcomes: "ready for pickup" or "reassigned"
+    if (outcomeStatus === "ready for pickup") {
+      serviceRequest.status = "ready for pickup";
+      serviceRequest.employee_id = null; // No employee_id when status is "ready for pickup"
+    } else if (outcomeStatus === "reassigned") {
+      if (!employee_id || !dataValidator.isValidObjectId(employee_id)) {
+        throw new CustomError({
+          message: `Employee ID is required and must be valid when changing status to "reassigned".`,
+          statusCode: 400,
+        });
+      }
+
+      const employee = await User.findById(employee_id);
+      if (!employee || employee.role !== "employee") {
+        throw new CustomError({
+          message: `Invalid employee ID: ${employee_id}.`,
+          statusCode: 400,
+        });
+      }
+
+      // If the employee_id is different from the current employee_id, update it
+      if (serviceRequest.employee_id !== employee_id) {
+        serviceRequest.status = "in-process"; // Change status back to "in-process"
+        serviceRequest.employee_id = employee_id; // Reassign employee
+      }
+    } else {
+      throw new CustomError({
+        message: `Invalid outcome status. Must be either "ready for pickup" or "reassigned".`,
+        statusCode: 400,
+      });
+    }
+  } else if (currentStatus === "ready for pickup") {
+    // Only possible status change is to "complete"
+    if (outcomeStatus !== "complete") {
+      throw new CustomError({
+        message: `Invalid status change. From "ready for pickup", only "complete" is allowed.`,
+        statusCode: 400,
+      });
+    }
+
+    serviceRequest.status = "complete";
+  } else {
+    throw new CustomError({
+      message: `Invalid current status: ${currentStatus}.`,
+      statusCode: 400,
+    });
+  }
+
+  try {
+    // Save the changes to the service request
+    await serviceRequest.save();
+    return serviceRequest;
+  } catch (error) {
+    throw new CustomError({
+      message: error.message,
+      statusCode: 500,
+    });
+  }
 }

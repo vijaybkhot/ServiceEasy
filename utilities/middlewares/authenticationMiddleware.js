@@ -36,10 +36,14 @@ export const attachUserToLocals = (req, res, next) => {
 export const hasRole = (requiredRoles) => {
   return (req, res, next) => {
     if (!req.session.user) {
-      return res.redirect("/login");
+      return res.status(401).render("errors/error", {
+        status: 401,
+        message: "You need to log in to access this page.",
+        cssPath: `/public/css/error.css`,
+      });
     }
 
-    // Ensure `requiredRoles` is an array for flexibility
+    //  `requiredRoles` should be an array of roles
     const roles = Array.isArray(requiredRoles)
       ? requiredRoles
       : [requiredRoles];
@@ -48,20 +52,29 @@ export const hasRole = (requiredRoles) => {
       return next();
     }
 
-    res.status(403).send("Access denied. Insufficient permissions.");
+    console.error(
+      `Access Denied: User with role '${
+        req.session.user.role
+      }' tried to access a page requiring one of the following roles: ${roles.join(
+        ", "
+      )}.`
+    );
+    return res.status(403).render("errors/error", {
+      status: 403,
+      message: "You do not have permission to access this page.",
+      cssPath: `/public/css/error.css`,
+    });
   };
 };
 
 export const redirectBasedOnRole = function (req, res, next) {
-  // Assuming you store the user role in req.user, for example from a JWT token or session
-  const userRole = req.session.user?.role; // Replace with how you're storing the user's role
+  const userRole = req.session.user?.role;
 
   if (!userRole) {
-    // If no user is logged in, redirect to login page (optional)
     return res.redirect("/login");
   }
 
-  // Redirect based on the user role
+  // Redirect based  users role
   switch (userRole) {
     case "customer":
       return res.redirect("/dashboard/customer-dashboard");
@@ -72,7 +85,14 @@ export const redirectBasedOnRole = function (req, res, next) {
     case "admin":
       return res.redirect("/dashboard/admin-dashboard");
     default:
-      // If role is not recognized, maybe redirect to a default page or show an error
-      return res.redirect("/error");
+      console.error(
+        `Unexpected role: ${userRole} - User info:`,
+        req.session.user
+      );
+      return res.status(403).render("errors/error", {
+        status: 403,
+        message: "You do not have permission to access this page.",
+        cssPath: `/public/css/error.css`,
+      });
   }
 };
