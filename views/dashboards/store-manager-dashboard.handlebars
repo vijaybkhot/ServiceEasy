@@ -115,35 +115,31 @@
         <table>
             <thead>
                 <tr>
-                    <th>Order ID</th>
                     <th>Device</th>
                     <th>Repair Type</th>
                     <th>Price</th>
+                    <th>Order Id</th>
                     <th>Date Created</th>
                     <th>Delivered On</th>
-                    <th>Status Message</th>
-                    <th>Customer Contact</th>
                     <th>Rating</th>
-                    <th>Comment</th>
-                    <th>Details</th>
-
+                    <th>Review Comment</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="completed-body">
                 {{#each completedServiceRequests}}
                 <tr class="completed">
-                    <td>{{orderId}}</td>
                     <td>{{device}}</td>
                     <td>{{repairType}}</td>
                     <td>${{price}}</td>
+                    <td>{{orderId}}</td>
                     <td>{{dateCreated}}</td>
                     <td>{{deliveryDate}}</td>
-                    <td>{{statusMessage}}</td>
-                    <td>{{customerContact}}</td>
-                    <td>{{assignedEmployee}}</td>
-                    <td>{{assignedEmployeePhone}}</td>
+                    <td>{{rating}}</td>
+                    <td>{{reviewComment}}</td>
+                    <td>
                     <td><button class="view-details-btn" data-order-id="{{orderId}}">View Details</button></td>
-
+                    </td>
                 </tr>
                 {{/each}}
             </tbody>

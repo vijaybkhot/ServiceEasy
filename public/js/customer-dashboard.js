@@ -11,7 +11,6 @@ const getQuotationFormContainer = document.getElementById("get-quotation-form");
 const newRequestButton = document.getElementById("newRequestButton");
 
 // Functions to handle feedback
-
 // Function using axios to add/modify feedback to a service request
 async function addFeedback(serviceRequestId, rating, comment = "") {
   try {
