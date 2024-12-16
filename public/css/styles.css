@@ -1,48 +1,133 @@
-body {
-  font-family: "Lato", sans-serif;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  background: linear-gradient(120deg, #84fab0, #8fd3f4);
-  color: #444;
-}
+  /* Global Styles */
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    color: #333;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  /* Navbar */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #ffffff;
+  }
+
+  .logo img {
+    height: 40px;
+  }
+
+  .nav-links {
+    list-style: none;
+    display: flex;
+    align-items: end;
+    gap: 20px;
+  }
+
+  .nav-links li a {
+    color: #555;
+    font-weight: bold;
+  }
+
+  .search-icon i {
+    font-size: 30px;
+    color: #555;
+    cursor: pointer;
+  }
 
 /* Footer */
-.footer {
-  text-align: center;
-  background-color: #333; /* Same background as header */
-  color: white; /* Same text color as header */
-  padding: 2rem 30px; /* Increase padding for better spacing */
-  border-top: 2px solid #444; /* Same border as header */
+footer {
+  background-color: #2C3E50;
+  color: #f7f7f7;
+  padding: 20px 0;
+  text-align: center; 
 }
 
-.footer__logo img {
-  height: 40px;
+.footer-logo {
+  margin-bottom: 20px;
 }
 
-.footer__nav {
+.footer-logo img {
+  height: 50px;
+  max-width: 100%; 
+}
+
+.footer-content {
+  display:flex;
+  justify-content:center;
+  align-items: flex-start; 
+  gap: 50px; 
+  padding: 10px 20px;
+}
+
+.footer-content h4{
+  font-weight: 300;
+  font-style: normal;
+  font-size: 20px;
+  color: #F7F7F7;
+  margin-bottom: 20px;
+}
+
+.quick-links,
+.contact-info {
+  text-align: left;
+  min-width: 200px;
+}
+
+.quick-links ul,
+.contact-info ul {
   list-style: none;
   padding: 0;
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  margin: 1rem 0;
+  margin: 0;
 }
 
-.footer__nav a {
+.quick-links li,
+.contact-info li {
+  margin-bottom: 10px; 
+}
+
+.quick-links li a,
+.contact-info a {
+  color: #fff;
+  font-weight: 100;
+  font-size: 14px;
   text-decoration: none;
-  color: white;
-  font-weight: bold;
-  transition: color 0.3s;
+  transition: color 0.3s ease;
 }
 
-.footer__nav a:hover {
-  color: #84fab0; /* Same hover effect as header */
+.quick-links li a:hover,
+.contact-info a:hover {
+  color: #3498DB;
 }
 
-.footer__copyright {
-  font-size: 0.9rem;
-  color: #ccc; /* Lighter text color for copyright */
+.footer-bottom {
+  text-align: center;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+.footer-bottom a {
+  color: #bbb;
+  text-decoration: none;
+}
+
+.footer-bottom a:hover {
+  color: #fff;
 }
 
 /* Error container */
@@ -63,80 +148,6 @@ body {
 .error-message {
   color: #e74c3c;
   font-size: 0.9rem;
-}
-
-/* Header */
-header {
-  background-color: #333;
-  color: white;
-  padding: 20px 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid #444;
-}
-
-header h1 {
-  font-size: 24px;
-  font-weight: 700;
-  margin: 0;
-  text-align: center;
-  flex-grow: 1;
-}
-
-header .left {
-  display: flex;
-  align-items: center;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-header .right {
-  display: flex;
-  align-items: center;
-}
-
-header a {
-  color: white;
-  text-decoration: none;
-  margin: 0 10px;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-header a:hover {
-  color: #4caf50;
-}
-
-header .new-request-btn,
-header .track-order-btn {
-  background-color: #4caf50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 600;
-  transition: background-color 0.3s ease;
-  margin-right: 10px;
-}
-
-header .new-request-btn:hover,
-header .track-order-btn:hover {
-  background-color: #45a049;
-}
-
-header p {
-  margin: 0;
-}
-
-header .logout-btn {
-  margin-left: 10px;
-}
-
-.hidden {
-  display: none;
 }
 
 /* Basic reset for the alert box */
