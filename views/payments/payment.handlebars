@@ -2,7 +2,7 @@
     <div id="payment-container">
         <h2>Payment For ServiceEasy</h2>
 
-        <form id="paymentForm" action="/process-payment" method="POST">
+        <form id="paymentForm">
             <!-- Hidden fields to store the IDs -->
             <input type="hidden" id="customerId" name="customerId" value="{{customerId}}">
             <input type="hidden" id="storeId" name="storeId" value="{{store_id}}">
@@ -67,10 +67,11 @@
                 <input type="number" id="amount" name="amount" value="{{associated_price}}" readonly required>
             </div>
             <div id="card-element" class="form-control"></div>
+            <div id="payment-result"></div>
             <button class="btn" id="confirmPaymentButton">Confirm Payment</button>
+            <button class="btn" id="cancelPaymentButton">Cancel Payment</button>
         </form>
     </div>
 </main>
-
-
 <script type="module" src="/public/js/payment.js"></script>
+<script src="https://js.stripe.com/v3/"></script>

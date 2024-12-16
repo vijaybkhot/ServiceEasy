@@ -36,7 +36,7 @@
                     <th>Customer Contact</th>
                     <th>Assigned Employee</th>
                     <th>Employee Contact</th>
-                    <th>Details</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="pending-body">
@@ -81,7 +81,7 @@
                     <th>Customer Contact</th>
                     <th>Assigned Employee</th>
                     <th>Employee Contact</th>
-                    <th>Details</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="in-progress-body">
@@ -137,9 +137,7 @@
                     <td>{{deliveryDate}}</td>
                     <td>{{rating}}</td>
                     <td>{{reviewComment}}</td>
-                    <td>
                     <td><button class="view-details-btn" data-order-id="{{orderId}}">View Details</button></td>
-                    </td>
                 </tr>
                 {{/each}}
             </tbody>

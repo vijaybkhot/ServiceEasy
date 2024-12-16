@@ -1,0 +1,157 @@
+<main id="admin-main">
+    {{#if error}}
+    <h1>{{error}}</h1>
+    {{else}}
+    <div id="store-data" data-store-id="{{storeId}}" data-store-name="{{storeName}}" data-store-phone="{{storePhone}}">
+    </div>
+
+    <h1>Welcome to the Admin Dashboard!</h1>
+    <input type="hidden" id="user-data" value='${JSON.stringify(req.session.user)}' />
+
+    <!-- Find Service Request Section -->
+    <section id="find-service-request">
+        <h2>Find Service Request</h2>
+        <div>
+            <label for="orderId">Order ID:</label>
+            <input type="text" id="orderId" placeholder="Enter Order ID">
+            <button id="findButton">Find</button>
+        </div>
+    </section>
+
+    {{!-- Report Section --}}
+    <section id="store-report">
+        <h2>Store Reports</h2>
+        <!-- General Summary Report -->
+        <div id="general-report">
+            <h3>General Report</h3>
+            <p>Total Requests: {{totalRequests}}</p>
+            <p>Completed Requests: {{completedRequests}}</p>
+            <p>In-Progress Requests: {{inProgressRequests}}</p>
+            <p>Total Price: ${{totalPrice}}</p>
+            <p>Average Rating: {{avgRating}}</p>
+        </div>
+
+        <!-- Store-Specific Reports -->
+        <div id="store-specific-report">
+            <h3>Store Specific Reports</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Store Name</th>
+                        <th>Total Requests</th>
+                        <th>Completed Requests</th>
+                        <th>In-Progress Requests</th>
+                        <th>Total Price</th>
+                        <th>Average Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each storeReport}}
+                    <tr>
+                        <td>{{storeName}}</td>
+                        <td>{{totalRequests}}</td>
+                        <td>{{completedRequests}}</td>
+                        <td>{{inProgressRequests}}</td>
+                        <td>${{totalPrice}}</td>
+                        <td>{{avgRating}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Store In-Progress Service Requests Section -->
+    <section id="in-progress-requests">
+        <h2>In-Progress Service Requests At The Store</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Device</th>
+                    <th>Repair Type</th>
+                    <th>Price</th>
+                    <th>Date Created (yyyy/mm/dd)</th>
+                    <th>Expected Delivery Date (yyyy/mm/dd)</th>
+                    <th>Status Message</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="in-progress-body">
+                {{#each inProgressServiceRequests}}
+                <tr class="in-progress">
+                    <td>{{orderId}}</td>
+                    <td>{{device}}</td>
+                    <td>{{repairType}}</td>
+                    <td>${{price}}</td>
+                    <td>{{dateCreated}}</td>
+                    <td>{{deliveryDate}}</td>
+                    <td>{{statusMessage}}</td>
+                    <td><button class="view-details-btn" data-order-id="{{orderId}}">View Details</button></td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <div id="in-progress-pagination-controls">
+            <button id="prevInProgressPage" onclick="navigatePage('in-progress', -1)">Previous</button>
+            <span id="in-progress-page-info">Page 1</span>
+            <button id="nextInProgressPage" onclick="navigatePage('in-progress', 1)">Next</button>
+        </div>
+    </section>
+
+    <!-- Completed Service Requests Section -->
+    <section id="completed-requests">
+        <h2>Completed Service Requests</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Device</th>
+                    <th>Repair Type</th>
+                    <th>Price</th>
+                    <th>Order Id</th>
+                    <th>Date Created</th>
+                    <th>Delivered On</th>
+                    <th>Rating</th>
+                    <th>Review Comment</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="completed-body">
+                {{#each completedServiceRequests}}
+                <tr class="completed">
+                    <td>{{device}}</td>
+                    <td>{{repairType}}</td>
+                    <td>${{price}}</td>
+                    <td>{{orderId}}</td>
+                    <td>{{dateCreated}}</td>
+                    <td>{{deliveryDate}}</td>
+                    <td>{{rating}}</td>
+                    <td>{{reviewComment}}</td>
+                    <td><button class="view-details-btn" data-order-id="{{orderId}}">View Details</button></td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+        <div id="completed-pagination-controls">
+            <button id="prevCompletedPage" onclick="navigatePage('completed', -1)">Previous</button>
+            <span id="completed-page-info">Page 1</span>
+            <button id="nextCompletedPage" onclick="navigatePage('completed', 1)">Next</button>
+        </div>
+    </section>
+
+    <section>
+        <div id="service-request-overlay" class="overlay hidden">
+            <div class="overlay-content">
+                <h2>Service Request Details</h2>
+                <div id="service-request-details"></div>
+
+            </div>
+
+
+        </div>
+    </section>
+    {{/if}}
+</main>
+
+<script type="module" src="/public/js/admin-dashboard.js"></script>

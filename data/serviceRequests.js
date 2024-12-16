@@ -280,22 +280,15 @@ export async function createServiceRequest(
 
 export const generateClientSecret = async (data) => {
   const { amount, name, email, phone } = data;
-  const stripe = new Stripe(process.env.SECRET_KEY);
-
-  amount = dataValidator.isValidNumber(amount);
-  name = dataValidator.isValidString(name);
-  email = dataValidator.isValidEmail(email);
-  phone = dataValidator.isValidPhoneNumber(phone);
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
   const paymentIntentObject = await stripe.paymentIntents.create({
     amount,
-    currency: "usd",
-    payment_method_types: ["card"],
-    customer: name,
+    currency: 'usd',
+    payment_method_types: ['card'],
     receipt_email: email,
-    phone,
   });
-
+ 
   return paymentIntentObject.client_secret;
 };
 

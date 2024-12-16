@@ -387,6 +387,46 @@ function getCurrentAndPrecedingActivity(activities, employeeId) {
   return { currentActivity, precedingActivity };
 }
 
+// Function to get reports across all store for admin dashboard
+export async function fetchReportData() {
+  try {
+    // Fetch the report data
+    const response = await axios.get(
+      "http://localhost:3000/api/service-request/generate-reports"
+    );
+    const data = response.data;
+
+    // Update the general report section
+    document.getElementById("general-report").innerHTML = `
+      <h3>General Report</h3>
+      <p>Total Requests: ${data.totalRequests}</p>
+      <p>Completed Requests: ${data.completedRequests}</p>
+      <p>In-Progress Requests: ${data.inProgressRequests}</p>
+      <p>Total Price: $${data.totalPrice}</p>
+      <p>Average Rating: ${data.avgRating}</p>
+    `;
+
+    // Update the store-specific report section
+    let storeReportHTML = "";
+    data.storeReport.forEach((store) => {
+      storeReportHTML += `
+        <tr>
+          <td>${store.storeName}</td>
+          <td>${store.totalRequests}</td>
+          <td>${store.completedRequests}</td>
+          <td>${store.inProgressRequests}</td>
+          <td>$${store.totalPrice}</td>
+          <td>${store.avgRating}</td>
+        </tr>
+      `;
+    });
+    document.querySelector("#store-specific-report tbody").innerHTML =
+      storeReportHTML;
+  } catch (error) {
+    console.error("Error fetching report:", error);
+  }
+}
+
 // Get date in ordinal suffix format
 export function formatDateWithOrdinalSuffix(dateStr, daysToAdd) {
   const date = new Date(dateStr);
@@ -501,7 +541,7 @@ export const loadServiceRequestDetails = async function (
   }
 };
 
-// Populate Service request for manager/employee
+// Populate Service request for manager/employee/admin
 export const populateServiceRequestOverlay = async function (
   serviceRequest,
   employees,
@@ -518,6 +558,34 @@ export const populateServiceRequestOverlay = async function (
   let approveButtonHTML = "";
   let submittedByEmployeeHTML = "";
   let handOverDeviceHTML = "";
+  let reviewHTML = "";
+
+  if (
+    serviceRequest.status.toLowerCase() === "complete" &&
+    serviceRequest.feedback?.rating
+  ) {
+    reviewHTML = `
+      <div class="review-section">
+        <h3>Customer Feedback</h3>
+  
+        <!-- Rating Stars -->
+        <div class="rating-container">
+          <strong>Rating:</strong>
+          <div class="stars" id="customerRating">
+            ${serviceRequest.feedback.rating} Stars
+          </div>
+        </div>
+  
+        <!-- Review Comment -->
+        <div class="review-comment">
+          <strong>Review:</strong>
+          <p id="customerReview">${
+            serviceRequest.feedback?.comment || "No review provided."
+          }</p>
+        </div>
+      </div>
+    `;
+  }
 
   // dynamic html select input and assign button if status is "Waiting for drop-off"
   if (
@@ -662,6 +730,7 @@ export const populateServiceRequestOverlay = async function (
     ${approveButtonHTML}
     ${submittedByEmployeeHTML}
     ${handOverDeviceHTML}
+    ${reviewHTML}
     <button id="closeOverlayBtn">Close</button>
 
   `;
