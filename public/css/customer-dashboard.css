@@ -264,3 +264,7 @@ button:disabled {
 #feedback-overlay textarea {
   width: 100%;
 }
+
+.hidden {
+  display: none;
+}
