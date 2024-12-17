@@ -10,7 +10,9 @@ import {
   removeEmployeeFromStore,
   changeStoreManager,
   getReviewsById,
+  getEmployeesWithServiceRequestCount,
 } from "../data/stores.js";
+import User from "../models/userModel.js";
 import {
   isAuthenticated,
   hasRole,
@@ -18,6 +20,7 @@ import {
 import { getUsersByRole } from "../data/user.js";
 
 const router = express.Router();
+router.use(isAuthenticated);
 
 // Route to render the "Add Store" page
 router.get("/add", isAuthenticated, hasRole("admin"), async (req, res) => {
@@ -49,10 +52,32 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Route to fetch all stores in JSON
+// Route to fetch all stores in JSON - also get managers without stores
 router.get("/jsonStores", async (req, res) => {
   try {
     const stores = await getAll();
+
+    const storeManagers = await User.find({ role: "store-manager" });
+
+    const managersWithoutStore = storeManagers.filter((manager) => {
+      // Check if the manager is not assigned to any store by comparing their _id with storeManager in stores
+      return !stores.some(
+        (store) =>
+          store.storeManager._id &&
+          store.storeManager._id.toString() === manager._id.toString()
+      );
+    });
+
+    // Unassigned employees
+    const employees = await User.find({ role: "employee" });
+
+    const unassignedEmployees = employees.filter((employee) => {
+      return !stores.some((store) => {
+        return store.employees.some(
+          (emp) => emp._id.toString() === employee._id.toString()
+        );
+      });
+    });
 
     if (!stores) {
       return res.status(404).json({ error: "No stores found" });
@@ -61,6 +86,8 @@ router.get("/jsonStores", async (req, res) => {
     return res.status(200).json({
       success: true,
       stores: stores,
+      managersWithoutStore: managersWithoutStore,
+      unassignedEmployees: unassignedEmployees,
     });
   } catch (error) {
     console.error("Error fetching stores:", error);
@@ -83,13 +110,17 @@ router.get("/:id", async (req, res) => {
       errors.push("Please provide a valid Store ID!");
     }
     const reviews = await getReviewsById(id);
-    let customerReviews = []
+    let customerReviews = [];
     let totalRatings = 0;
     // console.log(reviews)
     try {
       for (let review of reviews) {
         // console.log(review);
-        customerReviews.push({rating:review.feedback.rating,comment:review.feedback.comment, customerName:review.customer_id.name})
+        customerReviews.push({
+          rating: review.feedback.rating,
+          comment: review.feedback.comment,
+          customerName: review.customer_id.name,
+        });
         totalRatings = review.feedback.rating + totalRatings;
       }
       totalRatings = totalRatings / reviews.length;
@@ -109,8 +140,8 @@ router.get("/:id", async (req, res) => {
       json: JSON.stringify,
       store,
       errors: [],
-      customerReviews:customerReviews,
-      totalRatings:totalRatings?totalRatings.toFixed(1):null,
+      customerReviews: customerReviews,
+      totalRatings: totalRatings ? totalRatings.toFixed(1) : null,
       user: req.session.user,
     });
   } catch (error) {
@@ -401,4 +432,38 @@ router.patch(
     }
   }
 );
+
+// Route to get employee to service request count map for a given store
+router.post(
+  "/getEmployeeDetails",
+  isAuthenticated,
+  hasRole(["admin", "store-manager", "employee"]),
+  async (req, res) => {
+    try {
+      let { store_id } = req.body;
+      // Validate store_id is provided
+      store_id = store_id.trim();
+      if (!validatorFuncs.validId(store_id)) {
+        return res.status(400).json({ error: "Store ID is required" });
+      }
+
+      // Call the function to get the employees with service request count
+      const employeesWithRequestCount =
+        await getEmployeesWithServiceRequestCount(store_id);
+
+      // Return the result
+      res.status(200).json({
+        success: true,
+        employees: employeesWithRequestCount,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: error.message || "Internal server error",
+      });
+    }
+  }
+);
+
 export default router;

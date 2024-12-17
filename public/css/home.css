@@ -1,69 +1,101 @@
-.landing-container {
-  font-family: Arial, sans-serif;
-  padding: 20px;
-  text-align: center;
+  /* Devices Section */
+  .devices {
+    padding: 40px 20px;
+    text-align: center;
+    background-color: #f8f8f8;
+  }
+
+  .devices h2{
+font-weight: 400;
+font-style: normal;
+font-size: 30px;
+  }
+
+  .device-list {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+  }
+
+  .device-item {
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+
+  .device-item img {
+    height: 100px;
+    margin-bottom: 10px;
+  }
+
+  .device-item p {
+    font-weight: bold;
+    color: #333;
+  }
+
+  /* Hover effect */
+  .device-item:hover {
+    transform: scale(1.1);
+  }
+
+  /* Features Section */
+  .features {
+    background-color: #ffffff;
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .features h2{
+    font-weight: 400;
+    font-style: normal;
+    font-size: 30px;
+    color: #333;
+    margin-bottom: 20px;
+}
+    
+
+  .feature-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+  }
+
+  .feature-btn {
+    display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-.hero {
-  background-color: #f0f8ff;
-  padding: 30px 10px;
-  margin-bottom: 20px;
+.feature-btn img {
+  width: 250px; 
+  transition: transform 0.3s ease fill 0.3s ease; 
 }
 
-.hero h2 {
-  font-size: 2rem;
-  color: #333;
+.feature-btn:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px); 
 }
 
-.hero p {
-  font-size: 1.2rem;
-  color: #555;
+.feature-btn:hover img {
+  fill:#2980B9;
+  transform: scale(1.05); 
+}
+  /* About Us Section */
+  .about-us {
+    padding: 40px 20px;
+    text-align: center;
+    background-color: #f2f2f2;
+  }
+
+  .about-us h2{
+    font-weight: 400;
+    font-style: normal;
+    font-size: 30px;
+    color: #333;
+    margin-bottom: 20px;
 }
 
-.cta-button {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #0078d7;
-  color: white;
-  text-decoration: none;
-  border-radius: 5px;
-  margin-top: 10px;
-}
-
-.features,
-.extra-features,
-.about {
-  margin: 20px 0;
-}
-
-.features h3,
-.extra-features h3,
-.about h3 {
-  font-size: 1.5rem;
-  color: #333;
-}
-
-.feature-list {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-}
-
-.feature-item {
-  margin: 10px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  width: 250px;
-}
-
-.feature-item h4 {
-  color: #0078d7;
-}
-
-.extra-features ul {
-  list-style-type: disc;
-  text-align: left;
-  margin: 0 auto;
-  max-width: 500px;
-}
+  .about-us p {
+    max-width: 800px;
+    margin: 0 auto;
+    color: #666;
+    line-height: 1.5;
+  }

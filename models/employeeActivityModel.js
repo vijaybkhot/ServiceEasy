@@ -38,8 +38,20 @@ const employeeActivitySchema = new mongoose.Schema(
       comment: {
         type: String,
         required: function () {
-          // 'comments' are required only for 'assign/submit' activity type
-          return this.activity_type === "assign/submit";
+          // If the `comments` object exists for "assign/submit",
+          // the `comment` field must be non-empty.
+          return (
+            this.activity_type === "assign/submit" &&
+            this.comments &&
+            this.comments.comment
+          );
+        },
+        validate: {
+          validator: function (value) {
+            // Ensure the comment is a non-empty string (if provided)
+            return typeof value === "string" && value.trim().length > 0;
+          },
+          message: "Comment must be a non-empty string if provided.",
         },
       },
     },
@@ -119,10 +131,15 @@ employeeActivitySchema.pre("validate", function (next) {
       );
     }
 
-    if (!this.comments || !this.comments.comment) {
-      return next(
-        new Error("'comments' must be provided for 'assign/submit' activities.")
-      );
+    if (this.comments && this.comments.comment !== undefined) {
+      if (
+        typeof this.comments.comment !== "string" ||
+        this.comments.comment.trim().length === 0
+      ) {
+        return next(
+          new Error("Comment must be a non-empty string if provided.")
+        );
+      }
     }
   }
 

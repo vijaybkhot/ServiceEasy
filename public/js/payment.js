@@ -16,12 +16,70 @@ async function createServiceRequest(data) {
   }
 }
 
+async function getClientSecret(data) {
+  try {
+    const response = await axios.post(
+      "/api/service-request/process-payment",
+      data
+    );
+    if (response.status === 200) {
+      return response.data.clientSecret;
+    } else {
+      // Handle unexpected response
+      showAlert("error", `Unexpected response status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error("Error creating service request:", error);
+    showAlert("error", `Error while completing the payment: ${error.message}`);
+  }
+}
+
 if (paymentContainer) {
   const confirmPaymentButton = document.getElementById("confirmPaymentButton");
+  const cancelPaymentBUtton = document.getElementById("cancelPaymentButton");
+
+  cancelPaymentBUtton.addEventListener("click", (e) => {
+    e.preventDefault();
+    window.location.href = "/dashboard/customer-dashboard"; 
+  })
+
+  const cardElement = document.getElementById("card-element");
+  const stripe = Stripe('pk_test_51QWLC1A9qyCU5Oav4hkg12tcJk13Lc1brMnPGvM2LSjnJO3gk7bTfjTi4vIKFd2wVYUtxy8ylZFcx8EOrTfhbcqb00eMel4IY7');
+  const elements = stripe.elements();
+
+  const card = elements.create("card", {
+    style: {
+      base: {
+        color: "#32325d",
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSize: "16px",
+        "::placeholder": { color: "#aab7c4" },
+      },
+      invalid: { color: "#fa755a" },
+    },
+  });
+  if(cardElement)
+    card.mount(cardElement);
+
   if (confirmPaymentButton) {
     confirmPaymentButton.addEventListener("click", async (event) => {
       event.preventDefault();
 
+      const paymentObj = {
+        associatedPrice: +document.getElementById("associatedPrice").value,
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        phone: +document.getElementById("phone").value
+      };
+
+      const clientSecret = await getClientSecret(paymentObj);
+     
+      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: { card },
+      });
+      if(error) {
+        return showAlert("error", `Error making payment, please make sure all the details are correct`);
+      }
       //   customer_id,
       //   employee_id = null,
       //   store_id,
@@ -49,7 +107,11 @@ if (paymentContainer) {
       };
       let serviceRequest = await createServiceRequest(serviceRequestDetails);
       if (serviceRequest) {
+        showAlert("success","Service Request Created Successfully")
         console.log(serviceRequest);
+        setTimeout(() => {
+          window.location.href = "/dashboard/customer-dashboard"; 
+        }, 2000);
       }
     });
   } else {

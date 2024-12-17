@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import validatorFuncs from "../utilities/dataValidator.js";
 import { ObjectId } from "mongodb";
 import Store from "../models/storeModel.js";
@@ -32,7 +33,7 @@ async function getReviewsById(storeId) {
         store_id: storeId,
         feedback: { $ne: undefined },
       },
-      { feedback: 1, customer_id: 1, }
+      { feedback: 1, customer_id: 1 }
     )
       .populate("customer_id", "name email")
       .lean();
@@ -110,6 +111,16 @@ async function createStore(storeDetails) {
     // Check if the user has the "employee" role
     if (employeeUser.role !== "employee")
       throw new Error(`User with ID ${employeeId} is not an employee.`);
+
+    // Check if the employee is already assigned to another store
+    const existingStore = await Store.findOne({
+      employees: employeeId,
+    });
+    if (existingStore) {
+      throw new Error(
+        `Employee with ID ${employeeId} already works at another store (${existingStore.name}).`
+      );
+    }
   }
 
   try {
@@ -318,6 +329,16 @@ async function addEmployeeToStore(storeId, employeeId) {
     throw new Error(`User with ID ${employeeId} is not an employee.`);
   }
 
+  // Check if the employee is already assigned to another store
+  const existingStore = await Store.findOne({
+    employees: employeeId,
+  });
+  if (existingStore) {
+    throw new Error(
+      `Employee with ID ${employeeId} already works at another store (${existingStore.name}).`
+    );
+  }
+
   // Check if  employee is already in  store employee list
   if (store.employees.includes(employeeId)) {
     throw new Error(
@@ -363,16 +384,28 @@ async function removeEmployeeFromStore(storeId, employeeId) {
   if (!store) throw new Error(`Store with ID ${storeId} not found.`);
 
   // Check if the employee exists in the store's employee list (looking at userId inside populated data)
-  const employeeInStore = store.employees.find(
+  const employeeInStore = store.employees?.find(
     (employee) => employee._id.toString() === employeeId
   );
+
   if (!employeeInStore) {
     throw new Error(`Employee with ID ${employeeId} is not in the store.`);
   }
 
+  // Check if the employee has any service request assigned
+  const activeServiceRequest = await ServiceRequest.findOne({
+    employee_id: employeeId,
+  });
+
+  if (activeServiceRequest) {
+    throw new Error(
+      `Employee with name ${employeeInStore.name} is assigned to a service request and cannot be removed.`
+    );
+  }
+
   // Remove the employee from the store's employee list
   store.employees = store.employees.filter(
-    (employee) => employee.toString() !== employeeId
+    (employee) => employee._id.toString() !== employeeId
   );
 
   // Save the updated store
@@ -437,6 +470,76 @@ async function changeStoreManager(storeId, storeManagerId) {
   }
 }
 
+// Function to get employess and service_request count mapping for a give store_id
+async function getEmployeesWithServiceRequestCount(store_id) {
+  try {
+    // Validate store_id
+    if (!ObjectId.isValid(store_id)) {
+      throw new Error("Invalid store ID");
+    }
+
+    // Get store by ID
+    const store = await Store.findById(store_id).populate("employees");
+
+    if (!store) {
+      throw new Error("Store not found");
+    }
+
+    // count the number of service requests assigned to each employee
+    const employeesWithRequestCount = await Promise.all(
+      store.employees.map(async (employee) => {
+        const requestCount = await ServiceRequest.countDocuments({
+          employee_id: employee._id,
+        });
+        return {
+          ...employee.toObject(),
+          serviceRequestCount: requestCount,
+        };
+      })
+    );
+
+    return employeesWithRequestCount;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error while fetching employees with service requests");
+  }
+}
+
+// Function to get the store where an employee works
+async function getStoreForEmployee(employee_id) {
+  if (!mongoose.isValidObjectId(employee_id)) {
+    throw new Error(
+      `Invalid Employee ID: ${employee_id}. Please provide a valid Object ID.`
+    );
+  }
+
+  try {
+    const employee = await User.findById(employee_id);
+
+    if (!employee) {
+      throw new Error(`Employee with ID ${employee_id} not found.`);
+    }
+
+    if (employee.role !== "employee") {
+      throw new Error(
+        `User with ID ${employee_id} does not have the "employee" role.`
+      );
+    }
+
+    const store = await Store.findOne({ employees: employee_id });
+
+    // Return nothing if the employee is not found in any store
+    if (!store) {
+      return;
+    }
+
+    // Return store details
+    return store;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
 export {
   getAll,
   getById,
@@ -447,4 +550,6 @@ export {
   removeEmployeeFromStore,
   changeStoreManager,
   getReviewsById,
+  getEmployeesWithServiceRequestCount,
+  getStoreForEmployee,
 };

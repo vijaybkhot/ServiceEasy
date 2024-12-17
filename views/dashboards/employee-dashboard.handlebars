@@ -1,0 +1,101 @@
+<main id="employee-main">
+    {{#if error}}
+    <h1>{{error}}</h1>
+    {{else}}
+    <div id="store-data" data-store-id="{{storeId}}" data-store-name="{{storeName}}" data-store-phone="{{storePhone}}"
+        data-store-manager-id="{{storeManagerId}}">
+    </div>
+    <h1>Welcome to the {{storeName}} Employee Dashboard!</h1>
+    <p>Store Phone: {{storePhone}}</p>
+    <input type="hidden" id="user-data" value='${JSON.stringify(req.session.user)}' />
+
+    <section class="button-container"></section>
+    <!-- Find Service Request Section -->
+    <section id="find-service-request">
+        <h2>Find Service Request</h2>
+        <div>
+            <label for="orderId">Order ID:</label>
+            <input type="text" id="orderId" placeholder="Enter Order ID">
+            <button id="findButton">Find</button>
+        </div>
+    </section>
+
+    <!-- Service requests pending at the employee -->
+    <section id="pending-requests">
+        <h2>Requests Pending Manager Action</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Device</th>
+                    <th>Repair Type</th>
+                    <th>Price</th>
+                    <th>Date Created (yyyy/mm/dd)</th>
+                    <th>Expected Delivery Date (yyyy/mm/dd)</th>
+                    <th>Status Message</th>
+                    <th>Details/Action</th>
+                </tr>
+            </thead>
+            <tbody id="pending-body">
+                {{#each inProgressServiceRequests}}
+                <tr class="pending">
+                    <td>{{orderId}}</td>
+                    <td>{{device}}</td>
+                    <td>{{repairType}}</td>
+                    <td>${{price}}</td>
+                    <td>{{dateCreated}}</td>
+                    <td>{{deliveryDate}}</td>
+                    <td>{{statusMessage}}</td>
+                    <td><button class="view-details-btn" data-order-id="{{orderId}}">View Details/Perform
+                            Action</button>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Past Completed Service Requests Section -->
+    <section id="completed-requests">
+        <h2>Completed Service Requests</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Device</th>
+                    <th>Repair Type</th>
+                    <th>Price</th>
+                    <th>Date Created</th>
+                    <th>Delivered On</th>
+                    <th>Status Message</th>
+                </tr>
+            </thead>
+            <tbody id="completed-body">
+                {{#each completedServiceRequests}}
+                <tr class="completed">
+                    <td>{{orderId}}</td>
+                    <td>{{device}}</td>
+                    <td>{{repairType}}</td>
+                    <td>${{price}}</td>
+                    <td>{{dateCreated}}</td>
+                    <td>{{deliveryDate}}</td>
+                    <td>{{statusMessage}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+
+    </section>
+
+    <section>
+        <div id="service-request-overlay" class="overlay hidden">
+            <div class="overlay-content">
+                <h2>Service Request Details</h2>
+                <div id="service-request-details"></div>
+            </div>
+        </div>
+    </section>
+    {{/if}}
+</main>
+<script type="module" src="/public/js/employee-dashboard.js"></script>

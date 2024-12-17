@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { ObjectId } from "mongodb";
 
 import User from "../models/userModel.js";
+import Store from "../models/storeModel.js";
 import dataValidator from "../utilities/dataValidator.js";
 
 export async function createUser(
@@ -71,13 +72,31 @@ export async function getAllUsers() {
 }
 
 export async function getUsersByRole(role) {
-  const users = await User.find({role:role});
+  const users = await User.find({ role: role });
   const plainUsers = users.map((user) => user.toObject());
   // console.log(plainUsers)
   if (users.length === 0) {
     throw new Error("No users found.");
   }
   return plainUsers;
+}
+
+// Get user by email
+export async function searchUserByEmail(email) {
+  email = dataValidator.isValidString(email, "email", searchUserByEmail.name);
+  if (!validator.isEmail(email)) throw new Error("Please enter a valid email");
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      throw new Error(`No user found with the email: ${email}`);
+    }
+
+    return user;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 }
 
 // Update user details except password
@@ -216,6 +235,62 @@ export async function updatePassword(userId, oldPassword, newPassword) {
 
   if (!updatedUser) {
     throw new Error(`Could no update user with id: ${userId}`);
+  }
+
+  return updatedUser;
+}
+
+// Update user role function
+export async function updateUserRole(userId, newRole) {
+  // Validate userId and role
+
+  userId = dataValidator.isValidString(userId, "userId", updateUserRole.name);
+
+  const user = await getUserById(userId);
+
+  newRole = dataValidator.isValidString(newRole, "role", updateUserRole.name);
+  newRole = newRole.trim();
+  if (!["customer", "employee", "store-manager", "admin"].includes(newRole)) {
+    throw new Error(
+      `User role ${newRole} is not valid. User should be either ["customer", "employee", "store-manager", "admin"].`
+    );
+  }
+
+  // No need to update if the role is the same
+  if (user.role === newRole) {
+    throw new Error(`User role is already ${newRole}, no changes to update.`);
+  }
+
+  // validation if the user is trying to update their role from store-manager
+  if (user.role === "store-manager" && newRole !== "store-manager") {
+    //  the user should not be the manager of any store
+    const store = await Store.findOne({ storeManager: userId });
+    if (store) {
+      throw new Error(
+        "User is a store manager and cannot change role until they are no longer managing a store."
+      );
+    }
+  }
+
+  //  validation if the user is trying to update their role from employee
+  if (user.role === "employee" && newRole !== "employee") {
+    // user should not already be an employee in any store
+    const storeWithEmployee = await Store.findOne({ employees: userId });
+    if (storeWithEmployee) {
+      throw new Error(
+        "User is an employee at a store and cannot change role until they are no longer an employee."
+      );
+    }
+  }
+
+  let updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { role: newRole },
+    { new: true }
+  );
+
+  if (!updatedUser) {
+    throw new Error(`Could not update user role for user with id: ${userId}`);
   }
 
   return updatedUser;

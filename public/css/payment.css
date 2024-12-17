@@ -18,6 +18,15 @@
   letter-spacing: 1px;
 }
 
+#card-element {
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+}
+
 .repair-info {
   background-color: #ffffff;
   border-left: 6px solid #3498db;
@@ -94,15 +103,36 @@
   text-transform: uppercase;
   font-weight: bold;
   color: #ffffff;
-  background-color: #3498db;
+  background-color: #2C3E50;
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  margin: auto 0 10px 0;
   transition: background-color 0.3s ease-in-out;
 }
 
 .btn:hover {
-  background-color: #217dbb;
+  background-color: #34495E;
+}
+
+.btn-cancel{
+  display: block;
+  width: 100%;
+  padding: 15px;
+  font-size: 1rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: auto 0 10px 0;
+  transition: background-color 0.3s ease-in-out;
+  background-color: #db3434;  
+}
+
+.btn-cancel:hover{
+  background-color: #bb2121;
 }
 
 .btn:active {

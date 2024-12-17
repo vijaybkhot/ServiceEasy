@@ -1,71 +1,49 @@
 <main class="main" id="store-container">
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="/public/css/store.css" />
   <link rel="stylesheet" href="/public/css/styles.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="/public/js/leaflet.js"></script>
-  <script src="/public/js/form_validate.js"></script>
-  <script src="/public/js/index.js"></script>
-  <script>const stores = [{{{json store}}}];</script>
+  <script>const stores = [{{{ json store }}}];</script>
 
   <h1>{{store.name}}</h1>
   {{#if user}}
-    {{#if (eq user.role "admin")}}
-      <button class="edit-store">Edit Store</button>
-      <button class="save-changes">Save Changes</button>
-      <button class="cancel-edit">Cancel</button>
-      <button class="del-store">Delete Store</button>
-    {{/if}}
+  {{#if (eq user.role "admin")}}
+  <div class="admin-buttons">
+    <button class="edit-store">Edit Store</button>
+    <button class="save-changes">Save Changes</button>
+    <button class="cancel-edit">Cancel</button>
+    <button class="del-store">Delete Store</button>   
+ </div>
+  {{/if}}
   {{/if}}
   <div class="content-container">
     <div class="store-details-container">
-      <form class="store-info" id="store-info-form">
-        <input type="hidden" id="store-id" value="{{store._id}}" />
-        <h2>
+        <div class="store-info">
+       <h2>
           <span id="store-name">{{store.name}}</span>
-          <input
-            type="text"
-            name="name"
-            id="store-name-input"
-            value="{{store.name}}"
-          />
         </h2>
         <p>
           <b>Address:</b>
           <span id="store-address">{{store.location.address}}</span>
-          <input
-            type="text"
-            name="address"
-            id="store-address-input"
-            value="{{store.location.address}}"
-          />
         </p>
         <p>
           <b>Phone:</b>
           <span id="store-phone">{{store.phone}}</span>
-          <input
-            type="text"
-            name="phone"
-            id="store-phone-input"
-            value="{{store.phone}}"
-          />
         </p>
 
+        {{#if errors}}
         <div id="error-messages">
-          <div id="error-container" class="error-container">
-            {{#if errors}}
-              {{#each errors}}
-                {{this}}
-              {{/each}}
-            {{/if}}
-          </div>
+          {{#each errors}}
+          <div id="error-container" class="error-container">{{this}}</div>
+          {{/each}}
         </div>
-      </form>
-      
-      
+        {{/if}}
+  
+      {{#if (eq user.role "customer")}}
+      <button class="place-service-request-button">Place a Service Request</button>
+      {{/if}}
+    </div>
+
       <div id="map-container">
         <div id="map"></div>
       </div>
@@ -75,22 +53,25 @@
     <h2>Customer Reviews</h2>
     <p><b>Average Rating:</b>
       {{#if totalRatings}}
-        {{totalRatings}}/ 5
+      {{totalRatings}}/ 5
       {{else}}
-        N/A
+      N/A
       {{/if}}
     </p>
     {{#if customerReviews}}
-      <ul class="reviews-list">
-        {{#each customerReviews}}
-          <li>
-            <p><b>{{customerName}}</b>: <i>{{comment}}</i></p>
-            <p>Rating: {{rating}} / 5</p>
-          </li>
-        {{/each}}
-      </ul>
+    <ul class="reviews-list">
+      {{#each customerReviews}}
+      <li>
+        <p><b>{{customerName}}</b>: <i>{{comment}}</i></p>
+        <p>Rating: {{rating}} / 5</p>
+      </li>
+      {{/each}}
+    </ul>
     {{else}}
-      <p>No reviews available for this store.</p>
+    <p>No reviews available for this store.</p>
     {{/if}}
   </div>
+  <script src="/public/js/leaflet.js"></script>
+  <script src="/public/js/form_validate.js"></script>
+  <script src="/public/js/index.js"></script>
 </main>

@@ -47,6 +47,7 @@ const storeSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+        default: [],
       },
     ],
   },
@@ -55,6 +56,39 @@ const storeSchema = new mongoose.Schema(
 
 // Specified the 2dsphere index for mongodb geospatial queries
 storeSchema.index({ location: "2dsphere" });
+
+storeSchema.methods.addEmployees = async function (employees) {
+  for (let employeeId of employees) {
+    if (!validator.isMongoId(employeeId)) {
+      throw new Error(`Invalid employee ID: ${employeeId}`);
+    }
+
+    // Check if the employee exists
+    const employeeUser = await User.findById(employeeId);
+    if (!employeeUser) {
+      throw new Error(`Employee with ID ${employeeId} does not exist.`);
+    }
+
+    // Check if the user has the "employee" role
+    if (employeeUser.role !== "employee") {
+      throw new Error(`User with ID ${employeeId} is not an employee.`);
+    }
+
+    // Check if the employee is already in another store's employees array
+    const existingStore = await Store.findOne({
+      employees: employeeId,
+    });
+
+    if (existingStore) {
+      throw new Error(
+        `Employee with ID ${employeeId} already works at another store (${existingStore.name}).`
+      );
+    }
+  }
+
+  // Add employees to the store if all validations pass
+  this.employees.push(...employees);
+};
 
 // Pre hook to populate the store manager details
 storeSchema.pre(/^find/, function (next) {

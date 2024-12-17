@@ -2,7 +2,7 @@
     <div id="payment-container">
         <h2>Payment For ServiceEasy</h2>
 
-        <form id="paymentForm" action="/process-payment" method="POST">
+        <form id="paymentForm">
             <!-- Hidden fields to store the IDs -->
             <input type="hidden" id="customerId" name="customerId" value="{{customerId}}">
             <input type="hidden" id="storeId" name="storeId" value="{{store_id}}">
@@ -54,10 +54,6 @@
                         Credit Card (CC)</option>
                     <option value="DC" {{#if payment_mode}} {{#if_eq payment_mode "DC" }}selected{{/if_eq}} {{/if}}>
                         Debit Card (DC)</option>
-                    <option value="DD" {{#if payment_mode}} {{#if_eq payment_mode "DD" }}selected{{/if_eq}} {{/if}}>
-                        Direct Debit (DD)</option>
-                    <option value="cheque" {{#if payment_mode}} {{#if_eq payment_mode "cheque" }}selected{{/if_eq}}
-                        {{/if}}>Cheque</option>
                 </select>
             </div>
 
@@ -66,11 +62,12 @@
                 <label for="amount">Amount</label>
                 <input type="number" id="amount" name="amount" value="{{associated_price}}" readonly required>
             </div>
-
+            <div id="card-element" class="form-control"></div>
+            <div id="payment-result"></div>
             <button class="btn" id="confirmPaymentButton">Confirm Payment</button>
+            <button class="btn-cancel" id="cancelPaymentButton">Cancel Payment</button>
         </form>
     </div>
 </main>
-
-
 <script type="module" src="/public/js/payment.js"></script>
+<script src="https://js.stripe.com/v3/"></script>

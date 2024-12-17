@@ -12,6 +12,14 @@ export const mapServiceRequests = async (
       const orderId = request ? request._id.toString() : "N/A";
       const repairDetails = request.repair_details || {};
       const payment = request.payment || {};
+      let rating;
+      let reviewComment;
+      if (request.feedback) {
+        rating = request.feedback.rating;
+        if (request.feedback.comment) reviewComment = request.feedback.comment;
+      }
+      rating = rating ? rating : "N/A";
+      reviewComment = reviewComment ? reviewComment : "N/A";
 
       // Employee name and contact if assigned
 
@@ -24,7 +32,6 @@ export const mapServiceRequests = async (
         ? assignedEmployeePhone
         : "N/A";
       assignedEmployee = assignedEmployee ? assignedEmployee : "Unassigned";
-      console.log("request.employee", request.employee_id);
 
       // Get customer contact
       let customerContact;
@@ -32,7 +39,6 @@ export const mapServiceRequests = async (
         customerContact = request.customer_id.phone;
       }
       customerContact = customerContact ? customerContact : "N/A";
-      console.log("request.phone", customerContact);
 
       // Device info
       const device = `${repairDetails?.model_name || "Unknown Device"}`;
@@ -44,12 +50,12 @@ export const mapServiceRequests = async (
       const price = payment?.isPaid ? payment.amount : 0;
 
       // Date Created
-      const dateCreated = request?.createdAt
+      let dateCreated = request?.createdAt
         ? moment(request.createdAt).format("YYYY-MM-DD")
         : "N/A";
 
       // Delivery/Completion Date
-      const deliveryDate = request?.completedAt
+      let deliveryDate = request?.completedAt
         ? moment(request.completedAt).format("YYYY-MM-DD")
         : moment().add(1, "day").format("YYYY-MM-DD");
 
@@ -75,10 +81,10 @@ export const mapServiceRequests = async (
         customerContact,
         assignedEmployee,
         assignedEmployeePhone,
+        rating,
+        reviewComment,
       };
-    } catch (error) {
-      console.error("Error", error);
-    }
+    } catch (error) {}
   });
 
   // Wait for all promises to resolve

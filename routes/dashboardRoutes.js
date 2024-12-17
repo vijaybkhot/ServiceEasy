@@ -3,7 +3,9 @@ import { isValidObjectId } from "mongoose";
 import Repair from "../models/repairModel.js";
 import User from "../models/userModel.js";
 import Store from "../models/storeModel.js";
+import * as stores from "../data/stores.js";
 import * as serviceRequests from "../data/serviceRequests.js";
+import * as employeeActivity from "../data/employeeActivity.js";
 import * as helpers from "../utilities/helpers.js";
 import {
   isAuthenticated,
@@ -13,13 +15,13 @@ import {
 } from "../utilities/middlewares/authenticationMiddleware.js";
 
 const router = express.Router();
+router.use(isAuthenticated);
 
 router.get("/", redirectBasedOnRole);
 
 // Customer dashboard
 router.get(
   "/customer-dashboard",
-  isAuthenticated,
   hasRole(["customer"]),
   async (req, res, next) => {
     try {
@@ -32,7 +34,7 @@ router.get(
           req.session.user.role
         );
 
-      // Filter service requests into completed, pending, in-progress at managers dashboard
+      // Filter service requests into completed, in-progress at customers dashboard
       let unMappedCompletedServiceRequests = userServiceRequests.filter(
         (serviceRequest) => serviceRequest.status === "complete"
       );
@@ -41,26 +43,30 @@ router.get(
         (serviceRequest) => serviceRequest.status !== "complete"
       );
 
-      console.log(unMappedCompletedServiceRequests.length);
-      console.log(unMappedInProgressServiceRequests.length);
-
+      console.log(unMappedCompletedServiceRequests[0]);
       // Get page numbers from query params
       const completedPage = parseInt(req.query.completedPage) || 1;
       const inProgressPage = parseInt(req.query.inProgressPage) || 1;
       const pageSize = parseInt(req.query.pageSize) || 10;
 
       // Paginate the completed and in-progress requests
-      const completedServiceRequests = await helpers.mapServiceRequests(
-        unMappedCompletedServiceRequests,
-        completedPage,
-        pageSize
-      );
+      let completedServiceRequests;
+      if (unMappedCompletedServiceRequests) {
+        completedServiceRequests = await helpers.mapServiceRequests(
+          unMappedCompletedServiceRequests,
+          completedPage,
+          pageSize
+        );
+      }
 
-      const inProgressServiceRequests = await helpers.mapServiceRequests(
-        unMappedInProgressServiceRequests,
-        inProgressPage,
-        pageSize
-      );
+      let inProgressServiceRequests;
+      if (unMappedInProgressServiceRequests) {
+        inProgressServiceRequests = await helpers.mapServiceRequests(
+          unMappedInProgressServiceRequests,
+          inProgressPage,
+          pageSize
+        );
+      }
 
       return res.status(200).render("dashboards/customer-dashboard", {
         title: "Dashboard",
@@ -75,28 +81,95 @@ router.get(
   }
 );
 
-router.get("/employee-dashboard", async (req, res, next) => {
-  try {
-    // Render dashboard
-    return res.status(200).render("dashboards/employee-dashboard", {
-      title: "Employee Dashboard",
-      cssPath: `/public/css/employee-dashboard.css`,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
+router.get(
+  "/employee-dashboard",
+  hasRole(["employee"]),
+  async (req, res, next) => {
+    try {
+      const user = req.session.user;
 
+      // Find the store the user works in
+      let store = await stores.getStoreForEmployee(user.id);
+
+      if (!store || store.length === 0) {
+        // if no store found, user does not manage any store
+        return res.status(200).render("dashboards/employee-dashboard", {
+          title: "Employee Dashboard",
+          cssPath: `/public/css/employee-dashboard.css`,
+          error: `Sorry ${req.session.user.name}, you do not work at any our stores! So nothing to display`,
+        });
+      }
+      let storeManagerId = store.storeManager._id.toString();
+
+      // Get current service requests for the employee
+      const unMappedInProgressServiceRequests =
+        await serviceRequests.getServiceRequestsByUser(user.id, user.role);
+
+      // Get past completed service requests for the employee
+      const unMappedCompletedServiceRequests =
+        await employeeActivity.getServiceRequestsForEmployee(user.id);
+
+      // Get page numbers from query params
+      const completedPage = parseInt(req.query.completedPage) || 1;
+      const inProgressPage = parseInt(req.query.inProgressPage) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 10;
+
+      // Paginate the completed and in-progress requests
+      let completedServiceRequests;
+      if (unMappedCompletedServiceRequests) {
+        completedServiceRequests = await helpers.mapServiceRequests(
+          unMappedCompletedServiceRequests,
+          completedPage,
+          pageSize
+        );
+      }
+      let inProgressServiceRequests;
+      if (unMappedInProgressServiceRequests) {
+        inProgressServiceRequests = await helpers.mapServiceRequests(
+          unMappedInProgressServiceRequests,
+          inProgressPage,
+          pageSize
+        );
+      }
+
+      return res.status(200).render("dashboards/employee-dashboard", {
+        title: "Employee Dashboard",
+        cssPath: `/public/css/employee-dashboard.css`,
+        user: user,
+        storeId: store.id,
+        storeName: store.name,
+        storePhone: store.phone,
+        storeManagerId: storeManagerId,
+        completedServiceRequests,
+        inProgressServiceRequests,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// Store manager dashboard
 router.get(
   "/store-manager-dashboard",
-  isAuthenticated,
   hasRole(["store-manager"]),
   async (req, res, next) => {
     try {
       const managerId = req.session.user.id;
       // Get store id using managerId of manager
       let store = await Store.find({ storeManager: managerId });
+
+      if (!store || store.length === 0) {
+        // if no store found, user does not manage any store
+        return res.status(200).render("dashboards/store-manager-dashboard", {
+          title: "Manager Dashboard",
+          cssPath: `/public/css/store-manager-dashboard.css`,
+          error: `Sorry ${req.session.user.name}, you do not work at any our stores! So nothing to display`,
+        });
+      }
+
       let store_id = store[0]._id.toString();
+      store = store[0];
 
       // Get service requests for store
       const storeServiceRequests =
@@ -134,28 +207,38 @@ router.get(
       const pageSize = parseInt(req.query.pageSize) || 10;
 
       // Paginate the completed and in-progress requests
-      const completedServiceRequests = await helpers.mapServiceRequests(
-        unMappedCompletedServiceRequests,
-        completedPage,
-        pageSize
-      );
-      const pendingServiceRequests = await helpers.mapServiceRequests(
-        unMappedPendingServiceRequests,
-        completedPage,
-        pageSize
-      );
-      const inProgressServiceRequests = await helpers.mapServiceRequests(
-        unMappedInProgressServiceRequests,
-        inProgressPage,
-        pageSize
-      );
-
-      console.log(pendingServiceRequests[0]);
+      let completedServiceRequests;
+      if (unMappedCompletedServiceRequests) {
+        completedServiceRequests = await helpers.mapServiceRequests(
+          unMappedCompletedServiceRequests,
+          completedPage,
+          pageSize
+        );
+      }
+      let pendingServiceRequests;
+      if (unMappedPendingServiceRequests) {
+        pendingServiceRequests = await helpers.mapServiceRequests(
+          unMappedPendingServiceRequests,
+          completedPage,
+          pageSize
+        );
+      }
+      let inProgressServiceRequests;
+      if (unMappedInProgressServiceRequests) {
+        inProgressServiceRequests = await helpers.mapServiceRequests(
+          unMappedInProgressServiceRequests,
+          inProgressPage,
+          pageSize
+        );
+      }
 
       return res.status(200).render("dashboards/store-manager-dashboard", {
         title: "Manager Dashboard",
         cssPath: `/public/css/store-manager-dashboard.css`,
         user: req.session.user,
+        storeId: store.id,
+        storeName: store.name,
+        storePhone: store.phone,
         completedServiceRequests,
         pendingServiceRequests,
         inProgressServiceRequests,
@@ -170,12 +253,57 @@ router.get(
   }
 );
 
-router.get("/admin-dashboard", async (req, res, next) => {
+//  Admin dashboard
+router.get("/admin-dashboard", hasRole(["admin"]), async (req, res, next) => {
   try {
+    // Get all service requests, stores
+    const allServiceRequests = await serviceRequests.getAllServiceRequests();
+    const stores = await Store.find({}).lean();
+
+    // Filter service requests into completed, pending
+    let unMappedCompletedServiceRequests = allServiceRequests.filter(
+      (serviceRequest) => serviceRequest.status === "complete"
+    );
+
+    let unMappedInProgressServiceRequests = allServiceRequests.filter(
+      (serviceRequest) => serviceRequest.status !== "complete"
+    );
+
+    // Get page numbers from query params
+    const completedPage = parseInt(req.query.completedPage) || 1;
+    const inProgressPage = parseInt(req.query.inProgressPage) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
+
+    // Paginate the completed and in-progress requests
+    let completedServiceRequests;
+    if (unMappedCompletedServiceRequests) {
+      completedServiceRequests = await helpers.mapServiceRequests(
+        unMappedCompletedServiceRequests,
+        completedPage,
+        pageSize
+      );
+    }
+
+    let inProgressServiceRequests;
+    if (unMappedInProgressServiceRequests) {
+      inProgressServiceRequests = await helpers.mapServiceRequests(
+        unMappedInProgressServiceRequests,
+        inProgressPage,
+        pageSize
+      );
+    }
+
     // Render dashboard
     return res.status(200).render("dashboards/admin-dashboard", {
       title: "Admin Dashboard",
       cssPath: `/public/css/admin-dashboard.css`,
+      user: req.session.user,
+      stores,
+      completedServiceRequests,
+      inProgressServiceRequests,
+      currentCompletedPage: completedPage,
+      currentInProgressPage: inProgressPage,
+      pageSize,
     });
   } catch (error) {
     next(error);
@@ -183,7 +311,7 @@ router.get("/admin-dashboard", async (req, res, next) => {
 });
 
 // Payment route
-router.get("/payment", isAuthenticated, async (req, res, next) => {
+router.get("/payment", async (req, res, next) => {
   try {
     let {
       device_type,
