@@ -284,11 +284,11 @@ export const generateClientSecret = async (data) => {
 
   const paymentIntentObject = await stripe.paymentIntents.create({
     amount,
-    currency: 'usd',
-    payment_method_types: ['card'],
-    receipt_email: email,
+    currency: "usd",
+    payment_method_types: ["card"],
+    receipt_email: "kale44772@gmail.com",
   });
- 
+
   return paymentIntentObject.client_secret;
 };
 
