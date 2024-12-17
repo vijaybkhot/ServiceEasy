@@ -1066,9 +1066,15 @@ router.delete(
       }
 
       if (await deleteServiceRequestById(serviceRequestId))
-        res.status(200).redirect(req.get("referer"));
+        return res.status(201).json({
+          message: "Service request status Deleted successfully.",
+          serviceRequest,
+        });
     } catch (e) {
-      next(e);
+      return res.status(500).json({
+        Error: e,
+        message: e.message,
+      });
     }
   }
 );
