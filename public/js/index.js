@@ -79,7 +79,7 @@ if (storeContainer) {
   const phoneSpan = document.querySelector("#store-phone");
 
   // Toggle Edit Mode
-  if (editButton) {
+  // if (editButton) {
     editButton.addEventListener("click", (event) => {
       nameSpan.style.display = "none";
       addressSpan.style.display = "none";
@@ -95,10 +95,10 @@ if (storeContainer) {
       saveButton.style.display = "inline-block";
       cancelButton.style.display = "inline-block";
     });
-  }
+  // }
 
   // Cancel Edit Mode
-  if (cancelButton) {
+  // if (cancelButton) {
     cancelButton.addEventListener("click", (event) => {
       nameSpan.style.display = "block";
       addressSpan.style.display = "block";
@@ -119,11 +119,13 @@ if (storeContainer) {
       errorContainer.innerHTML = ""; // Clear existing errors
     } else {
       console.error('Error container not found!');
-  }
+    }
+    
 
   });
+// }
 
-  if (saveButton) {
+  // if (saveButton) {
     saveButton.addEventListener("click", async (event) => {
       event.preventDefault();
       const errors = [];
@@ -191,8 +193,8 @@ if (storeContainer) {
         console.error("Error updating store:", error);
       }
     });
-  }
-  if (deleteButton) {
+  // }
+  // if (deleteButton) {
     deleteButton.addEventListener("click", async (event) => {
       if (confirm("Are you sure you want to delete this store?")) {
         // const storeId = "{{store._id}}"; // Get the current store's ID
@@ -212,7 +214,7 @@ if (storeContainer) {
       }
     });
   }
-}
+// }
 
 // const editStoreButton = document.querySelector(".edit-store");
 // editStoreButton.addEventListener("click", (event) => {
