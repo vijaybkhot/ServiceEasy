@@ -1,0 +1,78 @@
+<main class="main"> 
+<link rel="stylesheet" href="/public/css/add-store.css" />
+<script src="/public/js/form_validate.js"></script>
+
+<section class="form-container">
+   <h1>Add a New Store</h1>
+    <p>Please fill in the details below to register a new store.</p>
+
+<form action="/stores" method="POST" id="add-store-form">
+      <div class="form-group">
+  <label for="store-name">Store Name:</label>
+  <input type="text" id="store-name" name="name" placeholder="Enter store name" required />
+  </div>
+
+<fieldset class="form-group location-group">
+  <legend>Location Details:</legend>
+
+  <div class="location-row">
+    <label for="store-longitude">Longitude:</label>
+    <input
+      type="number"
+      id="store-longitude"
+      name="longitude"
+      step="any"
+      placeholder="Enter longitude"
+      required
+    />
+  </div>
+  <div class="location-row">
+    <label for="store-latitude">Latitude:</label>
+    <input
+      type="number"
+      id="store-latitude"
+      name="latitude"
+      step="any"
+      placeholder="Enter latitude"
+      required
+    /><br />
+    </div>
+    <div class="location-row">
+    <label for="store-address">Address:</label>
+    <input type="text" id="store-address" name="address" placeholder="Enter address" required />
+    </div>
+</fieldset>
+
+      <div class="form-group">
+  <label for="store-phone">Phone:</label>
+  <input type="text" id="store-phone" name="phone" placeholder="Enter phone number" required /><br />
+</div>
+
+      <div class="form-group">
+  <label for="store-manager">Store Manager:</label>
+  <select name="storeManager" id="store-manager" required>
+    {{#each storeManagers}}
+    <option value="{{this._id}}">
+      {{this.name}}
+    </option>
+    {{/each}}
+  </select>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="submit-button">Add Store</button>
+    <a href="/stores" class="cancel-button">Cancel</a>
+  </div>
+  
+  <div id="error-messages">
+    <div id="error-container" class="error-container">
+      {{#if errors}}
+        {{#each errors}}
+          {{this}}
+        {{/each}}
+      {{/if}}
+    </div>
+  </div>
+
+</form><br />
+</main>

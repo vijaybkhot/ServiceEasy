@@ -14,15 +14,17 @@
   <div class="content-container">
     <div class="store-cards">
       {{#each stores}}
-        <div class="store-card">
-          <h2>{{this.name}}</h2>
-          <p><b>Address:</b> {{this.location.address}}</p>
-          <p><b>Phone:</b> {{this.phone}}</p>
-          <button class="view-store-button" data-store-id="{{this._id}}">
-            View Store
-          </button>
-          {{!-- <p><b>Manager ID:</b> {{this.storeManager}}</p> --}}
-        </div>
+      <div class="store-card">
+          <div class="store-info">
+        <h2>{{this.name}}</h2>
+        <p><b>Address:</b> {{this.location.address}}</p>
+        <p><b>Phone:</b> {{this.phone}}</p>
+          </div>
+        <button class="view-store-button" data-store-id="{{this._id}}">
+          View Store
+        </button>
+        {{!-- <p><b>Manager ID:</b> {{this.storeManager}}</p> --}}
+      </div>
       {{/each}}
     </div>
 

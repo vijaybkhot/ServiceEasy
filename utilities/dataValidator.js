@@ -7,6 +7,47 @@ const exportedMethods = {
       throw "Enter non-empty string consiting only characters!";
     return val.trim();
   },
+
+  isValidObjectArray(val, argument, routeOrFunction) {
+    if (!Array.isArray(val) || val.length === 0) {
+      throw new Error(
+        `${argument} must be a non-empty array in ${routeOrFunction}.`
+      );
+    }
+    return val;
+  },
+
+  isValidStringArray(val, argument, routeOrFunction) {
+    if (
+      !Array.isArray(val) ||
+      val.some((item) => typeof item !== "string" || !item.trim())
+    ) {
+      throw new Error(
+        `${argument} must contain only non-empty strings in ${routeOrFunction}.`
+      );
+    }
+    return val.map((item) => item.trim());
+  },
+
+  isValidNumber(val, argument, routeOrFunction) {
+    if (typeof val !== "number" || val <= 0) {
+      throw new Error(
+        `${argument} must be a positive number in ${routeOrFunction}.`
+      );
+    }
+    return val;
+  },
+
+  isValidEmail(email, argument, routeOrFunction) {
+    email = this.isValidString(email, argument, routeOrFunction);
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(emailPattern.test(email))
+      throw new Error(
+        `${argument} must be a valid email in ${routeOrFunction}.`
+      );
+    return email;
+  },
+
   validId(id) {
     if (
       typeof id === "undefined" ||

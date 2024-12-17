@@ -1,0 +1,176 @@
+<main id="store-manager-main">
+    {{#if error}}
+    <h1>{{error}}</h1>
+    {{else}}
+    <div id="store-data" data-store-id="{{storeId}}" data-store-name="{{storeName}}" data-store-phone="{{storePhone}}">
+    </div>
+
+    <h1>Welcome {{user.name}}, to the {{storeName}} Dashboard!</h1>
+    <p>Store Phone: {{storePhone}}</p>
+    <input type="hidden" id="user-data" value='${JSON.stringify(req.session.user)}' />
+
+    <!-- Find Service Request Section -->
+    <section id="find-service-request">
+        <h2>Find Service Request</h2>
+        <div>
+            <label for="orderId">Order ID:</label>
+            <input type="text" id="orderId" placeholder="Enter Order ID">
+            <button id="findButton">Find</button>
+        </div>
+    </section>
+
+    {{!-- Buttons --}}
+    <div id="button-container">
+        <button id="generateReportsBtn">Generate Reports</button>
+        <button id="completedServiceRequestsBtn">Completed Service Requests</button>
+        <button id="inProgressServiceRequestsBtn">In Progress Service Requests</button>
+        <button id="pendingServiceRequestsBtn">Pending Service Requests</button>
+    </div>
+
+    <!-- Store-Specific Report -->
+    <section id="store-manager-report" class="hidden">
+        <h2>Store Manager Report</h2>
+        <div id="store-specific-report">
+            <h3>Store Specific Report</h3>
+            <p><strong>Store Name:</strong> {{storeName}}</p>
+            <p><strong>Total Requests:</strong> {{totalRequests}}</p>
+            <p><strong>Completed Requests:</strong> {{completedRequests}}</p>
+            <p><strong>In-Progress Requests:</strong> {{inProgressRequests}}</p>
+            <p><strong>Total Price:</strong> ${{totalPrice}}</p>
+            <p><strong>Average Rating:</strong> {{avgRating}}</p>
+        </div>
+    </section>
+
+    <!--   service requests pending at the manger -->
+    <section id="pending-requests" class="hidden">
+        <h2>Requests Pending Manager Action</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Device</th>
+                    <th>Repair Type</th>
+                    <th>Price</th>
+                    <th>Date Created (yyyy/mm/dd)</th>
+                    <th>Expected Delivery Date (yyyy/mm/dd)</th>
+                    <th>Status Message</th>
+                    <th>Customer Contact</th>
+                    <th>Assigned Employee</th>
+                    <th>Employee Contact</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="pending-body">
+                {{#each pendingServiceRequests}}
+                <tr class="pending">
+                    <td>{{orderId}}</td>
+                    <td>{{device}}</td>
+                    <td>{{repairType}}</td>
+                    <td>${{price}}</td>
+                    <td>{{dateCreated}}</td>
+                    <td>{{deliveryDate}}</td>
+                    <td>{{statusMessage}}</td>
+                    <td>{{customerContact}}</td>
+                    <td>{{assignedEmployee}}</td>
+                    <td>{{assignedEmployeePhone}}</td>
+                    <td><button class="view-details-btn" data-order-id="{{orderId}}">View Details</button></td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+
+    </section>
+
+    <!-- Store In-Progress Service Requests Section -->
+    <section id="in-progress-requests" class="hidden">
+        <h2>In-Progress Service Requests At The Store</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Device</th>
+                    <th>Repair Type</th>
+                    <th>Price</th>
+                    <th>Date Created (yyyy/mm/dd)</th>
+                    <th>Expected Delivery Date (yyyy/mm/dd)</th>
+                    <th>Status Message</th>
+                    <th>Customer Contact</th>
+                    <th>Assigned Employee</th>
+                    <th>Employee Contact</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="in-progress-body">
+                {{#each inProgressServiceRequests}}
+                <tr class="in-progress">
+                    <td>{{orderId}}</td>
+                    <td>{{device}}</td>
+                    <td>{{repairType}}</td>
+                    <td>${{price}}</td>
+                    <td>{{dateCreated}}</td>
+                    <td>{{deliveryDate}}</td>
+                    <td>{{statusMessage}}</td>
+                    <td>{{customerContact}}</td>
+                    <td>{{assignedEmployee}}</td>
+                    <td>{{assignedEmployeePhone}}</td>
+                    <td><button class="view-details-btn" data-order-id="{{orderId}}">View Details</button></td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+    </section>
+
+    <!-- Completed Service Requests Section -->
+    <section id="completed-requests" class="hidden">
+        <h2>Completed Service Requests</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Device</th>
+                    <th>Repair Type</th>
+                    <th>Price</th>
+                    <th>Order Id</th>
+                    <th>Date Created</th>
+                    <th>Delivered On</th>
+                    <th>Rating</th>
+                    <th>Review Comment</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="completed-body">
+                {{#each completedServiceRequests}}
+                <tr class="completed">
+                    <td>{{device}}</td>
+                    <td>{{repairType}}</td>
+                    <td>${{price}}</td>
+                    <td>{{orderId}}</td>
+                    <td>{{dateCreated}}</td>
+                    <td>{{deliveryDate}}</td>
+                    <td>{{rating}}</td>
+                    <td>{{reviewComment}}</td>
+                    <td><button class="view-details-btn" data-order-id="{{orderId}}">View Details</button></td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+
+    </section>
+
+    <section>
+        <div id="service-request-overlay" class="overlay hidden">
+            <div class="overlay-content">
+                <h2>Service Request Details</h2>
+                <div id="service-request-details"></div>
+
+            </div>
+
+
+        </div>
+    </section>
+    {{/if}}
+</main>
+
+<script type="module" src="/public/js/store-manager-dashboard.js"></script>

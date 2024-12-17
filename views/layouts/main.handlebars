@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{title}} | My Website</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    {{!-- font links --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+
+    {{!-- favicon --}}
+    <link rel="icon" href="/public/images/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/public/images/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="/public/css/styles.css" />
+    <link rel="stylesheet" href="{{cssPath}}" />
+</head>
+
+<body>
+    {{> _header}}
+    
+    
+    {{{body}}}
+
+    {{> _footer}}
+  
+
+    <script type="module" src="/public/js/index.js"></script>
+</body>
+
+</html>

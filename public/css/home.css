@@ -1,0 +1,101 @@
+  /* Devices Section */
+  .devices {
+    padding: 40px 20px;
+    text-align: center;
+    background-color: #f8f8f8;
+  }
+
+  .devices h2{
+font-weight: 400;
+font-style: normal;
+font-size: 30px;
+  }
+
+  .device-list {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+  }
+
+  .device-item {
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+
+  .device-item img {
+    height: 100px;
+    margin-bottom: 10px;
+  }
+
+  .device-item p {
+    font-weight: bold;
+    color: #333;
+  }
+
+  /* Hover effect */
+  .device-item:hover {
+    transform: scale(1.1);
+  }
+
+  /* Features Section */
+  .features {
+    background-color: #ffffff;
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .features h2{
+    font-weight: 400;
+    font-style: normal;
+    font-size: 30px;
+    color: #333;
+    margin-bottom: 20px;
+}
+    
+
+  .feature-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+  }
+
+  .feature-btn {
+    display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.feature-btn img {
+  width: 250px; 
+  transition: transform 0.3s ease fill 0.3s ease; 
+}
+
+.feature-btn:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px); 
+}
+
+.feature-btn:hover img {
+  fill:#2980B9;
+  transform: scale(1.05); 
+}
+  /* About Us Section */
+  .about-us {
+    padding: 40px 20px;
+    text-align: center;
+    background-color: #f2f2f2;
+  }
+
+  .about-us h2{
+    font-weight: 400;
+    font-style: normal;
+    font-size: 30px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+  .about-us p {
+    max-width: 800px;
+    margin: 0 auto;
+    color: #666;
+    line-height: 1.5;
+  }

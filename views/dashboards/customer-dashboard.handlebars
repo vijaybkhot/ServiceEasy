@@ -1,0 +1,177 @@
+<main>
+    <div id="user-data" data-user='{{{json user}}}'></div>
+
+    <button id="newRequestButton" class="new-request-btn">New Repair Order</button>
+
+    <section id="get-quotation-form" class="hidden">
+        <h2>NEW SERVICE REQUEST</h2>
+        <form id="getQuotationForm">
+
+
+            <label for="deviceType">Device Type:</label>
+            <select id="deviceType" name="deviceType" required>
+                <option value="" disabled selected>Select a device type</option>
+            </select>
+
+            <label for="deviceModel">Device Model:</label>
+            <select id="deviceModel" name="deviceModel" required>
+                <option value="" disabled selected>Select a device model</option>
+            </select>
+
+            <label for="repairType">Repair Type:</label>
+            <select id="repairType" name="repairType" required>
+                <option value="" disabled selected>Select a repair type</option>
+            </select>
+
+            <button type="submit">Get Quotation</button>
+        </form>
+    </section>
+
+    <section id="quotation-display" class="hidden">
+        <h2>Quotation Details</h2>
+        <table>
+            <tr>
+                <th>Device Type</th>
+                <td id="quote-deviceType"></td>
+            </tr>
+            <tr>
+                <th>Device Model</th>
+                <td id="quote-deviceModel"></td>
+            </tr>
+            <tr>
+                <th>Repair Name</th>
+                <td id="quote-repairName"></td>
+            </tr>
+            <tr>
+                <th>Defective Parts</th>
+                <td id="quote-defectiveParts"></td>
+            </tr>
+            <tr>
+                <th>Price</th>
+                <td id="quote-price"></td>
+            </tr>
+            <tr>
+                <th>Estimated Time in Hours</th>
+                <td id="quote-estimatedTime"></td>
+            </tr>
+        </table>
+
+        <label for="storeSelect">Select Store:</label>
+        <select id="storeSelect" name="storeSelect" required>
+            <option value="" disabled selected>Select a Store</option>
+        </select>
+
+        <button id="checkoutButton">Check Out</button>
+    </section>
+
+    <section id="in-progress-requests">
+        <h2>In-Progress Service Requests</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Device</th>
+                    <th>Repair Type</th>
+                    <th>Price</th>
+                    <th>Order Id</th>
+                    <th>Date Created</th>
+                    <th>Expected Delivery Date</th>
+                    <th>Status Message</th>
+                    <th>Store Contact</th>
+
+                </tr>
+            </thead>
+            <tbody id="in-progress-body">
+                {{#each inProgressServiceRequests}}
+                <tr class="in-progress">
+                    <td>{{device}}</td>
+                    <td>{{repairType}}</td>
+                    <td>${{price}}</td>
+                    <td>{{orderId}}</td>
+                    <td>{{dateCreated}}</td>
+                    <td>{{deliveryDate}}</td>
+                    <td>{{statusMessage}}</td>
+                    <td>{{storeContact}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+        <div id="in-progress-pagination-controls">
+            <button id="prevInProgressPage" onclick="navigatePage('in-progress', -1)">Previous</button>
+            <span id="in-progress-page-info">Page 1</span>
+            <button id="nextInProgressPage" onclick="navigatePage('in-progress', 1)">Next</button>
+        </div>
+    </section>
+    <section id="completed-requests">
+        <h2>Completed Service Requests</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Device</th>
+                    <th>Repair Type</th>
+                    <th>Price</th>
+                    <th>Order Id</th>
+                    <th>Date Created</th>
+                    <th>Delivered On</th>
+                    <th>Rating</th>
+                    <th>Review Comment</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="completed-body">
+                {{#each completedServiceRequests}}
+                <tr class="completed">
+                    <td>{{device}}</td>
+                    <td>{{repairType}}</td>
+                    <td>${{price}}</td>
+                    <td>{{orderId}}</td>
+                    <td>{{dateCreated}}</td>
+                    <td>{{deliveryDate}}</td>
+                    <td>{{rating}}</td>
+                    <td>{{reviewComment}}</td>
+                    <td>
+                        <button class="feedback-btn" data-order-id="{{orderId}}">Give Feedback</button>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+        <div id="completed-pagination-controls">
+            <button id="prevCompletedPage" onclick="navigatePage('completed', -1)">Previous</button>
+            <span id="completed-page-info">Page 1</span>
+            <button id="nextCompletedPage" onclick="navigatePage('completed', 1)">Next</button>
+        </div>
+    </section>
+
+    <!-- Feedback overlay for rating and review -->
+    <div id="feedback-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <h2>RATE AND REVIEW</h2>
+            <div class="feedback-row">
+                {{!-- <p>* fields are required</p> --}}
+                <label for="feedback-rating">Rating<p>*</p>(1-5):</label>
+                <select id="feedback-rating">
+                    <option value="" disabled selected>Select rating</option>
+                    <option value="1">1 - Poor</option>
+                    <option value="2">2 - Fair</option>
+                    <option value="3">3 - Good</option>
+                    <option value="4">4 - Very Good</option>
+                    <option value="5">5 - Excellent</option>
+                </select>
+            </div>
+            <div class="feedback-row">
+                <label for="feedback-comment">Review Comment<p>*</p>:</label>
+            </div>
+            <div class="feedback-row">
+                <textarea id="feedback-comment" rows="4" placeholder="Write your review here..."></textarea>
+            </div>
+            <div class="feedback-row">
+                <button id="submit-feedback-btn">Submit Feedback</button>
+                <button id="close-feedback-overlay-btn">Close</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script type="module" src="/public/js/customer-dashboard.js"></script>

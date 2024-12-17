@@ -10,6 +10,11 @@ const serviceRequestSchema = new mongoose.Schema(
     employee_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: function () {
+        // employee_id is required if status is "in-process"
+        const requiredStatuses = ["in-process"];
+        return requiredStatuses.includes(this.status);
+      },
     },
     store_id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -126,7 +131,31 @@ const serviceRequestSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Service request pre hook
+// Pre-validation hook to ensure employee_id is set when required by the status
+serviceRequestSchema.pre("validate", function (next) {
+  const requiredStatuses = ["in-process"];
+
+  // Ensure employee_id is set if status requires it
+  if (requiredStatuses.includes(this.status) && !this.employee_id) {
+    return next(
+      new Error(`Employee ID is required when status is '${this.status}'.`)
+    );
+  }
+
+  // Ensure rating is provided if feedback exists
+  if (
+    this.feedback &&
+    typeof this.feedback === "object" &&
+    this.feedback.rating === undefined &&
+    this.feedback.comment !== undefined
+  ) {
+    return next(new Error("Rating is required if feedback is provided."));
+  }
+
+  next();
+});
+
+// Pre-save middleware to set completedAt when status is "complete"
 serviceRequestSchema.pre("save", function (next) {
   if (this.status === "ready for pickup" || this.status === "completed") {
     if (!this.feedback || !this.feedback.rating || !this.feedback.comment) {

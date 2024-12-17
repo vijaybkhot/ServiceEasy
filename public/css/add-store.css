@@ -1,0 +1,151 @@
+body{
+  background-color: #f9f9f9;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+/* Styling the form container */
+.form-container {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.form-container h1 {
+  font-size: 1.8rem;
+  color: #333;
+  text-transform: uppercase;
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+
+.form-container p {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+#add-store-form {
+  width: 100%;
+  }
+
+.form-group {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+/* Form inputs and labels styling */
+label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  display: block;
+  color: #333;
+}
+
+input, select {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+input::placeholder {
+  color: #aaa;
+}
+
+input:focus,
+select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+.location-group {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: #f7f7f7;
+}
+
+.location-group legend {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.location-row {
+  margin-bottom: 1rem;
+}
+
+.location-row label {
+  margin-right: 10px;
+}
+
+/* button styling */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+/* Submit button styling */
+.submit-button {
+  flex: 1;
+  margin-right: 10px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+  background-color: #0056b3;
+}
+
+/* Cancel Button */
+.cancel-button {
+  flex: 1;
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #555;
+  background-color: #f8f9fa;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.cancel-button:hover {
+  background-color: #e2e6ea;
+  color: #333;
+}
+
+.error-container {
+  margin-top: 1rem;
+  color: #d9534f;
+}
+
+.error-container {
+  font-style: italic;
+} 

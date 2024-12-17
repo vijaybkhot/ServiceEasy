@@ -1,0 +1,390 @@
+main {
+  margin: 20px;
+}
+
+h2 {
+  color: #2c3e50;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* Section Styles */
+section {
+  margin-bottom: 30px;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Service Requests Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+th {
+  background-color: #4caf50;
+  color: white;
+}
+
+#pagination-controls,
+#in-progress-pagination-controls,
+#completed-pagination-controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+button {
+  background-color: #4caf50;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* New Service Request Form */
+#get-quotation-form {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+#get-quotation-form label {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #2c3e50;
+  display: block;
+}
+
+#get-quotation-form select,
+#get-quotation-form input,
+#get-quotation-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+#get-quotation-form textarea {
+  resize: vertical;
+  height: 100px;
+}
+
+#get-quotation-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #2980b9;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#get-quotation-form button:hover {
+  background-color: #3498db;
+}
+
+/* Error Message Styling */
+.error-messages {
+  margin-top: 20px;
+  color: #e74c3c;
+  font-size: 14px;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.error {
+  border-color: red;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #get-quotation-form {
+    width: 90%;
+  }
+
+  #service-requests table {
+    font-size: 14px;
+  }
+}
+
+#quotation-display {
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: "Arial", sans-serif;
+}
+
+#quotation-display h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333333;
+  text-align: center;
+}
+
+#quotation-display table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+#quotation-display th,
+#quotation-display td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #e1e1e1;
+}
+
+#quotation-display th {
+  background-color: #f1f1f1;
+  color: #555555;
+  font-size: 16px;
+}
+
+#quotation-display td {
+  background-color: #f9f9f9;
+  font-size: 14px;
+}
+
+#quotation-display td#quote-price {
+  font-weight: bold;
+  color: #28a745;
+}
+
+#quotation-display td#quote-estimatedTime {
+  font-weight: bold;
+  color: #ff9900;
+}
+
+#quotation-display select {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #ffffff;
+  margin-bottom: 20px;
+}
+
+#quotation-display button {
+  background-color: #4caf50;
+  color: white;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+#quotation-display button:hover {
+  background-color: #45a049;
+}
+
+#quotation-display button:disabled {
+  background-color: #c6c6c6;
+  cursor: not-allowed;
+}
+
+/* Overlay styles */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.overlay-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 800px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Title */
+.overlay-content h2 {
+  text-align: center;
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+/* Service Request Details */
+#service-request-details p {
+  font-size: 16px;
+  margin: 8px 0;
+}
+
+#service-request-details p strong {
+  color: #4caf50;
+}
+
+/* Select Box for Employee */
+#employeeSelect {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  color: #333;
+}
+
+#employeeSelect option {
+  padding: 10px;
+}
+
+/* Textarea for Comment */
+#assignmentComment {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  margin: 10px 0;
+  resize: vertical;
+}
+
+/* Buttons */
+button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  margin-top: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Close Button */
+#closeOverlayBtn {
+  background-color: #dc3545;
+  margin-left: 10px;
+}
+
+#closeOverlayBtn:hover {
+  background-color: #c82333;
+}
+
+/* Close Overlay on Esc Key */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Styling the labels */
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .overlay-content {
+    width: 90%;
+    padding: 20px;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.change-store-manager input,
+.change-store-manager select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: #f9f9f9;
+  color: #333;
+  margin-bottom: 20px;
+  transition: all 0.3s ease-in-out;
+}
+
+.change-store-manager input:focus,
+.change-store-manager select:focus {
+  border-color: #4caf50;
+  background-color: #fff;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+  outline: none;
+}
