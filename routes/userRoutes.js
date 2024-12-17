@@ -22,7 +22,7 @@ const router = express.Router();
 router.get("/", redirectBasedOnRole);
 
 router.get("/home", async (req, res, next) => {
-  res.status(200).render("users/home", {
+  return res.status(200).render("users/home", {
     title: "Home Page",
     cssPath: "/public/css/home.css",
   });
@@ -33,7 +33,7 @@ router.get("/login", async (req, res, next) => {
     res.redirect("/home");
     return;
   }
-  res.status(200).render("users/login", {
+  return res.status(200).render("users/login", {
     title: "Log into ServiceEasy",
     cssPath: "/public/css/login.css",
     errors: [],
@@ -119,7 +119,7 @@ router.get("/signup", async (req, res, next) => {
     res.redirect("/home");
     return;
   }
-  res.status(200).render("users/signup", {
+  return res.status(200).render("users/signup", {
     title: "Signup for ServiceEasy",
     cssPath: "/public/css/signup.css",
     errors: [],
@@ -221,13 +221,13 @@ router.get("/my-dashboard", async (req, res) => {
   if (!req.session.user) {
     return res.redirect("/login");
   }
-  res.render("my-dashboard", { user: req.session.user });
+  return res.render("my-dashboard", { user: req.session.user });
 });
 
 // Get user details to the client side
 router.get("/api/user", isAuthenticated, async (req, res, next) => {
   try {
-    res.status(200).json({ user: res.locals.user });
+    return res.status(200).json({ user: res.locals.user });
   } catch (error) {
     next(error);
   }

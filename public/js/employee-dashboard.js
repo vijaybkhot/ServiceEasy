@@ -10,6 +10,7 @@ if (employeeMain) {
   const storeId = storeData.dataset.storeId;
   const findButton = document.getElementById("findButton");
   const buttons = document.querySelectorAll(".view-details-btn");
+  console.log(user);
 
   // Event listners for the view details buttons
   buttons.forEach((button) => {
