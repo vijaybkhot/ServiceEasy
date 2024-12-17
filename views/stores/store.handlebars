@@ -12,14 +12,14 @@
     <button class="edit-store">Edit Store</button>
     <button class="save-changes">Save Changes</button>
     <button class="cancel-edit">Cancel</button>
-    <button class="del-store">Delete Store</button>   
- </div>
+    <button class="del-store">Delete Store</button>
+  </div>
   {{/if}}
   {{/if}}
   <div class="content-container">
     <div class="store-details-container">
-        <div class="store-info">
-       <h2>
+      <div class="store-info">
+        <h2>
           <span id="store-name">{{store.name}}</span>
         </h2>
         <p>
@@ -38,11 +38,12 @@
           {{/each}}
         </div>
         {{/if}}
-  
-      {{#if (eq user.role "customer")}}
-      <button class="place-service-request-button">Place a Service Request</button>
-      {{/if}}
-    </div>
+
+        {{#if (eq user.role "customer")}}
+        <button class="place-service-request-button" onclick="window.location.href='/dashboard';">
+          Place a Service Request
+        </button> {{/if}}
+      </div>
 
       <div id="map-container">
         <div id="map"></div>

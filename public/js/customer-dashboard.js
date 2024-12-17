@@ -240,9 +240,9 @@ if (getQuotationFormContainer) {
       document.getElementById(
         "quote-price"
       ).textContent = `$${repairDetails.associated_price}`;
-      document.getElementById(
-        "quote-estimatedTime"
-      ).textContent = `${repairDetails.estimated_time} hours`;
+      document.getElementById("quote-estimatedTime").textContent = `${
+        repairDetails.estimated_time
+      } ${repairDetails.estimated_time > 1 ? "days" : "day"}`;
 
       // Checkout button event listner - get payment page
       checkoutButton.addEventListener("click", async (event) => {
