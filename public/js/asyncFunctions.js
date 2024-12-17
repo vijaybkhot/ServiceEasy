@@ -1230,17 +1230,17 @@ export const populateServiceRequestOverlay = async function (
           sendEmailObject.url,
           sendEmailObject.orderData
         );
-        // setTimeout(() => {
-        //   location.reload();
-        // }, 3000);
+        setTimeout(() => {
+          location.reload();
+        }, 3000);
       } catch (error) {
         // Catch any errors from updateActivityStatus, modifyStatus, or any other unexpected errors
         console.error("Error while approving request:", error);
         showAlert("error", "An error occurred while approving the request.");
-        // closeOverlay();
-        // setTimeout(() => {
-        //   location.reload();
-        // }, 3000);
+        closeOverlay();
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
       }
     });
 
