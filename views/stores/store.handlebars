@@ -50,6 +50,10 @@
 
       </form>
 
+      {{#unless user}} 
+        <a href="/dashboard" class="place-service-request-button">Place a Service Request</a>
+      {{/unless}}
+
       {{#if (eq user.role "customer")}}
       <a href="/dashboard" class="place-service-request-button" >Place a Service Request</a>
       {{/if}}
