@@ -40,11 +40,13 @@ if (paymentContainer) {
 
   cancelPaymentBUtton.addEventListener("click", (e) => {
     e.preventDefault();
-    window.location.href = "/dashboard/customer-dashboard"; 
-  })
+    window.location.href = "/dashboard/customer-dashboard";
+  });
 
   const cardElement = document.getElementById("card-element");
-  const stripe = Stripe('pk_test_51QWLC1A9qyCU5Oav4hkg12tcJk13Lc1brMnPGvM2LSjnJO3gk7bTfjTi4vIKFd2wVYUtxy8ylZFcx8EOrTfhbcqb00eMel4IY7');
+  const stripe = Stripe(
+    "pk_test_51QWLC1A9qyCU5Oav4hkg12tcJk13Lc1brMnPGvM2LSjnJO3gk7bTfjTi4vIKFd2wVYUtxy8ylZFcx8EOrTfhbcqb00eMel4IY7"
+  );
   const elements = stripe.elements();
 
   const card = elements.create("card", {
@@ -58,27 +60,38 @@ if (paymentContainer) {
       invalid: { color: "#fa755a" },
     },
   });
-  if(cardElement)
-    card.mount(cardElement);
+  if (cardElement) card.mount(cardElement);
 
   if (confirmPaymentButton) {
     confirmPaymentButton.addEventListener("click", async (event) => {
       event.preventDefault();
 
+      let paymentMethod = document.getElementById("paymentMode").value;
+      if (!paymentMethod) {
+        showAlert("warning", "Please select a payment method!");
+        return;
+      }
+
       const paymentObj = {
         associatedPrice: +document.getElementById("associatedPrice").value,
         name: document.getElementById("name").value,
         email: document.getElementById("email").value,
-        phone: +document.getElementById("phone").value
+        phone: +document.getElementById("phone").value,
       };
 
       const clientSecret = await getClientSecret(paymentObj);
-     
-      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: { card },
-      });
-      if(error) {
-        return showAlert("error", `Error making payment, please make sure all the details are correct`);
+
+      const { error, paymentIntent } = await stripe.confirmCardPayment(
+        clientSecret,
+        {
+          payment_method: { card },
+        }
+      );
+      if (error) {
+        return showAlert(
+          "error",
+          `Error making payment, please make sure all the details are correct`
+        );
       }
       //   customer_id,
       //   employee_id = null,
@@ -107,10 +120,10 @@ if (paymentContainer) {
       };
       let serviceRequest = await createServiceRequest(serviceRequestDetails);
       if (serviceRequest) {
-        showAlert("success","Service Request Created Successfully")
+        showAlert("success", "Service Request Created Successfully");
         console.log(serviceRequest);
         setTimeout(() => {
-          window.location.href = "/dashboard/customer-dashboard"; 
+          window.location.href = "/dashboard/customer-dashboard";
         }, 2000);
       }
     });
