@@ -29,7 +29,22 @@ Once the service is up and running go to  `localhost:3000/home` to take a look a
 
 ## Logging in
 If you want to have a walkthrough of our website as a customer, feel free to use the following credentials:
+Customer log in details:
 - username : vijay111991@gmail.com
 - password : test1234,
+
+Admin Log in:
+- admin.user@example.com
+- password: password123
+
+Store Manager Log in:
+- manager1@example.com
+- test1234
+
+Employee Log in
+- employeeonestoreone@email.com
+- password
+
+
 
 Or simply click on signup to create a new account!
