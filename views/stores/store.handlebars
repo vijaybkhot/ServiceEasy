@@ -18,36 +18,46 @@
   {{/if}}
   <div class="content-container">
     <div class="store-details-container">
-        <div class="store-info">
-       <h2>
+      <form class="store-info" id="store-info-form">
+        <input type="hidden" id="store-id" value="{{store._id}}" />
+        <p id="store-name-label" style="display: none;">
+          <b>Store Name:</b>
+        </p>
+        <h2>
           <span id="store-name">{{store.name}}</span>
+          <input id="store-name-input" type="text" value="{{store.name}}"/>
         </h2>
         <p>
           <b>Address:</b>
           <span id="store-address">{{store.location.address}}</span>
+          <input id="store-address-input" type="text" value="{{store.location.address}}"/>
         </p>
         <p>
           <b>Phone:</b>
           <span id="store-phone">{{store.phone}}</span>
+          <input id="store-phone-input" type="text" value="{{store.phone}}" />
         </p>
 
-        {{#if errors}}
-        <div id="error-messages">
-          {{#each errors}}
-          <div id="error-container" class="error-container">{{this}}</div>
-          {{/each}}
+         <div id="error-messages"  style="display: none;">
+          <div id="error-container" class="error-container">
+            {{#if errors}}
+              {{#each errors}}
+                {{this}}
+              {{/each}}
+            {{/if}}
+          </div>
         </div>
-        {{/if}}
-  
+
+      </form>
+
       {{#if (eq user.role "customer")}}
-      <button class="place-service-request-button">Place a Service Request</button>
+      <a href="/dashboard" class="place-service-request-button" >Place a Service Request</a>
       {{/if}}
     </div>
 
       <div id="map-container">
         <div id="map"></div>
       </div>
-    </div>
   </div>
   <div class="reviews-container">
     <h2>Customer Reviews</h2>

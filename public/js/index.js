@@ -83,6 +83,7 @@ if (storeContainer) {
     nameSpan.style.display = "none";
     addressSpan.style.display = "none";
     phoneSpan.style.display = "none";
+    document.querySelector("#store-name-label").style.display = "block";  //static name
 
     nameInput.style.display = "block";
     // nameTag.style.display = "block";
@@ -99,7 +100,9 @@ if (storeContainer) {
     nameSpan.style.display = "block";
     addressSpan.style.display = "block";
     phoneSpan.style.display = "block";
-
+    
+    document.querySelector("#store-name-label").style.display = "none";
+    
     nameInput.style.display = "none";
     addressInput.style.display = "none";
     phoneInput.style.display = "none";
@@ -108,7 +111,12 @@ if (storeContainer) {
     saveButton.style.display = "none";
     cancelButton.style.display = "none";
     const errorContainer = document.querySelector("#error-container");
-    errorContainer.innerHTML = ""; // Clear existing errors
+    // errorContainer.innerHTML = ""; // Clear existing errors
+    if (errorContainer) {
+      errorContainer.innerHTML = ""; // Clear existing errors
+    } else {
+      console.error('Error container not found!');
+  }
 
   });
 

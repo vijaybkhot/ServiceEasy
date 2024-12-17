@@ -2,17 +2,28 @@ body{
   background-color: #f4f4f4;
 }
 
+/* Main container layout */
+.content-container {
+  display: flex; 
+  flex-wrap: wrap;
+  gap: 20px; 
+  margin-top: 20px;
+  padding: 10px;
+  min-width: 1010px;
+  background-color: white;
+  justify-content: space-between;
+  border-radius: 10px;
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.1);
+
+}
+
 #store-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* justify-content: flex-start; */
-  /* text-align: center; */
   margin: 0 auto;
   padding: 40px 20px;
   max-width: 1200px;
-  /* border-radius: 10px; */
-  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
 }
 
 #store-container h1 {
@@ -21,6 +32,7 @@ body{
   color: #333;
   font-weight: 400;
   text-transform: uppercase;
+  text-align: center;
 }
 
 /* Admin Buttons */
@@ -51,32 +63,18 @@ body{
 /* Store Details Container */
 .store-details-container {
   display: flex;
-  flex-wrap: wrap;
-  /* flex-direction: column; */
-  /* align-items: flex-start; */
-  justify-content: space-between;
+  flex-direction: column;
   gap: 20px;
-  /* margin-top: 20px; */
   padding: 30px;
-  max-width: 1000px;
-  /* min-width: 500px; */
-  width: 100%;
-  background-color: white;
+  max-width: 50%;
   border-radius: 10px;
-  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 /* Store Info Form */
 .store-info {
-  flex: 1;
+  flex: 1 1 45%;
   min-width: 300px;
   max-width: 50%;
-  /* width: 100%;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 30px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: #fafafa; */
 }
 
 .store-info h2 {
@@ -91,95 +89,28 @@ body{
   margin-bottom: 15px;
   color: #555;
 }
-/* 
+
 .store-info input[type="text"] {
-  margin-top: 10px;
+  display: none;
+  margin-top: 5px;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
   width: 100%;
   font-size: 1rem;
   box-sizing: border-box;
+  text-align: center;
   transition: border-color 0.3s;
 }
 
 .store-info input[type="text"]:focus {
   border-color: #007bff;
   outline: none;
-} */
-
-.place-service-request-button {
-  margin-top: 15px;
-  padding: 10px 20px;
-  background-color: #288ea7;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  /* margin-right: 100px; */
-  cursor: pointer;
-  transition: background 0.3s ease;
 }
 
-.place-service-request-button:hover {
-  background-color: #0056b3;
-}
-
-/* Reviews Container */
-.reviews-container {
-  width: 100%;
-  max-width: 1000px;
-  margin-top: 30px;
-  padding: 30px;
-  /* border: 1px solid #ddd; */
-  border-radius: 10px;
-  background-color: #2C3E50;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  color: #fff;
-}
-
-.reviews-container h2 {
-  font-size: 22px;
-  margin-bottom: 15px;
-  color: #f7f7f7;
-  text-transform: uppercase;
-  font-weight: 500;
-}
-
-.reviews-container p {
-  font-size: 18px;
-  margin: 5px 0;
-  font-weight: 300;
-  color: #fff;
-}
-
-.reviews-list {
-  list-style: none;
-  padding: 0;
-}
-
-.reviews-list li {
-  border-bottom: 1px solid #ddd;
-  padding: 10px 0;
-  /* color: #f1f1f1; */
-}
-
-.reviews-list li:last-child {
-  border-bottom: none;
-}
-
-/* .store-info input[type="text"]:disabled {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-}
-
-.store-info input[type="text"]:disabled:hover {
-  cursor: not-allowed;
-} */
-
-/* Buttons for Edit, Save, Cancel, Delete */
-/* button {
+button {
   background-color: #007bff;
+  margin-top: 10px;
   padding: 12px 18px;
   border: none;
   border-radius: 6px;
@@ -198,24 +129,21 @@ button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
 }
- */
-/* Edit/Delete/Save/Cancel Buttons */
-/* .edit-store,
+
+/* Specific Buttons */
+.edit-store,
 .del-store,
 .cancel-edit,
 .save-changes {
-  background-color: #007bff;
   margin-top: 10px;
   padding: 12px 18px;
   border-radius: 6px;
-  color: white;
-  font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
 .del-store {
-  background-color: red;
+  background-color: #ff4c4c;
 }
 
 .cancel-edit,
@@ -225,15 +153,75 @@ button:disabled {
 
 .cancel-edit:hover {
   background-color: #ff5858;
-} */
+}
+
+.place-service-request-button {
+  margin-top: 15px;
+  margin-left: auto;
+  padding: 15px 20px;
+  background-color: #288ea7;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.3s ease;
+}
+
+.place-service-request-button:hover {
+  background-color: #0056b3;
+}
+
+/* Reviews Container */
+.reviews-container {
+  width: 100%;
+  max-width: 1000px;
+  margin-top: 30px;
+  padding: 30px;
+  border-radius: 10px;
+  background-color: #2C3E50;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  color: #fff;
+}
+
+.reviews-container h2 {
+  font-size: 22px;
+  margin-bottom: 15px;
+  color: #f7f7f7;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.reviews-container p {
+  font-size: 18px;
+  margin: 5px 0;
+  font-weight: 300;
+  /* color: #fff; */
+}
+
+.reviews-list {
+  list-style: none;
+  padding: 0;
+}
+
+.reviews-list li {
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+  /* color: #f1f1f1; */
+}
+
+.reviews-list li:last-child {
+  border-bottom: none;
+}
 
 /* Map Container */
 #map-container {
   flex: 1;
   min-width: 300px;
   max-width: 50%;
-  height: 300px;
-  /* background-color: white; */
+  height: 400px;
+  background-color: white;
   border-radius: 10px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -247,37 +235,13 @@ button:disabled {
 /* Responsive Layout for Larger Screens */
 @media (min-width: 768px) {
   .store-details-container {
-    flex-direction: row;
-    /* justify-content: space-between; */
+    flex-direction: column;
   }
 
-  /* .store-info {
-    max-width: 400px;
-  } */
-
   #map-container {
-    /* max-width: 700px; */
     height: 400px;
   }
 }
-
-/* General Button Styles for Store Actions */
-/* button {
-  cursor: pointer;
-  border-radius: 6px;
-  padding: 12px 18px;
-  font-size: 1rem;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-button:disabled {
-  background-color: #ddd;
-  cursor: not-allowed;
-} */
 
 #error-messages {
   color: #ff4c4c;

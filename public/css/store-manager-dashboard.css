@@ -15,6 +15,20 @@ section {
   text-align: center;
 }
 
+section h2{
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+input{
+  width: 20%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
 /* Service Requests Table */
 table {
   width: 100%;
@@ -38,8 +52,9 @@ tr:hover {
 }
 
 th {
-  background-color: #4caf50;
+  background-color: #4c8eaf;
   color: white;
+  font-weight: 400;
 }
 
 #pagination-controls,
@@ -51,7 +66,7 @@ th {
 }
 
 button {
-  background-color: #4caf50;
+  background-color: #2C3E50;
   color: white;
   padding: 10px 20px;
   border: none;
@@ -60,7 +75,7 @@ button {
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #34495E;
 }
 
 button:disabled {
@@ -104,7 +119,7 @@ button:disabled {
 #get-quotation-form button {
   width: 100%;
   padding: 12px;
-  background-color: #2980b9;
+  background-color: #2C3E50;
   color: white;
   border: none;
   border-radius: 5px;
@@ -113,7 +128,7 @@ button:disabled {
 }
 
 #get-quotation-form button:hover {
-  background-color: #3498db;
+  background-color: #34495E;
 }
 
 /* Error Message Styling */
@@ -210,7 +225,7 @@ button:disabled {
 }
 
 #quotation-display button {
-  background-color: #4caf50;
+  background-color: #2C3E50;
   color: white;
   padding: 12px 20px;
   font-size: 16px;
@@ -222,7 +237,7 @@ button:disabled {
 }
 
 #quotation-display button:hover {
-  background-color: #45a049;
+  background-color: #34495E;
 }
 
 #quotation-display button:disabled {
@@ -314,7 +329,7 @@ button:disabled {
 
 /* Buttons */
 button {
-  background-color: #4caf50;
+  background-color: #2C3E50;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -326,7 +341,7 @@ button {
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #34495e;
 }
 
 /* Close Button */
@@ -381,12 +396,12 @@ label {
   font-size: 16px; /* Makes the button text readable */
   border: none; /* Removes default border */
   border-radius: 5px; /* Rounds button corners */
-  background-color: #007bff; /* Primary blue color */
+  background-color: #2C3E50; /* Primary blue color */
   color: white; /* White text color */
   cursor: pointer; /* Pointer cursor on hover */
   transition: background-color 0.3s; /* Smooth background color transition */
 }
 
 #button-container button:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: #34495E; /* Darker blue on hover */
 }

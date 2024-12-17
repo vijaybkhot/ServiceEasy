@@ -264,20 +264,7 @@ button:disabled {
   display: none;
 }
 
-/* #feedback-overlay button {
-  margin-top: 10px;
-  display: block;
-  width: 100%;
-}
-
-#feedback-overlay textarea {
-  width: 100%;
-}
-*/
-
-
 .feedback-row {
-  /* margin-bottom: 20px; */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -285,14 +272,12 @@ button:disabled {
 
 .feedback-row label {
   font-weight: 500;
-  /* margin-bottom: 5px; */
   display: flex;
   align-items: center;
 }
 
 .feedback-row label p {
   color: red;
-  /* margin-left: 5px; */
 }
 
 /* Rating and dropdown in one row */
@@ -302,7 +287,6 @@ button:disabled {
   border: 1px solid #DCDDE1;
   font-size: 14px;
   width: 100%;
-  /* margin-top: 5px; */
 }
 
 /* Textarea for review comment */
