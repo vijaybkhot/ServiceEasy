@@ -326,7 +326,7 @@ router.post("/", hasRole("customer", "admin"), async (req, res) => {
         paymentMethod: serviceRequest.payment.payment_mode,
       };
       const url = `${req.protocol}://${req.get("host")}/dashboard`;
-      // await new Email(req.session.user, url, orderData).sendOrderPlaced();
+      await new Email(req.session.user, url, orderData).sendOrderPlaced();
       return res.status(200).json({
         message: "Service request created successfully",
         serviceRequest,
