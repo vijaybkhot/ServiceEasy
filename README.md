@@ -93,6 +93,4 @@ Our platform leverages a robust and modern tech stack to deliver a seamless expe
 📦 Version Control & Collaboration
 	•	Git & GitHub: Version control and collaboration tools for managing source code, tracking changes, and handling team contributions.
 
-This diverse and powerful technology stack ensures smooth, secure, and efficient handling of customer service requests while providing an intuitive user experience for employees, store managers, and administrators. The integration of security-first principles with libraries like bcrypt.js, crypto, and xss ensures that the platform is secure against data breaches, XSS attacks, and credential theft.
-
 
