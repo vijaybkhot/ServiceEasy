@@ -61,7 +61,7 @@ Employee Log in
 - password
 
 
-🛠️ Technical Stack & Tools Used
+## 🛠️ Technical Stack & Tools Used
 
 Our platform leverages a robust and modern tech stack to deliver a seamless experience for customers, store managers, employees, and administrators. Here’s a breakdown of the key technologies and tools used:
 
