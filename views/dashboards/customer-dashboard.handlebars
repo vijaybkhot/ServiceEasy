@@ -1,6 +1,7 @@
 <main>
     <div id="user-data" data-user='{{{json user}}}'></div>
-
+    <h1>Welcome {{user.name}}, to your Dashboard!</h1>
+    <h2>Track all your ServiceEasy orders here!!</h2>
     <button id="newRequestButton" class="new-request-btn">New Repair Order</button>
 
     <section id="get-quotation-form" class="hidden">
@@ -51,7 +52,7 @@
                 <td id="quote-price"></td>
             </tr>
             <tr>
-                <th>Estimated Time in Hours</th>
+                <th>Estimated Time in Days</th>
                 <td id="quote-estimatedTime"></td>
             </tr>
         </table>

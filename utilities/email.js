@@ -86,17 +86,3 @@ class Email {
 }
 
 export default Email;
-
-// // Test
-// if (process.env.NODE_ENV === "production") {
-//   const mockUser = {
-//     email: "vijay111991@gmail.com",
-//     name: "Vijay Khot",
-//   };
-
-//   const mockUrl = "http://localhost:3000/home";
-
-//   const email = new Email(mockUser, mockUrl);
-
-//   email.sendWelcome().catch((err) => console.error("Test failed:", err));
-// }

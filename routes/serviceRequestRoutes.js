@@ -326,7 +326,7 @@ router.post("/", hasRole("customer", "admin"), async (req, res) => {
         paymentMethod: serviceRequest.payment.payment_mode,
       };
       const url = `${req.protocol}://${req.get("host")}/dashboard`;
-      // await new Email(req.session.user, url, orderData).sendOrderPlaced();
+      await new Email(req.session.user, url, orderData).sendOrderPlaced();
       return res.status(200).json({
         message: "Service request created successfully",
         serviceRequest,
@@ -1066,9 +1066,15 @@ router.delete(
       }
 
       if (await deleteServiceRequestById(serviceRequestId))
-        res.status(200).redirect(req.get("referer"));
+        return res.status(201).json({
+          message: "Service request status Deleted successfully.",
+          serviceRequest,
+        });
     } catch (e) {
-      next(e);
+      return res.status(500).json({
+        Error: e,
+        message: e.message,
+      });
     }
   }
 );

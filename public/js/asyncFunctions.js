@@ -268,6 +268,32 @@ export const fetchServiceRequestById = async function (id) {
   }
 };
 
+// Function to send Ready for Pickup email
+const sendReadyForPickupEmail = async (email, name, url, orderData) => {
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/api/email/send-ready-for-pickup",
+      {
+        email,
+        name,
+        url,
+        orderData,
+      }
+    );
+
+    if (response.data.status === "success") {
+      console.log("Email sent successfully:", response.data.message);
+    } else {
+      console.error("Failed to send email:", response.data.message);
+    }
+  } catch (error) {
+    console.error(
+      "Error sending email:",
+      error.response?.data || error.message
+    );
+  }
+};
+
 // Function to get employeeDetails and serviceRequest count of each employee for a storeId
 export const getEmployeeDetails = async function (storeId) {
   try {
@@ -1171,12 +1197,39 @@ export const populateServiceRequestOverlay = async function (
           outcome_status,
           employee_id
         );
+        const date = new Date(Date.now());
+        const formattedDate = `${(date.getMonth() + 1)
+          .toString()
+          .padStart(2, "0")}/${date
+          .getDate()
+          .toString()
+          .padStart(2, "0")}/${date.getFullYear()}`;
+        let sendEmailObject = {
+          email: serviceRequest.customer_id.email,
+          name: serviceRequest.customer_id.email,
+          url: "http://localhost:3000/dashboard",
+          orderData: {
+            storeName: serviceRequest.store_id.name,
+            storePhone: serviceRequest.store_id.phone,
+            orderId: serviceRequest._id,
+            modelName: serviceRequest.repair_details.model_name,
+            repairName: serviceRequest.repair_details.repair_name,
+            completedOn: formattedDate,
+          },
+        };
 
         if (!updatedApprovalActivity || !modifiedServiceRequest) {
           showAlert("error", "Failed to approve");
         }
         showAlert("success", "Service request approved successfully!");
         closeOverlay();
+        // Send email to client
+        await sendReadyForPickupEmail(
+          sendEmailObject.email,
+          sendEmailObject.name,
+          sendEmailObject.url,
+          sendEmailObject.orderData
+        );
         setTimeout(() => {
           location.reload();
         }, 3000);
@@ -1187,7 +1240,7 @@ export const populateServiceRequestOverlay = async function (
         closeOverlay();
         setTimeout(() => {
           location.reload();
-        }, 3000);
+        }, 2000);
       }
     });
 
