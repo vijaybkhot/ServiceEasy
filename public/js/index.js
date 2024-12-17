@@ -84,7 +84,7 @@ if (storeContainer) {
       nameSpan.style.display = "none";
       addressSpan.style.display = "none";
       phoneSpan.style.display = "none";
-    document.querySelector("#store-name-label").style.display = "block";  //static name
+      document.querySelector("#store-name-label").style.display = "block"; //static name
 
       nameInput.style.display = "block";
       // nameTag.style.display = "block";
@@ -103,9 +103,9 @@ if (storeContainer) {
       nameSpan.style.display = "block";
       addressSpan.style.display = "block";
       phoneSpan.style.display = "block";
-    
-    document.querySelector("#store-name-label").style.display = "none";
-    
+
+      document.querySelector("#store-name-label").style.display = "none";
+
       nameInput.style.display = "none";
       addressInput.style.display = "none";
       phoneInput.style.display = "none";

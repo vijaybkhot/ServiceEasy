@@ -50,6 +50,7 @@
             <div class="form-group">
                 <label for="paymentMode">Payment Mode</label>
                 <select id="paymentMode" name="paymentMode" required>
+                    <option value="" disabled selected>Select Payment Method</option>
                     <option value="CC" {{#if payment_mode}} {{#if_eq payment_mode "CC" }}selected{{/if_eq}} {{/if}}>
                         Credit Card (CC)</option>
                     <option value="DC" {{#if payment_mode}} {{#if_eq payment_mode "DC" }}selected{{/if_eq}} {{/if}}>

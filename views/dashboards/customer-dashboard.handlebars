@@ -1,5 +1,5 @@
 <main>
-    <div id="user-data" data-user='{{{json user}}}'></div>
+    {{!-- <div id="user-data" data-user='{{{json user}}}'></div> --}}
     <h1>Welcome {{user.name}}, to your Dashboard!</h1>
     <h2>Track all your ServiceEasy orders here!!</h2>
     <button id="newRequestButton" class="new-request-btn">New Repair Order</button>
@@ -151,7 +151,7 @@
             <h2>RATE AND REVIEW</h2>
             <div class="feedback-row">
                 {{!-- <p>* fields are required</p> --}}
-                <label for="feedback-rating">Rating<p>*</p>(1-5):</label>
+                <label for="feedback-rating">Rating * (1-5):</label>
                 <select id="feedback-rating">
                     <option value="" disabled selected>Select rating</option>
                     <option value="1">1 - Poor</option>
@@ -162,7 +162,7 @@
                 </select>
             </div>
             <div class="feedback-row">
-                <label for="feedback-comment">Review Comment<p>*</p>:</label>
+                <label for="feedback-comment">Review Comment *:</label>
             </div>
             <div class="feedback-row">
                 <textarea id="feedback-comment" rows="4" placeholder="Write your review here..."></textarea>

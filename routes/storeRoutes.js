@@ -20,7 +20,6 @@ import {
 import { getUsersByRole } from "../data/user.js";
 
 const router = express.Router();
-router.use(isAuthenticated);
 
 // Route to render the "Add Store" page
 router.get("/add", isAuthenticated, hasRole("admin"), async (req, res) => {
@@ -46,6 +45,7 @@ router.get("/", async (req, res) => {
       json: JSON.stringify,
       errors: [],
       user: req.session.user,
+      cssPath: `/public/css/all-stores.css`,
     });
   } catch (error) {
     return res.status(400).json({ error: error });
@@ -143,6 +143,7 @@ router.get("/:id", async (req, res) => {
       customerReviews: customerReviews,
       totalRatings: totalRatings ? totalRatings.toFixed(1) : null,
       user: req.session.user,
+      cssPath: `/public/css/store.css`,
     });
   } catch (error) {
     errors.push("An unexpected error occurred. Please try again later.");
@@ -204,6 +205,7 @@ router.post("/", isAuthenticated, hasRole("admin"), async (req, res) => {
       title: "Add Store",
       storeManagers: storeManagers,
       errors: errors,
+      cssPath: `/public/css/add-store.css`,
     });
   }
 
@@ -233,8 +235,9 @@ router.post("/", isAuthenticated, hasRole("admin"), async (req, res) => {
 });
 
 // Route to update a store
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", isAuthenticated, hasRole(["admin"]), async (req, res) => {
   let errors = [];
+  console.log(req.body);
 
   // Validate employees array if provided
   let { employees } = req.body;
@@ -267,7 +270,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 // Route to delete a store
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", isAuthenticated, hasRole(["admin"]), async (req, res) => {
   try {
     const result = await deleteStore(req.params.id);
     if (result) {
