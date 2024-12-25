@@ -1,4 +1,4 @@
-body{
+body {
   background-color: #f9f9f9;
   color: #333;
   margin: 0;
@@ -39,7 +39,7 @@ body{
 
 #add-store-form {
   width: 100%;
-  }
+}
 
 .form-group {
   margin-bottom: 1.5rem;
@@ -54,7 +54,8 @@ label {
   color: #333;
 }
 
-input, select {
+input,
+select {
   width: 100%;
   padding: 0.8rem;
   border: 1px solid #ddd;
@@ -148,4 +149,4 @@ select:focus {
 
 .error-container {
   font-style: italic;
-} 
+}

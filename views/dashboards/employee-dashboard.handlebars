@@ -19,8 +19,16 @@
         </div>
     </section>
 
+    {{!-- Buttons --}}
+    <div id="button-container">
+        <button id="completedServiceRequestsBtn">Completed Service Requests</button>
+        <button id="pendingServiceRequestsBtn">Your Action Required</button>
+    </div>
+
+
+
     <!-- Service requests pending at the employee -->
-    <section id="pending-requests">
+    <section id="pending-requests" class="hidden">
         <h2>Requests Pending For Your Action</h2>
         <table>
             <thead>
@@ -55,7 +63,7 @@
     </section>
 
     <!-- Past Completed Service Requests Section -->
-    <section id="completed-requests">
+    <section id="completed-requests" class="hidden">
         <h2>Completed Service Requests</h2>
         <table>
             <thead>

@@ -1,8 +1,18 @@
 <main>
     {{!-- <div id="user-data" data-user='{{{json user}}}'></div> --}}
     <h1>Welcome {{user.name}}, to your Dashboard!</h1>
-    <h2>Track all your ServiceEasy orders here!!</h2>
-    <button id="newRequestButton" class="new-request-btn">New Repair Order</button>
+    <h2>Track your ServiceEasy orders here!!</h2>
+
+
+    {{!-- Buttons --}}
+
+    <div id="button-container">
+        <button id="newRequestButton" class="new-request-btn">Place A New Repair Order</button>
+        <button id="inProgressServiceRequestsBtn">In Progress Service Requests</button>
+        <button id="completedServiceRequestsBtn">Completed Service Requests</button>
+    </div>
+
+
 
     <section id="get-quotation-form" class="hidden">
         <h2>NEW SERVICE REQUEST</h2>
@@ -65,7 +75,7 @@
         <button id="checkoutButton">Check Out</button>
     </section>
 
-    <section id="in-progress-requests">
+    <section id="in-progress-requests" class="hidden">
         <h2>In-Progress Service Requests</h2>
         <table>
             <thead>
@@ -97,13 +107,9 @@
             </tbody>
         </table>
 
-        <div id="in-progress-pagination-controls">
-            <button id="prevInProgressPage" onclick="navigatePage('in-progress', -1)">Previous</button>
-            <span id="in-progress-page-info">Page 1</span>
-            <button id="nextInProgressPage" onclick="navigatePage('in-progress', 1)">Next</button>
-        </div>
+
     </section>
-    <section id="completed-requests">
+    <section id="completed-requests" class="hidden">
         <h2>Completed Service Requests</h2>
         <table>
             <thead>
@@ -138,11 +144,7 @@
             </tbody>
         </table>
 
-        <div id="completed-pagination-controls">
-            <button id="prevCompletedPage" onclick="navigatePage('completed', -1)">Previous</button>
-            <span id="completed-page-info">Page 1</span>
-            <button id="nextCompletedPage" onclick="navigatePage('completed', 1)">Next</button>
-        </div>
+
     </section>
 
     <!-- Feedback overlay for rating and review -->

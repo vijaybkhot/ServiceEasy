@@ -10,7 +10,53 @@ if (employeeMain) {
   const storeId = storeData.dataset.storeId;
   const findButton = document.getElementById("findButton");
   const buttons = document.querySelectorAll(".view-details-btn");
-  console.log(user);
+
+  const completedRequestSection = document.getElementById("completed-requests");
+  const pendingRequestSection = document.getElementById("pending-requests");
+  const completedServiceRequestsBtn = document.getElementById(
+    "completedServiceRequestsBtn"
+  );
+  const pendingServiceRequestsBtn = document.getElementById(
+    "pendingServiceRequestsBtn"
+  );
+
+  const sections = {
+    completedRequestSection,
+    pendingRequestSection,
+  };
+
+  const showButtons = {
+    completedServiceRequestsBtn,
+    pendingServiceRequestsBtn,
+  };
+
+  const toggleSectionVisibility = (sectionToShow) => {
+    Object.values(sections).forEach((section) =>
+      section.classList.add("hidden")
+    );
+
+    sectionToShow.classList.remove("hidden");
+
+    setTimeout(() => {
+      sectionToShow.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 50);
+  };
+
+  // Add event listeners to buttons
+  Object.keys(showButtons).forEach((buttonKey) => {
+    showButtons[buttonKey].addEventListener("click", (event) => {
+      const clickedButton = event.target;
+
+      if (clickedButton === completedServiceRequestsBtn) {
+        toggleSectionVisibility(completedRequestSection);
+      } else if (clickedButton === pendingServiceRequestsBtn) {
+        toggleSectionVisibility(pendingRequestSection);
+      }
+    });
+  });
 
   // Event listners for the view details buttons
   buttons.forEach((button) => {

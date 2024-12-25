@@ -25,12 +25,12 @@
         </p>
         <h2>
           <span id="store-name">{{store.name}}</span>
-          <input id="store-name-input" type="text" value="{{store.name}}"/>
+          <input id="store-name-input" type="text" value="{{store.name}}" />
         </h2>
         <p>
           <b>Address:</b>
           <span id="store-address">{{store.location.address}}</span>
-          <input id="store-address-input" type="text" value="{{store.location.address}}"/>
+          <input id="store-address-input" type="text" value="{{store.location.address}}" />
         </p>
         <p>
           <b>Phone:</b>
@@ -38,36 +38,36 @@
           <input id="store-phone-input" type="text" value="{{store.phone}}" />
         </p>
 
-         <div id="error-messages"  style="display: none;">
+        <div id="error-messages" style="display: none;">
           <div id="error-container" class="error-container">
             {{#if errors}}
-              {{#each errors}}
-                {{this}}
-              {{/each}}
+            {{#each errors}}
+            {{this}}
+            {{/each}}
             {{/if}}
           </div>
         </div>
 
       </form>
 
-      {{#unless user}} 
-        <a href="/dashboard" class="place-service-request-button">Place a Service Request</a>
+      {{#unless user}}
+      <a href="/dashboard" class="place-service-request-button">Place a Service Request</a>
       {{/unless}}
 
       {{#if (eq user.role "customer")}}
-      <a href="/dashboard" class="place-service-request-button" >Place a Service Request</a>
+      <a href="/dashboard" class="place-service-request-button">Place a Service Request</a>
       {{/if}}
     </div>
 
-      <div id="map-container">
-        <div id="map"></div>
-      </div>
+    <div id="map-container">
+      <div id="map"></div>
+    </div>
   </div>
   <div class="reviews-container">
     <h2>Customer Reviews</h2>
-    <p><b>Average Rating:</b>
-      {{#if totalRatings}}
-      {{totalRatings}}/ 5
+    <p><b>Overall Rating For The Store:</b>
+      {{#if totalAverageRating}}
+      {{totalAverageRating}}/ 5
       {{else}}
       N/A
       {{/if}}
@@ -76,8 +76,8 @@
     <ul class="reviews-list">
       {{#each customerReviews}}
       <li>
-        <p><b>{{customerName}}</b>: <i>{{comment}}</i></p>
-        <p>Rating: {{rating}} / 5</p>
+        <p><b>{{customerName}}</b>: <i>{{bestComment}}</i></p>
+        <p>Average Rating: {{averageRating}} / 5</p>
       </li>
       {{/each}}
     </ul>

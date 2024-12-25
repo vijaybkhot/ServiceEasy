@@ -24,7 +24,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const errorContainer = document.getElementById("error-container");
 
       if (!storeName || !/^[a-zA-Z\s]*$/.test(storeName))
-        errors.push("Store name is required and must contain only letters and spaces.");
+        errors.push(
+          "Store name is required and must contain only letters and spaces."
+        );
       if (storeLatitude > 90 || storeLatitude < -90)
         errors.push("Latitude must be within -90 and 90!");
       if (storeLongitude > 180 || storeLongitude < -180)
@@ -67,7 +69,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const errorContainer = document.getElementById("error-container");
 
       if (!storeName || !/^[a-zA-Z0-9\s\-',.]+$/.test(storeName))
-        errors.push("Store name is required and must contain valid characters.");
+        errors.push(
+          "Store name is required and must contain valid characters."
+        );
       if (
         storeAddress.length >= 300 ||
         storeAddress.length < 20 ||

@@ -74,7 +74,6 @@ export async function getAllUsers() {
 export async function getUsersByRole(role) {
   const stores = await Store.find({});
   const storeManagers = await User.find({ role: role });
-
   const managersWithoutStore = storeManagers.filter((manager) => {
     // Check if the manager is not assigned to any store by comparing their _id with storeManager in stores
     return !stores.some(
@@ -83,9 +82,8 @@ export async function getUsersByRole(role) {
         store.storeManager._id.toString() === manager._id.toString()
     );
   });
-  // const users = await User.find({ role: role });
+
   const plainUsers = managersWithoutStore.map((user) => user.toObject());
-  console.log(plainUsers);
   if (managersWithoutStore.length === 0) {
     throw new Error("No unassigned store managers found.");
   }

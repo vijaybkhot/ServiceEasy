@@ -13,6 +13,7 @@ import {
   getEmployeesWithServiceRequestCount,
 } from "../data/stores.js";
 import User from "../models/userModel.js";
+import ServiceRequest from "../models/serviceRequestModel.js";
 import {
   isAuthenticated,
   hasRole,
@@ -28,6 +29,7 @@ router.get("/add", isAuthenticated, hasRole("admin"), async (req, res) => {
     return res.status(200).render("stores/add-store", {
       title: "Add Store",
       storeManagers: storeManagers,
+      cssPath: "/public/css/add-store.css",
     });
   } catch (error) {
     return res.status(400).json({ error: error.message });
@@ -38,7 +40,6 @@ router.get("/add", isAuthenticated, hasRole("admin"), async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const stores = await getAll();
-    // console.log(stores)
     return res.status(200).render("stores/all-stores", {
       title: "List of all Stores",
       stores: stores,
@@ -98,6 +99,63 @@ router.get("/jsonStores", async (req, res) => {
 });
 
 // Route to fetch a specific store by ID
+// router.get("/:id", async (req, res) => {
+//   let errors = [];
+//   try {
+//     const id = validatorFuncs.isValidString(
+//       req.params.id,
+//       "id",
+//       "/get Store Route"
+//     );
+//     if (!validatorFuncs.validId(id)) {
+//       errors.push("Please provide a valid Store ID!");
+//     }
+//     const reviews = await getReviewsById(id);
+//     let customerReviews = [];
+//     let totalRatings = 0;
+//     // console.log(reviews)
+//     try {
+//       for (let review of reviews) {
+//         // console.log(review);
+//         customerReviews.push({
+//           rating: review.feedback.rating,
+//           comment: review.feedback.comment,
+//           customerName: review.customer_id.name,
+//         });
+//         totalRatings = review.feedback.rating + totalRatings;
+//       }
+//       totalRatings = totalRatings / reviews.length;
+//       // console.log(customerReviews);
+//     } catch (error) {
+//       console.log(error);
+//     }
+//     if (errors.length > 0) {
+//       return res.status(400).render("stores/store", {
+//         title: "Store Details",
+//         errors,
+//       });
+//     }
+//     const store = await getById(id);
+//     return res.status(200).render("stores/store", {
+//       title: "Store Details",
+//       json: JSON.stringify,
+//       store,
+//       errors: [],
+//       customerReviews: customerReviews,
+//       totalRatings: totalRatings ? totalRatings.toFixed(1) : null,
+//       user: req.session.user,
+//       cssPath: `/public/css/store.css`,
+//     });
+//   } catch (error) {
+//     errors.push("An unexpected error occurred. Please try again later.");
+//     // console.log(error);
+//     return res.status(500).render("stores/store", {
+//       title: "Store Details",
+//       errors,
+//     });
+//   }
+// });
+
 router.get("/:id", async (req, res) => {
   let errors = [];
   try {
@@ -109,45 +167,109 @@ router.get("/:id", async (req, res) => {
     if (!validatorFuncs.validId(id)) {
       errors.push("Please provide a valid Store ID!");
     }
-    const reviews = await getReviewsById(id);
-    let customerReviews = [];
-    let totalRatings = 0;
-    // console.log(reviews)
-    try {
-      for (let review of reviews) {
-        // console.log(review);
-        customerReviews.push({
-          rating: review.feedback.rating,
-          comment: review.feedback.comment,
-          customerName: review.customer_id.name,
-        });
-        totalRatings = review.feedback.rating + totalRatings;
-      }
-      totalRatings = totalRatings / reviews.length;
-      // console.log(customerReviews);
-    } catch (error) {
-      console.log(error);
-    }
+
     if (errors.length > 0) {
       return res.status(400).render("stores/store", {
         title: "Store Details",
         errors,
       });
     }
+
+    // Get the store details
     const store = await getById(id);
-    return res.status(200).render("stores/store", {
-      title: "Store Details",
-      json: JSON.stringify,
-      store,
-      errors: [],
-      customerReviews: customerReviews,
-      totalRatings: totalRatings ? totalRatings.toFixed(1) : null,
-      user: req.session.user,
-      cssPath: `/public/css/store.css`,
-    });
+    if (!store) {
+      errors.push("Store not found.");
+      return res.status(404).render("stores/store", {
+        title: "Store Details",
+        errors,
+      });
+    }
+
+    try {
+      // Get all service requests for this store and populate the customer details
+      const reviews = await ServiceRequest.find({
+        store_id: id,
+        feedback: { $exists: true },
+      })
+        .populate("customer_id", "name") // Populating only the 'name' field of the customer
+        .select("feedback customer_id");
+
+      // Create a map to store feedbacks grouped by customer_id
+      const customerReviewsMap = new Map();
+
+      for (const review of reviews) {
+        const customerId = review.customer_id._id.toString();
+
+        if (!customerReviewsMap.has(customerId)) {
+          // Initialize customer review data for this customer
+          customerReviewsMap.set(customerId, {
+            customerName: review.customer_id.name,
+            totalRating: 0,
+            reviewCount: 0,
+            bestComment: review.feedback.comment || "",
+            bestRating: review.feedback.rating || 0,
+          });
+        }
+
+        const customerData = customerReviewsMap.get(customerId);
+
+        // Update total rating and count for averaging later
+        customerData.totalRating += review.feedback.rating;
+        customerData.reviewCount += 1;
+
+        // Check if this review's rating is better than the current best rating for this customer
+        if (review.feedback.rating > customerData.bestRating) {
+          customerData.bestComment = review.feedback.comment || "";
+          customerData.bestRating = review.feedback.rating;
+        }
+      }
+
+      // Convert the map to an array of customer review objects
+      const customerReviewsArray = Array.from(customerReviewsMap.values());
+
+      const customerReviews = customerReviewsArray.map((customerData) => {
+        const averageRating = (
+          customerData.totalRating / customerData.reviewCount
+        ).toFixed(1);
+        return {
+          customerName: customerData.customerName,
+          averageRating: averageRating,
+          bestComment: customerData.bestComment,
+        };
+      });
+
+      // Calculate the overall average of the average ratings
+      let totalAverageRating = 0;
+      if (customerReviews.length > 0) {
+        totalAverageRating =
+          customerReviews.reduce(
+            (sum, customer) => sum + parseFloat(customer.averageRating),
+            0
+          ) / customerReviews.length;
+      }
+
+      totalAverageRating = totalAverageRating.toFixed(1);
+
+      return res.status(200).render("stores/store", {
+        title: "Store Details",
+        store,
+        errors: [],
+        customerReviews,
+        totalAverageRating,
+        user: req.session.user,
+        cssPath: `/public/css/store.css`,
+      });
+    } catch (error) {
+      console.error("Error while processing reviews:", error);
+      errors.push("An error occurred while retrieving customer reviews.");
+      return res.status(500).render("stores/store", {
+        title: "Store Details",
+        errors,
+      });
+    }
   } catch (error) {
+    console.error("Unexpected error:", error);
     errors.push("An unexpected error occurred. Please try again later.");
-    // console.log(error);
     return res.status(500).render("stores/store", {
       title: "Store Details",
       errors,

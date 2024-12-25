@@ -9,6 +9,7 @@ import {
   addEmployeetoStore,
   searchUserByEmail,
   updateUserRole,
+  validateEmail,
 } from "./asyncFunctions.js";
 
 // DOM elements
@@ -370,9 +371,30 @@ if (adminMain) {
     const userDetails = document.getElementById("userDetails");
     const userRoleSelect = document.getElementById("userRoleSelect");
     const changeRoleBtn = document.getElementById("changeRoleBtn");
+    console.log("in admin dashboard", email);
+
+    if (!email) {
+      showAlert("error", "Please enter an email!");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      showAlert("error", "Invalid email format");
+      return;
+    }
 
     try {
-      const { user } = await searchUserByEmail(email);
+      const result = await searchUserByEmail(email);
+      let user;
+      if (result && result.user) {
+        user = result.user;
+        if (!user) {
+          showAlert("error", "User not found");
+        }
+      } else {
+        // Handle when the result is invalid or an error occurs in searchUserByEmail
+        showAlert("error", "User not found!!");
+      }
 
       if (user) {
         document.getElementById("userName").textContent = user.name;
@@ -418,7 +440,7 @@ if (adminMain) {
       }
     } catch (error) {
       console.error("Error fetching user:", error);
-      showAlert("error", "An error occurred while fetching the user.");
+      showAlert("error", error);
     }
   });
 }

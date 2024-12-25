@@ -2,7 +2,6 @@ import ServiceRequest from "../models/serviceRequestModel.js";
 import dataValidator from "../utilities/dataValidator.js";
 import User from "../models/userModel.js";
 import Store from "../models/storeModel.js";
-import Repair from "../models/repairModel.js";
 import CustomError from "../utilities/customError.js";
 import Stripe from "stripe";
 
@@ -286,7 +285,7 @@ export const generateClientSecret = async (data) => {
     amount,
     currency: "usd",
     payment_method_types: ["card"],
-    receipt_email: "kale44772@gmail.com",
+    receipt_email: process.env.STRIPE_EMAIL,
   });
 
   return paymentIntentObject.client_secret;

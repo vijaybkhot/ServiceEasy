@@ -15,7 +15,7 @@ section {
   text-align: center;
 }
 
-section h2{
+section h2 {
   text-transform: uppercase;
   font-weight: 500;
 }
@@ -57,7 +57,7 @@ th {
 }
 
 button {
-  background-color: #2C3E50;
+  background-color: #2c3e50;
   color: white;
   padding: 10px 20px;
   border: none;
@@ -66,7 +66,7 @@ button {
 }
 
 button:hover {
-  background-color: #34495E;
+  background-color: #34495e;
 }
 
 button:disabled {
@@ -74,7 +74,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-input{
+input {
   width: 20%;
   padding: 10px;
   margin-bottom: 15px;
@@ -83,7 +83,7 @@ input{
   font-size: 14px;
 }
 
-select{
+select {
   width: auto;
   padding: 10px;
   margin-bottom: 15px;
@@ -96,7 +96,7 @@ textarea {
   width: 95%;
   padding: 10px;
   border-radius: 5px;
-  border: 1px solid #DCDDE1;
+  border: 1px solid #dcdde1;
   font-size: 14px;
   resize: none;
 }
@@ -137,7 +137,7 @@ textarea {
 #get-quotation-form button {
   width: 100%;
   padding: 12px;
-  background-color: #2C3E50;
+  background-color: #2c3e50;
   color: white;
   border: none;
   border-radius: 5px;
@@ -146,7 +146,7 @@ textarea {
 }
 
 #get-quotation-form button:hover {
-  background-color: #34495E;
+  background-color: #34495e;
 }
 
 /* Error Message Styling */
@@ -243,7 +243,7 @@ textarea {
 }
 
 #quotation-display button {
-  background-color: #2C3E50;
+  background-color: #2c3e50;
   color: white;
   padding: 12px 20px;
   font-size: 16px;
@@ -255,7 +255,7 @@ textarea {
 }
 
 #quotation-display button:hover {
-  background-color: #34495E;
+  background-color: #34495e;
 }
 
 #quotation-display button:disabled {
@@ -347,7 +347,7 @@ textarea {
 
 /* Buttons */
 button {
-  background-color: #2C3E50;
+  background-color: #2c3e50;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -359,7 +359,7 @@ button {
 }
 
 button:hover {
-  background-color: #34495E;
+  background-color: #34495e;
 }
 
 /* Close Button */
@@ -399,4 +399,27 @@ label {
 
 .hidden {
   display: none;
+}
+
+#button-container {
+  display: flex; /* Enables flexbox */
+  justify-content: center; /* Centers the buttons horizontally */
+  align-items: center; /* Centers the buttons vertically (if container has height) */
+  gap: 20px; /* Space between buttons */
+  margin: 20px 0; /* Adds space above and below the button container */
+}
+
+#button-container button {
+  padding: 10px 20px; /* Adds padding to buttons */
+  font-size: 16px; /* Makes the button text readable */
+  border: none; /* Removes default border */
+  border-radius: 5px; /* Rounds button corners */
+  background-color: #2c3e50; /* Primary blue color */
+  color: white; /* White text color */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s; /* Smooth background color transition */
+}
+
+#button-container button:hover {
+  background-color: #34495e; /* Darker blue on hover */
 }

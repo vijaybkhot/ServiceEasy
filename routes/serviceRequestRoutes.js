@@ -478,7 +478,7 @@ router.get(
             (sum, request) => sum + request.payment?.amount,
             0
           ),
-          avgRating: storeAvgRating,
+          avgRating: storeAvgRating.toFixed(1),
         };
       });
 
@@ -487,7 +487,7 @@ router.get(
         completedRequests,
         inProgressRequests,
         totalPrice,
-        avgRating,
+        avgRating: avgRating.toFixed(1),
         storeReport,
       });
     } catch (err) {

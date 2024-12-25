@@ -73,40 +73,33 @@ export async function getUserById(userId) {
   }
 }
 
-// Get user by email
 // Function to validate email using a regular expression
-function validateEmail(email) {
-  const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+export function validateEmail(email) {
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return emailPattern.test(email);
 }
 
-// Function to search for a user by email
+// Get user by email
 export const searchUserByEmail = async function (email) {
-  if (!email) {
-    showAlert("error", "Email is required.");
-    return;
-  }
-
-  if (!validateEmail(email)) {
-    showAlert("error", "Please enter a valid email.");
-    return;
-  }
-
   try {
+    // Make the API request if the email is valid
     const response = await axios.get(`http://localhost:3000/search-user/`, {
       params: { email },
       headers: {
         Authorization: `Bearer ${localStorage.getItem("authToken")}`,
       },
     });
+
     return response.data;
   } catch (error) {
-    if (error.response && error.response.status === 404) {
-      showAlert("error", "No user found with this email.");
-    } else {
-      showAlert("error", "An error occurred while searching for the user.");
+    let errorMessage;
+    if (error && error.status === 404) {
+      errorMessage = "No user found with this email.";
     }
-    console.error("Error:", error.message);
+    // Display the error message
+    showAlert("error", errorMessage);
+    console.error("Error:", error);
+    return null;
   }
 };
 
@@ -517,6 +510,7 @@ async function updateActivityStatus(activityId, status = "completed") {
 // Function to get current in-progress activity for the give processing user id
 function getCurrentAndPrecedingActivity(activities, employeeId) {
   // Validate input
+
   if (!Array.isArray(activities)) {
     throw new Error("Activities must be an array");
   }
@@ -535,7 +529,6 @@ function getCurrentAndPrecedingActivity(activities, employeeId) {
   if (!currentActivity) {
     return { currentActivity: null, precedingActivity: null }; // No current activity found
   }
-
   // Step 2: Find the preceding activity
   // (createdAt closest to currentActivity but earlier than its createdAt)
   // (activity_type must be 'assign' or 'submit')
@@ -607,7 +600,6 @@ export async function fetchReportData() {
 
 // Function to fetch report for a store
 export async function fetchStoreReportData(storeId) {
-  console.log(storeId);
   try {
     if (!storeId || typeof storeId !== "string") {
       throw new Error("Invalid storeId: storeId must be a non-empty string.");
@@ -798,9 +790,7 @@ export const populateServiceRequestOverlay = async function (
         <div class="review-comment">
           <strong>Review:</strong>
           <p id="customerReview">${
-            serviceRequest.feedback
-              ? serviceRequest.feedback.comment
-              : "No review posted."
+            serviceRequest?.feedback?.comment ?? "No review posted."
           }</p>
         </div>
       </div>
@@ -838,7 +828,10 @@ export const populateServiceRequestOverlay = async function (
     user.role === "employee"
   ) {
     if (precedingActivity && precedingActivity.comments) {
-      const { comment, date } = precedingActivity.comments;
+      const {
+        comment = "No comment available",
+        date = new Date().toISOString(),
+      } = precedingActivity?.comments || {};
       precedingActivityHTML = `
         <div id="precedingActivity">
         <h3>Assigned By Store Manager</h3>
@@ -869,7 +862,6 @@ export const populateServiceRequestOverlay = async function (
   ) {
     // Get details of employee who submitted:
     let assigned_by_id = currentActivity.assigned_by;
-    console.log("assigned_by_id", assigned_by_id);
     let submittedByEmployee = await getUserById(assigned_by_id);
     let submittedByEmployeeDetails = "";
     // Show the employee select dropdown with all employees for reassign
@@ -1063,7 +1055,7 @@ export const populateServiceRequestOverlay = async function (
           closeOverlay();
           setTimeout(() => {
             location.reload();
-          }, 5000);
+          }, 3000);
         }
       }
     });
@@ -1159,7 +1151,7 @@ export const populateServiceRequestOverlay = async function (
           closeOverlay();
           setTimeout(() => {
             location.reload();
-          }, 5000);
+          }, 3000);
         }
       }
     });

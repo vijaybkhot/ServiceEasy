@@ -50,7 +50,7 @@ router.get(
       const pageSize = parseInt(req.query.pageSize) || 10;
 
       // Paginate the completed and in-progress requests
-      let completedServiceRequests;
+      let completedServiceRequests = [];
       if (unMappedCompletedServiceRequests) {
         completedServiceRequests = await helpers.mapServiceRequests(
           unMappedCompletedServiceRequests,
@@ -59,7 +59,7 @@ router.get(
         );
       }
 
-      let inProgressServiceRequests;
+      let inProgressServiceRequests = [];
       if (unMappedInProgressServiceRequests) {
         inProgressServiceRequests = await helpers.mapServiceRequests(
           unMappedInProgressServiceRequests,
@@ -185,6 +185,10 @@ router.get(
         inProgress: ["in-process", "reassigned"],
       };
 
+      let completedServiceRequests = [];
+      let inProgressServiceRequests = [];
+      let pendingServiceRequests = [];
+
       // Filter service requests into completed, pending, in-progress at managers dashboard
       let unMappedCompletedServiceRequests = storeServiceRequests.filter(
         (serviceRequest) =>
@@ -207,7 +211,6 @@ router.get(
       const pageSize = parseInt(req.query.pageSize) || 10;
 
       // Paginate the completed and in-progress requests
-      let completedServiceRequests;
       if (unMappedCompletedServiceRequests) {
         completedServiceRequests = await helpers.mapServiceRequests(
           unMappedCompletedServiceRequests,
@@ -215,7 +218,6 @@ router.get(
           pageSize
         );
       }
-      let pendingServiceRequests;
       if (unMappedPendingServiceRequests) {
         pendingServiceRequests = await helpers.mapServiceRequests(
           unMappedPendingServiceRequests,
@@ -223,7 +225,6 @@ router.get(
           pageSize
         );
       }
-      let inProgressServiceRequests;
       if (unMappedInProgressServiceRequests) {
         inProgressServiceRequests = await helpers.mapServiceRequests(
           unMappedInProgressServiceRequests,
@@ -248,7 +249,7 @@ router.get(
         pageSize,
       });
     } catch (error) {
-      return res.status(500).json(error.message);
+      return res.status(500).render("errors/error", { error: error });
     }
   }
 );

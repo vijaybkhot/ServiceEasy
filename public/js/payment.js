@@ -2,6 +2,7 @@ import { showAlert } from "./alert.js";
 const paymentContainer = document.getElementById("payment-container");
 
 async function createServiceRequest(data) {
+  console.log(data);
   try {
     const response = await axios.post("/api/service-request/", data);
     if (response.status === 200) {
@@ -124,7 +125,7 @@ if (paymentContainer) {
         console.log(serviceRequest);
         setTimeout(() => {
           window.location.href = "/dashboard/customer-dashboard";
-        }, 2000);
+        }, 200);
       }
     });
   } else {

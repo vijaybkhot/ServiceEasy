@@ -10,6 +10,53 @@ import {
 const getQuotationFormContainer = document.getElementById("get-quotation-form");
 const newRequestButton = document.getElementById("newRequestButton");
 
+const completedRequestSection = document.getElementById("completed-requests");
+const inProgressRequestSection = document.getElementById(
+  "in-progress-requests"
+);
+const completedServiceRequestsBtn = document.getElementById(
+  "completedServiceRequestsBtn"
+);
+const inProgressServiceRequestsBtn = document.getElementById(
+  "inProgressServiceRequestsBtn"
+);
+
+const sections = {
+  completedRequestSection,
+  inProgressRequestSection,
+};
+
+const showButtons = {
+  completedServiceRequestsBtn,
+  inProgressServiceRequestsBtn,
+};
+
+const toggleSectionVisibility = (sectionToShow) => {
+  Object.values(sections).forEach((section) => section.classList.add("hidden"));
+
+  sectionToShow.classList.remove("hidden");
+
+  setTimeout(() => {
+    sectionToShow.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, 50);
+};
+
+// Add event listeners to buttons
+Object.keys(showButtons).forEach((buttonKey) => {
+  showButtons[buttonKey].addEventListener("click", (event) => {
+    const clickedButton = event.target;
+
+    if (clickedButton === completedServiceRequestsBtn) {
+      toggleSectionVisibility(completedRequestSection);
+    } else if (clickedButton === inProgressServiceRequestsBtn) {
+      toggleSectionVisibility(inProgressRequestSection);
+    }
+  });
+});
+
 // Functions to handle feedback
 // Function using axios to add/modify feedback to a service request
 async function addFeedback(serviceRequestId, rating, comment = "") {

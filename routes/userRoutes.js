@@ -140,7 +140,8 @@ router.post("/signup", async (req, res) => {
 
   if (!dataValidator.validName(name)) errors.push("Invalid name.");
   if (!validator.isEmail(email)) errors.push("Invalid email.");
-  if (!dataValidator.isValidPhoneNumber(phone)) errors.push("Invalid phone.");
+  if (!dataValidator.isValidPhoneNumberBoolean(phone))
+    errors.push("Invalid phone.");
   if (!dataValidator.isValidStringBoolean(password))
     errors.push("Invalid password.");
   if (!dataValidator.isValidStringBoolean(role)) errors.push("Invalid role.");
@@ -212,9 +213,14 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-router.get("/logout", async (req, res) => {
-  req.session.destroy();
-  return res.status(200).redirect("/home");
+router.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Failed to destroy session:", err);
+      return res.status(500).send("Error logging out.");
+    }
+    return res.redirect("/home");
+  });
 });
 
 router.get("/my-dashboard", async (req, res) => {

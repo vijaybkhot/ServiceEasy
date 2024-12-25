@@ -1,53 +1,53 @@
 <header>
-    <nav class="navbar">
-      <div class="logo">
-        <a href="/home"><img src="/public/images/logo_dark.png" alt="ServiceEasy Logo"></a>
-      </div>
-      <ul class="nav-links">
+  <nav class="navbar">
+    <div class="logo">
+      <a href="/home"><img src="/public/images/logo_dark.png" alt="ServiceEasy Logo"></a>
+    </div>
+    <ul class="nav-links">
 
-{{!-- if logged in --}}
+      {{!-- if logged in --}}
       {{#if user}}
       <li><a href="/dashboard">DASHBOARD</a></li>
 
       {{#if (eq user.role "admin")}}
-        <li><a href="/stores">MANAGE STORES</a></li>
+      <li><a href="/stores">MANAGE STORES</a></li>
       {{else}}
-        {{#if (eq user.role "employee")}}
-          <li><a href="/stores">VIEW STORES</a></li>
-        {{else}}
-          {{#if (eq user.role "store-manager")}}
-            <li><a href="/stores">VIEW STORES</a></li>
-          {{else}}
-            <li><a href="/stores">FIND STORES NEAR ME</a></li>
-          {{/if}}
-        {{/if}}
+      {{#if (eq user.role "employee")}}
+      <li><a href="/stores">VIEW STORES</a></li>
+      {{else}}
+      {{#if (eq user.role "store-manager")}}
+      <li><a href="/stores">VIEW STORES</a></li>
+      {{else}}
+      <li><a href="/stores">FIND STORES NEAR ME</a></li>
+      {{/if}}
+      {{/if}}
       {{/if}}
 
       {{#unless (eq user.role "employee")}}
-        {{#unless (eq user.role "store-manager")}}
-          {{#unless (eq user.role "admin")}}
-            <li><a href="/dashboard">TRACK REPAIR</a></li>
-          {{/unless}}
-        {{/unless}}
+      {{#unless (eq user.role "store-manager")}}
+      {{#unless (eq user.role "admin")}}
+      <li><a href="/dashboard">TRACK REPAIR</a></li>
       {{/unless}}
-      
+      {{/unless}}
+      {{/unless}}
+
       <li><a href="/logout">LOGOUT</a></li>
       {{/if}}
 
-{{!-- not logged in --}}
+      {{!-- not logged in --}}
       {{#unless user}}
-        <li><a href="/stores">FIND STORES NEAR ME</a></li>
-        <li><a href="/dashboard">TRACK REPAIR</a></li>
-          {{#unless onLoginPage}}
-            <li><a href="/login">LOGIN</a></li>
-          {{/unless}}
-
-          {{#unless onSignupPage}}
-            <li><a href="/signup">SIGN UP</a></li>
-           {{/unless}}
+      <li><a href="/stores">FIND STORES NEAR ME</a></li>
+      <li><a href="/dashboard">TRACK REPAIR</a></li>
+      {{#unless onLoginPage}}
+      <li><a href="/login">LOGIN</a></li>
       {{/unless}}
 
-      </ul>
-    </nav>
-      <div id="user-data" data-user='{{{json user}}}'></div>
+      {{#unless onSignupPage}}
+      <li><a href="/signup">SIGN UP</a></li>
+      {{/unless}}
+      {{/unless}}
+
+    </ul>
+  </nav>
+  <div id="user-data" data-user='{{{json user}}}'></div>
 </header>

@@ -15,7 +15,7 @@ section {
   text-align: center;
 }
 
-section h2{
+section h2 {
   text-transform: uppercase;
   font-weight: 500;
 }
@@ -57,7 +57,7 @@ th {
 }
 
 button {
-  background-color: #2C3E50;
+  background-color: #2c3e50;
   color: white;
   padding: 5px 10px;
   border: none;
@@ -66,7 +66,7 @@ button {
 }
 
 button:hover {
-  background-color: #34495E;
+  background-color: #34495e;
 }
 
 button:disabled {
@@ -74,7 +74,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-input{
+input {
   width: 20%;
   padding: 10px;
   margin-bottom: 15px;
@@ -83,7 +83,7 @@ input{
   font-size: 14px;
 }
 
-select{
+select {
   width: auto;
   padding: 10px;
   margin-bottom: 15px;
@@ -127,7 +127,7 @@ select{
 #get-quotation-form button {
   width: 100%;
   padding: 12px;
-  background-color: #2C3E50;
+  background-color: #2c3e50;
   color: white;
   border: none;
   border-radius: 5px;
@@ -136,7 +136,7 @@ select{
 }
 
 #get-quotation-form button:hover {
-  background-color: #34495E;
+  background-color: #34495e;
 }
 
 /* Error Message Styling */
@@ -233,7 +233,7 @@ select{
 }
 
 #quotation-display button {
-  background-color: #2C3E50;
+  background-color: #2c3e50;
   color: white;
   padding: 12px 20px;
   font-size: 16px;
@@ -245,7 +245,7 @@ select{
 }
 
 #quotation-display button:hover {
-  background-color: #34495E;
+  background-color: #34495e;
 }
 
 #quotation-display button:disabled {
@@ -337,7 +337,7 @@ select{
 
 /* Buttons */
 button {
-  background-color: #2C3E50;
+  background-color: #2c3e50;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -349,7 +349,7 @@ button {
 }
 
 button:hover {
-  background-color: #34495E;
+  background-color: #34495e;
 }
 
 /* Close Button */
