@@ -68,10 +68,10 @@ Navigate to the `server.js` directory of our project folder. Once inside, run th
 ### **Installing Dependencies**  
 ```npm i```
 
-## **Running the Project
+## Running the Project
 ```npm start```
 
-## **Database Seed
+## Database Seed
 We are using MongoDB Atlas, a cloud-based database service, with the initial data already seeded in the database. The database connection details are specified in the config.env file. Currently, the database includes three device types: iPhone, MacBook, and iPad. Each device type contains multiple models, and each model offers various repair types, with each repair type having an associated cost and time estimate. The database currently contains 5 stores, all located in the New York area, with the flexibility to add more stores as needed.
 
 Once the service is up and running go to  `localhost:3000/home` to take a look at our website.
