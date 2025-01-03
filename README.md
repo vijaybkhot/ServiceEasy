@@ -88,9 +88,13 @@ Email: employeeonestoreone@email.com | Password: password
 
 ## Technical Stack
 • Backend: Node.js, Express.js
-• Frontend: Handlebars.js, JavaScript, HTML, CSS
+
+• Frontend: Handlebars.js, JavaScript, HTML, CSS, Leaflet.js (Interactive Map)
+
 • Database: MongoDB Atlas with Mongoose
+
 • APIs: Stripe (Payments), SendGrid (Emails)
+
 • Security: bcrypt.js, crypto, xss  
 
 
