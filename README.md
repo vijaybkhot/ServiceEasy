@@ -66,7 +66,6 @@ With a focus on end-to-end service management, real-time updates, and powerful a
 Navigate to the `server.js` directory of our project folder. Once inside, run the following commands:  
 
 ### **Installing Dependencies**  
-```bash  
 ```npm i```
 
 ## **Running the Project
