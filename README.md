@@ -35,7 +35,7 @@
    npm install 
 3. Start the server:
    ```bash  
-   npm install 
+   npm run 
 4. Access the application at http://localhost:3000/home.
 
 ## Test Credentials:
