@@ -7,6 +7,22 @@ Group 10 Members
 3. Shreyas Desai - 20022834
 4. Raj Kale - 20029349
 
+## **Overview**  
+
+**ServiceEasy** is a comprehensive electronic device repair and service platform tailored for repair service brands with multiple stores in urban areas, starting with New York. This platform aims to streamline and digitize the entire repair process for customers, employees, store managers, and administrators. By providing user-friendly interfaces and efficient service management tools, **ServiceEasy** bridges the gap between convenience for customers and operational efficiency for the service provider.  
+
+### **Key Features**  
+- **Customer Convenience**: Easy service request placement, real-time repair updates, and secure online payment through Stripe integration.  
+- **Operational Efficiency**: Dedicated dashboards for store managers and employees to handle job assignments, approvals, and customer handovers.  
+- **Centralized Administration**: Admin tools to oversee all service requests, manage stores, and generate detailed performance reports.  
+- **End-to-End Transparency**: Automated email notifications to keep customers informed at every stage of the repair process.  
+- **Interactive Store Discovery**: Store listing and detail pages with interactive maps to help customers locate nearby stores and explore their services.  
+- **Scalability**: Support for adding more stores, services, and devices as the business grows.  
+
+By leveraging modern technologies and focusing on user-centric design, **ServiceEasy** ensures an elevated customer experience while empowering repair companies to optimize their operations.  
+
+---
+
 ### Project Description
 The website is an electronic device repair/service platform service for service/repair brands that own a few stores in the city. This platform can serve as an all-in-one solution for these brands. This website will 
 provide an interface to the customers to get their devices serviced as well as to the employees working at 
