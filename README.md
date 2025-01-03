@@ -66,7 +66,7 @@ With a focus on end-to-end service management, real-time updates, and powerful a
 ## Quick Start  
 1. Clone the repository and navigate to the project directory:  
    ```bash  
-   git clone https://github.com/your-repo/serviceeasy.git  
+   git clone https://github.com/vijaybkhot/ServiceEasy  
    cd serviceeasy
 2. Install dependencies:
    ```bash  
