@@ -1,15 +1,18 @@
-# ServiceEasy
-CS 546 - Group Project
-<br>
-Group 10 Members
-1. Vijay Khot - 20021838 
-2. Piyush Devendra Kataktalware - 20022156
-3. Shreyas Desai - 20022834
-4. Raj Kale - 20029349
+# ServiceEasy  
+**CS 546 - Group Project**  
+<br>  
+
+## **Group 10 Members**  
+1. **Vijay Khot - 20021838**  
+2. **Piyush Devendra Kataktalware - 20022156**  
+3. **Shreyas Desai - 20022834**  
+4. **Raj Kale - 20029349**  
+
+---
 
 ## **Overview**  
 
-**ServiceEasy** is a comprehensive electronic device repair and service platform tailored for repair service brands with multiple stores in urban areas, starting with New York. This platform aims to streamline and digitize the entire repair process for customers, employees, store managers, and administrators. By providing user-friendly interfaces and efficient service management tools, **ServiceEasy** bridges the gap between convenience for customers and operational efficiency for the service provider.  
+**ServiceEasy** is a web platform developed with the growth of a service repair company in mind. The company, which started with one store, has expanded to multiple stores across New York. To efficiently manage its growing operations and provide seamless service to customers, the company decided to move its operations online. **ServiceEasy** serves as the ideal solution, offering a unified platform that simplifies service management while enhancing customer convenience.  
 
 ### **Key Features**  
 - **Customer Convenience**: Easy service request placement, real-time repair updates, and secure online payment through Stripe integration.  
@@ -19,34 +22,51 @@ Group 10 Members
 - **Interactive Store Discovery**: Store listing and detail pages with interactive maps to help customers locate nearby stores and explore their services.  
 - **Scalability**: Support for adding more stores, services, and devices as the business grows.  
 
-By leveraging modern technologies and focusing on user-centric design, **ServiceEasy** ensures an elevated customer experience while empowering repair companies to optimize their operations.  
+By leveraging modern technologies and focusing on user-centric design, **ServiceEasy** ensures an elevated customer experience while empowering the repair company to optimize its operations.  
 
 ---
 
-### Project Description
-The website is an electronic device repair/service platform service for service/repair brands that own a few stores in the city. This platform can serve as an all-in-one solution for these brands. This website will 
-provide an interface to the customers to get their devices serviced as well as to the employees working at 
-the stores, the store managers and the administrator to manage service requests. We have developed a comprehensive web platform for an electronic device repair company with multiple stores in the New York area. To cater to a growing customer base and enhance customer service, the platform enables customers to easily locate nearby stores, explore repair options, get instant repair quotations, and place service requests online — all from the comfort of their devices.
+## **Project Description**  
 
-This all-in-one solution goes beyond customer support, empowering the repair company to efficiently manage its stores, store managers, and employees. The platform features dedicated dashboards for store managers and employees, enabling them to handle service requests from start to finish. The entire repair process is digitized and transparent, covering every step, including:
-	1.	Order Placement by the customer.
-	2.	Job Assignment by the store manager to an employee.
-	3.	Job Completion by the employee, followed by submission for approval.
-	4.	Repair Approval by the manager.
-	5.	Handover of the Device to the customer.
+**ServiceEasy** is an all-in-one platform catering to a service repair company with multiple stores. This web application is designed to streamline the repair process for customers, employees, store managers, and administrators.  
 
-The customer is kept informed at every stage via automated email notifications, and once the service is complete, they can provide feedback. This feedback is displayed on the store’s page, encouraging continuous improvement.
+We have created a comprehensive solution that allows customers to easily:  
+- Locate nearby stores.  
+- Explore repair options.  
+- Get instant repair quotations.  
+- Place service requests online.  
 
-The platform also includes an Admin Dashboard, offering a bird’s-eye view of all service requests across every store. Using this powerful tool, the admin can manage stores, store managers, and employees while generating detailed sales reports for performance analysis.
+### **Store Listing and Detail Pages**  
 
-To provide a seamless experience, the platform includes Stripe payment integration for secure online payments, ensuring customers can pay for services with ease.
+The platform includes:  
+- **Store Listing Page**: Customers can view all the stores on an interactive map powered by the **Leaflet** library, with store locations marked for easy discovery.  
+- **Store Detail Page**: Clicking on a store marker displays additional details about the store, including available services, customer feedback, and the option to request a repair at that specific location.  
 
-With a focus on end-to-end service management, real-time updates, and powerful admin controls, this platform serves as a scalable, future-ready solution for electronic device repair companies looking to offer an elevated customer experience.
+---
 
-# How to use
-Navigate to the `server.js` directory of our project folder. Once inside, run the following commands -
+The platform goes beyond customer support, empowering the repair company to efficiently manage its stores, store managers, and employees. The platform features dedicated dashboards for store managers and employees, enabling them to handle service requests from start to finish. The entire repair process is digitized and transparent, covering every step, including:  
+1. **Order Placement** by the customer.  
+2. **Job Assignment** by the store manager to an employee.  
+3. **Job Completion** by the employee, followed by submission for approval.  
+4. **Repair Approval** by the manager.  
+5. **Handover of the Device** to the customer.  
 
-# Installing Dependencies
+The customer is kept informed at every stage via automated email notifications, and once the service is complete, they can provide feedback. This feedback is displayed on the store’s page, encouraging continuous improvement.  
+
+The platform also includes an **Admin Dashboard**, offering a bird’s-eye view of all service requests across every store. Using this powerful tool, the admin can manage stores, store managers, and employees while generating detailed sales reports for performance analysis.  
+
+To provide a seamless experience, the platform includes **Stripe payment integration** for secure online payments, ensuring customers can pay for services with ease.  
+
+With a focus on end-to-end service management, real-time updates, and powerful admin controls, this platform serves as a scalable, future-ready solution for electronic device repair companies looking to offer an elevated customer experience.  
+
+---
+
+## **How to Use**  
+
+Navigate to the `server.js` directory of our project folder. Once inside, run the following commands:  
+
+### **Installing Dependencies**  
+```bash  
 ```npm i```
 
 # Running the Project
