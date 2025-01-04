@@ -8,7 +8,9 @@
 - [Walkthrough Video](#walkthrough-video)   
 - [Features](#features)
 - [Project Description](#project-description)    
-- [Quick Start](#quick-start)  
+- [Quick Start](#quick-start)
+- [Test Credentials](#test-credentials)  
+- [Service Request Workflow](#service-request-workflow)  
 - [Technical Stack](#technical-stack)  
 
 ---
@@ -85,6 +87,29 @@ Email: manager1@example.com | Password: test1234
 
 • Employee:
 Email: employeeonestoreone@email.com | Password: password
+
+## Service Request Workflow:
+	1.	Customer Action:
+	• The customer places a service request for a specific store via their login.
+	• The service request is submitted to the Store Manager of the selected store.
+	2.	Physical Drop-Off:
+	•	The customer physically drops off the device at the chosen store and provides the Order ID to the Store Manager.
+	3.	Store Manager Action:
+	•	The Store Manager logs into their dashboard and locates the service request using the Order ID provided by the customer.
+	•	The Store Manager receives the device and assigns the repair task to one of the store’s employees.
+	•	The service request now appears in the assigned Employee’s dashboard.
+	4.	Employee Action:
+	•	The assigned Employee repairs the device and updates the service request status by submitting it for approval.
+	5.	Store Manager Approval:
+	•	The Store Manager verifies the repair work.
+	•	If satisfied, the Store Manager marks the service request as Ready for Pickup.
+	6.	Customer Notification:
+	•	The customer receives an email notification that their device is ready for pickup.
+	7.	Final Pickup and Completion:
+	•	The customer visits the store to pick up the device.
+	•	The Store Manager updates the service request status to Complete after handing over the device.
+	8.	Customer Feedback:
+	•	Once the service request is marked as complete, the customer can log in and provide feedback on the service.
 
 ## Technical Stack
 • Backend: Node.js, Express.js
