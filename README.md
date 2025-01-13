@@ -1,13 +1,11 @@
 # ServiceEasy
-
 **Effortless service management for growing repair companies**
 ---
 **Quick Access Link:** **[https://serviceeasy.onrender.com](https://serviceeasy.onrender.com)**  
 **Note**: Since the application is hosted on a free web hosting service (Render.com), please allow up to 30 seconds for the website to load on your first visit. Thank you for your patience!
+
 ---
-
 ## Table of Contents
-
 - [Overview](#overview)
 - [Walkthrough Video](#walkthrough-video)
 - [Features](#features)
@@ -16,7 +14,6 @@
 - [Test Credentials](#test-credentials)
 - [Service Request Workflow](#service-request-workflow)
 - [Technical Stack](#technical-stack)
-
 ---
 
 ## Overview
