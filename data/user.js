@@ -319,7 +319,6 @@ async function testCreateUser() {
 
   try {
     const user = await createUser(name, email, phone, hashedPassword);
-    console.log(user);
   } catch (error) {
     console.error(error);
   }
@@ -328,7 +327,6 @@ async function testCreateUser() {
 async function testGetUserById(userId) {
   try {
     const user = await getUserById(userId);
-    console.log(user);
   } catch (error) {
     console.error(error);
   }
@@ -337,7 +335,6 @@ async function testGetUserById(userId) {
 async function testGetAllUsers() {
   try {
     const users = await getAllUsers();
-    console.log(users);
   } catch (error) {
     console.error(error);
   }
@@ -353,7 +350,6 @@ async function testUpdateUser() {
 
   try {
     const updatedUser = await updateUser(userId, upObj);
-    console.log(updatedUser);
   } catch (error) {
     console.error(error.message);
   }
@@ -366,7 +362,6 @@ async function testUpdatePassword() {
 
   try {
     const updatedUser = await updatePassword(userId, oldPassword, newPassword);
-    console.log(updatedUser);
   } catch (error) {
     console.error(error.message);
   }

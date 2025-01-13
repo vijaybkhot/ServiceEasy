@@ -136,7 +136,6 @@ export const updateUserRole = async function (userId, newRole) {
       newRole,
     });
 
-    console.log("User role updated:", response.data);
     return response.data;
   } catch (error) {
     console.error(
@@ -275,7 +274,6 @@ const sendReadyForPickupEmail = async (email, name, url, orderData) => {
     );
 
     if (response.data.status === "success") {
-      console.log("Email sent successfully:", response.data.message);
     } else {
       console.error("Failed to send email:", response.data.message);
     }
@@ -434,7 +432,6 @@ export const changeStoreManager = async function (storeId, newManagerId) {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
-    console.log("Store manager changed successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error(
@@ -452,7 +449,6 @@ export const removeEmployeeFromStore = async function (storeId, employeeId) {
       `http://localhost:3000/stores/${storeId}/employees/${employeeId}`
     );
 
-    console.log(response.data.message);
     return response.data.store;
   } catch (error) {
     if (error.response) {
@@ -474,7 +470,6 @@ export const addEmployeetoStore = async function (storeId, employeeId) {
     const response = await axios.post(
       `http://localhost:3000/stores/${storeId}/employees/${employeeId}`
     );
-    console.log(response.data.message);
     return response.data.store;
   } catch (error) {
     if (error.response) {

@@ -6,7 +6,6 @@ const router = express.Router();
 router.post("/send-ready-for-pickup", async (req, res) => {
   try {
     const { email, name, url, orderData } = req.body;
-    console.log(req.body);
 
     if (!email || !name || !url || !orderData) {
       return res.status(400).json({

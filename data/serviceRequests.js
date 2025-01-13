@@ -14,7 +14,6 @@ export async function createServiceRequest(
   payment,
   feedback = {}
 ) {
-  console.log(repair_details);
   // Input validation
   customer_id = dataValidator.isValidObjectId(customer_id);
   store_id = dataValidator.isValidObjectId(store_id);

@@ -69,7 +69,6 @@ class Email {
       };
 
       await this.newTransport().sendMail(mailOptions);
-      console.log("Email sent successfully");
     } catch (error) {
       console.error("Error sending email:", error.response?.body || error);
     }

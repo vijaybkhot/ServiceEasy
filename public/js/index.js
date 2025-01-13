@@ -158,7 +158,6 @@ if (storeContainer) {
     const nameValue = nameInput.value.trim();
     const addressValue = addressInput.value.trim();
     const phoneValue = phoneInput.value.trim();
-    console.log(nameValue);
     // Validation rules
     if (!nameValue || !/^[a-zA-Z0-9\s\-',.]+$/.test(nameValue)) {
       errors.push(
@@ -317,7 +316,6 @@ if (customerDashboard) {
         feedbackData
       );
 
-      console.log("Feedback submitted successfully:", response.data);
       return response.data;
     } catch (error) {
       console.error(
@@ -619,7 +617,6 @@ if (customerDashboard) {
     submitFeedbackBtn.addEventListener("click", async () => {
       const rating = parseInt(feedbackRating.value);
       const reviewComment = feedbackComment.value.trim();
-      console.log("rating", typeof rating);
 
       if (!rating) {
         showAlert("warning", "Please select a rating.");
@@ -1169,7 +1166,6 @@ if (adminDashboard) {
         showAlert("warning", "Please select a store and an employee to add.");
         return;
       }
-      console.log(selectedAddEmployee);
       try {
         let employeeAdd = await addEmployeetoStore(
           storeId,
@@ -1209,7 +1205,6 @@ if (adminDashboard) {
     const userDetails = document.getElementById("userDetails");
     const userRoleSelect = document.getElementById("userRoleSelect");
     const changeRoleBtn = document.getElementById("changeRoleBtn");
-    console.log("in admin dashboard", email);
 
     if (!email) {
       showAlert("error", "Please enter an email!");
@@ -1371,7 +1366,6 @@ if (paymentContainer) {
       let serviceRequest = await createServiceRequest(serviceRequestDetails);
       if (serviceRequest) {
         showAlert("success", "Service Request Created Successfully");
-        console.log(serviceRequest);
         setTimeout(() => {
           window.location.href = "/dashboard/customer-dashboard";
         }, 200);

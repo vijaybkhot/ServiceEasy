@@ -359,7 +359,6 @@ router.post("/", isAuthenticated, hasRole("admin"), async (req, res) => {
 // Route to update a store
 router.patch("/:id", isAuthenticated, hasRole(["admin"]), async (req, res) => {
   let errors = [];
-  console.log(req.body);
 
   // Validate employees array if provided
   let { employees } = req.body;

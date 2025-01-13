@@ -274,8 +274,6 @@ router.get(
 router.put("/update-activity-status/:activityId", async (req, res) => {
   const { activityId } = req.params;
   const { status } = req.body;
-  console.log(status);
-  console.log(activityId);
 
   try {
     // Validate and update the status using the controller function

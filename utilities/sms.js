@@ -18,7 +18,6 @@ class SmsSender {
         from: this.from,
         to: user.phone,
       });
-      console.log(`Message sent successfully: ${message.sid}`);
       return message;
     } catch (error) {
       console.error("Error sending SMS:", error);

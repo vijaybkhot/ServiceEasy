@@ -4,6 +4,7 @@ import exphbs from "express-handlebars";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import dotenv from "dotenv";
+import compression from "compression";
 dotenv.config({ path: "./config.env" });
 
 import { sanitizeInputs } from "./utilities/middlewares/securityMiddlewares.js";
@@ -18,6 +19,7 @@ app.use("/public", staticDir);
 app.use(express.urlencoded({ extended: true }));
 app.use(sanitizeInputs);
 parserMiddlewares(app);
+app.use(compression());
 
 // Session for authentication
 app.use(

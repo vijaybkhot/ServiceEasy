@@ -261,7 +261,6 @@ router.post("/", hasRole("customer", "admin"), async (req, res) => {
       defective_parts = [defective_parts];
       repair_details.defective_parts = [defective_parts];
     }
-    console.log("defective_parts", defective_parts);
 
     if (
       defective_parts &&
@@ -310,8 +309,6 @@ router.post("/", hasRole("customer", "admin"), async (req, res) => {
     );
 
     if (serviceRequest) {
-      console.log("serviceRequest", serviceRequest);
-      console.log("repair_details", repair_details);
       const orderData = {
         orderId: serviceRequest._id.toString(),
         storeName: store.name,
@@ -561,7 +558,6 @@ router.get(
 router.get("/:id", isAuthenticated, async (req, res, next) => {
   const serviceRequestId = dataValidator.isValidObjectId(req.params.id);
   try {
-    console.log(serviceRequestId);
     const request = await getServiceRequestById(serviceRequestId);
     return res.status(200).json({ serviceRequest: request });
   } catch (e) {
@@ -939,9 +935,6 @@ router.put("/feedback/:id", hasRole("customer"), async (req, res, next) => {
         statusCode: 400,
       });
     }
-    console.log("req.body", req.body);
-
-    console.log("feedback", feedback);
 
     const { rating, comment } = feedback;
 
@@ -1086,9 +1079,6 @@ router.put(
   async (req, res) => {
     let { service_request_id, current_status, outcome_status, employee_id } =
       req.body;
-
-    console.log(outcome_status);
-    console.log(employee_id);
 
     try {
       // Validate service_request_id
