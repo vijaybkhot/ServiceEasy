@@ -65,51 +65,63 @@ To provide a seamless experience, the platform includes **Stripe payment integra
 With a focus on end-to-end service management, real-time updates, and powerful admin controls, this platform serves as a scalable, future-ready solution for electronic device repair companies looking to offer an elevated customer experience.  
 ---
 
-## Quick Start  
-1. Clone the repository and navigate to the project directory:  
-   ```bash  
-   git clone https://github.com/vijaybkhot/ServiceEasy  
-   cd serviceeasy
-2. Install dependencies:
-   ```bash  
-   npm install 
-3. Start the server:
-   ```bash  
-   npm run 
-4. Access the application at http://localhost:3000/home.
+## Quick Start
+## Access the Application  
 
-## Test Credentials:
-• Customer:
-Email: vijay111991@gmail.com | Password: test1234
+The **ServiceEasy** platform is deployed and available online. You can access it directly at:  
+**[https://serviceeasy.onrender.com](https://serviceeasy.onrender.com)**  
 
-• Store Manager:
-Email: manager1@example.com | Password: test1234
+## How to Use  
 
-• Employee:
-Email: employeeonestoreone@email.com | Password: password
+1. **Sign Up or Log In**:  
+   - You can sign up as a customer to explore the platform, or you can use the test credentials provided below to log in as a customer, store manager, or employee.  
 
-## Service Request Workflow:
-	1.	Customer Action:
-		• The customer places a service request for a specific store via their login.
-		• The service request is submitted to the Store Manager of the selected store.
-	2.	Physical Drop-Off:
-		• The customer physically drops off the device at the chosen store and provides the Order ID to the Store Manager.
-	3.	Store Manager Action:
-		• The Store Manager logs into their dashboard and locates the service request using the Order ID provided by the customer.
-		• The Store Manager receives the device and assigns the repair task to one of the store’s employees.
-		• The service request now appears in the assigned Employee’s dashboard.
-	4.	Employee Action:
-		• The assigned Employee repairs the device and updates the service request status by submitting it for approval.
-	5.	Store Manager Approval:
-		• The Store Manager verifies the repair work.
-		• If satisfied, the Store Manager marks the service request as Ready for Pickup.
-	6.	Customer Notification:
-		• The customer receives an email notification that their device is ready for pickup.
-	7.	Final Pickup and Completion:
-		• The customer visits the store to pick up the device.
-		• The Store Manager updates the service request status to Complete after handing over the device.
-	8.	Customer Feedback:
-		• Once the service request is marked as complete, the customer can log in and provide feedback on the service.
+2. **Placing a Service Request**:  
+   - While placing the order, **select "ServiceEasy Store One"** as the store to place the order.  
+
+3. **Test the Repair Order Workflow**:  
+   - Use the credentials provided below to test the complete repair order cycle for **"ServiceEasy Store One"**.  
+
+---
+
+## Test Credentials  
+
+### Customer:  
+- **Email**: vijay111991@gmail.com  
+- **Password**: test1234  
+
+### Store Manager for **ServiceEasy Store One**:  
+- **Email**: manager1@example.com  
+- **Password**: test1234  
+
+### Employee for **ServiceEasy Store One**:  
+- **Email**: EmployeeTenStoreOne@email.com  
+- **Password**: password  
+
+---
+
+## Service Request Workflow  
+
+1. **Customer Action**:  
+   - Log in as the customer.  
+   - Place a service request for **"ServiceEasy Store One"**.  
+
+2. **Store Manager Action (ServiceEasy Store One)**:  
+   - Log in as the store manager using the provided credentials.  
+   - Locate the order using the customer’s order ID and assign it to the employee for **"ServiceEasy Store One"**.  
+
+3. **Employee Action (ServiceEasy Store One)**:  
+   - Log in as the employee using the provided credentials.  
+   - Complete the repair work and submit it for approval.  
+
+4. **Manager Approval and Customer Notification**:  
+   - Log in as the store manager.  
+   - Approve the repair work and mark the order as ready for pickup.  
+   - The customer will receive a notification that their device is ready for pickup.  
+
+5. **Completion and Feedback**:  
+   - The customer picks up the device, and the manager marks the order as complete.  
+   - The customer can then log in and leave feedback on the service.  
 
 ## Technical Stack
 • Backend: Node.js, Express.js
