@@ -10,7 +10,7 @@
 - [Walkthrough Video](#walkthrough-video)
 - [Features](#features)
 - [Project Description](#project-description)
-- [Quick Start and How to use](#quick-start)
+- [Quick Start and How To Use](#quick-start)
 - [Test Credentials](#test-credentials)
 - [Service Request Workflow](#service-request-workflow)
 - [Technical Stack](#technical-stack)
