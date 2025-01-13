@@ -4,6 +4,9 @@
 ---
 **Quick Access Link:** **[https://serviceeasy.onrender.com](https://serviceeasy.onrender.com)**  
 
+**Note**: Since the application is hosted on a free web hosting service (Render.com), please allow up to 30 seconds for the website to load on your first visit. Thank you for your patience!
+
+
 ---
 
 ## Table of Contents
