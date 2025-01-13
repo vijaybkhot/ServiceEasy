@@ -3,7 +3,7 @@ import { showAlert } from "./alert.js";
 // Get all repairs
 export const fetchAllRepairs = async function () {
   try {
-    const response = await axios.get("http://localhost:3000/api/repairs/");
+    const response = await axios.get("/api/repairs/");
     const repairs = response.data;
     return repairs;
   } catch (error) {
@@ -28,7 +28,7 @@ export const fetchAllRepairs = async function () {
 // Get all stores
 export const fetchAllStores = async function () {
   try {
-    const response = await axios.get("http://localhost:3000/stores/jsonStores");
+    const response = await axios.get("/stores/jsonStores");
     const stores = response.data;
     return stores;
   } catch (error) {
@@ -64,7 +64,7 @@ export const getUserData = async function () {
 // Get user by id
 export async function getUserById(userId) {
   try {
-    const response = await axios.get(`http://localhost:3000/user/${userId}`);
+    const response = await axios.get(`/user/${userId}`);
     return response.data.data;
   } catch (error) {
     console.error("Error fetching user by ID:", error);
@@ -83,7 +83,7 @@ export function validateEmail(email) {
 export const searchUserByEmail = async function (email) {
   try {
     // Make the API request if the email is valid
-    const response = await axios.get(`http://localhost:3000/search-user/`, {
+    const response = await axios.get(`/search-user/`, {
       params: { email },
       headers: {
         Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -131,7 +131,7 @@ export const updateUserRole = async function (userId, newRole) {
 
   try {
     // Axios put request
-    const response = await axios.put(`http://localhost:3000/update-user-role`, {
+    const response = await axios.put(`/update-user-role`, {
       userId,
       newRole,
     });
@@ -231,9 +231,7 @@ export const getRepairDetails = function (
 // Function to fetch serviceRequest by Id
 export const fetchServiceRequestById = async function (id) {
   try {
-    const response = await axios.get(
-      `http://localhost:3000/api/service-request/${id}`
-    );
+    const response = await axios.get(`/api/service-request/${id}`);
     const data = response.data;
 
     // Check if nothing is returned
@@ -263,15 +261,12 @@ export const fetchServiceRequestById = async function (id) {
 // Function to send Ready for Pickup email
 const sendReadyForPickupEmail = async (email, name, url, orderData) => {
   try {
-    const response = await axios.post(
-      "http://localhost:3000/api/email/send-ready-for-pickup",
-      {
-        email,
-        name,
-        url,
-        orderData,
-      }
-    );
+    const response = await axios.post("/api/email/send-ready-for-pickup", {
+      email,
+      name,
+      url,
+      orderData,
+    });
 
     if (response.data.status === "success") {
     } else {
@@ -288,12 +283,9 @@ const sendReadyForPickupEmail = async (email, name, url, orderData) => {
 // Function to get employeeDetails and serviceRequest count of each employee for a storeId
 export const getEmployeeDetails = async function (storeId) {
   try {
-    const response = await axios.post(
-      "http://localhost:3000/stores/getEmployeeDetails",
-      {
-        store_id: storeId,
-      }
-    );
+    const response = await axios.post("/stores/getEmployeeDetails", {
+      store_id: storeId,
+    });
     return response.data.employees;
   } catch (error) {
     console.error(
@@ -324,7 +316,7 @@ export const modifyStatus = async function (
     };
 
     const response = await axios.put(
-      "http://localhost:3000/api/service-request/modify-status",
+      "/api/service-request/modify-status",
       requestBody,
       {
         headers: {
@@ -363,10 +355,7 @@ export const modifyStatus = async function (
 // function to create employeeActivity
 export const createEmployeeActivity = async function (activityData) {
   try {
-    const response = await axios.post(
-      "http://localhost:3000/api/employee-activity",
-      activityData
-    );
+    const response = await axios.post("/api/employee-activity", activityData);
     // showAlert("success", "Employee Activity Created:");
     return response.data;
   } catch (error) {
@@ -396,7 +385,7 @@ export const fetchEmployeeActivities = async function (serviceRequest) {
       return;
     }
 
-    const url = `http://localhost:3000/api/employee-activity/service-requests/${serviceRequestId}/`;
+    const url = `/api/employee-activity/service-requests/${serviceRequestId}/`;
     const response = await axios.get(url, {
       headers: {
         "Content-Type": "application/json",
@@ -424,7 +413,7 @@ export const fetchEmployeeActivities = async function (serviceRequest) {
 export const changeStoreManager = async function (storeId, newManagerId) {
   try {
     // Construct the URL for the request
-    const url = `http://localhost:3000/stores/${storeId}/manager/${newManagerId}`;
+    const url = `/stores/${storeId}/manager/${newManagerId}`;
 
     // patch request using axios
     const response = await axios.patch(url, {
@@ -446,7 +435,7 @@ export const changeStoreManager = async function (storeId, newManagerId) {
 export const removeEmployeeFromStore = async function (storeId, employeeId) {
   try {
     const response = await axios.delete(
-      `http://localhost:3000/stores/${storeId}/employees/${employeeId}`
+      `/stores/${storeId}/employees/${employeeId}`
     );
 
     return response.data.store;
@@ -468,7 +457,7 @@ export const removeEmployeeFromStore = async function (storeId, employeeId) {
 export const addEmployeetoStore = async function (storeId, employeeId) {
   try {
     const response = await axios.post(
-      `http://localhost:3000/stores/${storeId}/employees/${employeeId}`
+      `/stores/${storeId}/employees/${employeeId}`
     );
     return response.data.store;
   } catch (error) {
@@ -489,7 +478,7 @@ export const addEmployeetoStore = async function (storeId, employeeId) {
 async function updateActivityStatus(activityId, status = "completed") {
   try {
     const response = await axios.put(
-      `http://localhost:3000/api/employee-activity/update-activity-status/${activityId}`,
+      `/api/employee-activity/update-activity-status/${activityId}`,
       {
         status: status,
       }
@@ -557,9 +546,7 @@ function getCurrentAndPrecedingActivity(activities, employeeId) {
 export async function fetchReportData() {
   try {
     // Fetch the report data
-    const response = await axios.get(
-      "http://localhost:3000/api/service-request/generate-reports"
-    );
+    const response = await axios.get("/api/service-request/generate-reports");
     const data = response.data;
 
     // Update the general report section
@@ -608,7 +595,7 @@ export async function fetchStoreReportData(storeId) {
     }
 
     const response = await axios.get(
-      `http://localhost:3000/api/service-request/generate-store-report/${storeId}`
+      `/api/service-request/generate-store-report/${storeId}`
     );
     const data = response.data.storeReport;
 
@@ -1229,7 +1216,7 @@ export const populateServiceRequestOverlay = async function (
         let sendEmailObject = {
           email: serviceRequest.customer_id.email,
           name: serviceRequest.customer_id.email,
-          url: "http://localhost:3000/dashboard",
+          url: "/dashboard",
           orderData: {
             storeName: serviceRequest.store_id.name,
             storePhone: serviceRequest.store_id.phone,

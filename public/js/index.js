@@ -312,7 +312,7 @@ if (customerDashboard) {
       };
 
       const response = await axios.put(
-        `http://localhost:3000/api/service-request/feedback/${serviceRequestId}`,
+        `/api/service-request/feedback/${serviceRequestId}`,
         feedbackData
       );
 
@@ -560,7 +560,7 @@ if (customerDashboard) {
           });
 
           if (paymentData) {
-            window.location.href = `http://localhost:3000/dashboard/payment?device_type=${encodeURIComponent(
+            window.location.href = `/dashboard/payment?device_type=${encodeURIComponent(
               repairDetails.device_type
             )}&model_name=${encodeURIComponent(
               repairDetails.model_name
@@ -1374,6 +1374,4 @@ if (paymentContainer) {
   } else {
     console.error("paymentForm not found");
   }
-} else {
-  console.error("paymentContainer not found");
 }

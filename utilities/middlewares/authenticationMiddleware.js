@@ -71,7 +71,7 @@ export const redirectBasedOnRole = function (req, res, next) {
   const userRole = req.session.user?.role;
 
   if (!userRole) {
-    return res.redirect("/login");
+    return res.redirect("/home");
   }
 
   // Redirect based  users role
