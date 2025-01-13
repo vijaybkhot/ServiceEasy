@@ -638,6 +638,41 @@ export async function fetchStoreReportData(storeId) {
   }
 }
 
+// Function to create service request
+export async function createServiceRequest(data) {
+  try {
+    const response = await axios.post("/api/service-request/", data);
+    if (response.status === 200) {
+      return response.data.serviceRequest;
+    } else {
+      // Handle unexpected response
+      showAlert("error", `Unexpected response status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error("Error creating service request:", error);
+    showAlert("error", `Error creating service request: ${error.message}`);
+  }
+}
+
+// Get Client secret for payment
+export async function getClientSecret(data) {
+  try {
+    const response = await axios.post(
+      "/api/service-request/process-payment",
+      data
+    );
+    if (response.status === 200) {
+      return response.data.clientSecret;
+    } else {
+      // Handle unexpected response
+      showAlert("error", `Unexpected response status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error("Error creating service request:", error);
+    showAlert("error", `Error while completing the payment: ${error.message}`);
+  }
+}
+
 // Get date in ordinal suffix format
 export function formatDateWithOrdinalSuffix(dateStr, daysToAdd) {
   const date = new Date(dateStr);
