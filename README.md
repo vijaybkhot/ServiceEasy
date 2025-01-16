@@ -148,5 +148,5 @@ The **ServiceEasy** platform is deployed and available online. You can access it
 
 ## Acknowledgements
 
-Special thanks to Professor Patrick Hill @graffixnyc **([@graffixnyc](https://github.com/graffixnyc))**  
+Special thanks to Professor Patrick Hill **([@graffixnyc](https://github.com/graffixnyc))**  
  for his guidance and support throughout the development of this project.
