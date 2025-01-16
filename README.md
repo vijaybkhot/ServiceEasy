@@ -145,3 +145,7 @@ The **ServiceEasy** platform is deployed and available online. You can access it
 • APIs: Stripe (Payments), SendGrid (Emails)
 
 • Security: bcrypt.js, crypto, xss
+
+## Acknowledgements
+
+Special thanks to Professor Patrick Hill @graffixnyc  for his guidance and support throughout the development of this project.
