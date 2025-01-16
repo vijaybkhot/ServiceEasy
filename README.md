@@ -13,7 +13,7 @@
 - [Test Credentials](#test-credentials)
 - [Service Request Workflow](#service-request-workflow)
 - [Technical Stack](#technical-stack)
-- [Acknowledgements Stack](#acknowledgements)
+- [Acknowledgements](#acknowledgements)
 
 ---
 
