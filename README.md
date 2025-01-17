@@ -1,12 +1,15 @@
 # ServiceEasy: **Effortless service management for growing repair companies**
 
+## Walkthrough Video
+
+Take a look at our platform in action by watching this [Walkthrough Video](https://youtu.be/QGSx0CbL9QA).
+
 **Quick Access Link:** **[ServiceEasy](https://serviceeasy.onrender.com)**  
 **Note**: Since the application is hosted on a free web hosting service (Render.com), please allow up to 30 seconds for the website to load on your first visit. Thank you for your patience!
 
 ---
 ## Table of Contents
 - [Overview](#overview)
-- [Walkthrough Video](#walkthrough-video)
 - [Features](#features)
 - [Project Description](#project-description)
 - [Quick Start and How To Use](#quick-start)
@@ -20,10 +23,6 @@
 ## Overview
 
 **ServiceEasy** is a web platform developed with the growth of a service repair company in mind. The company, which started with one store, has expanded to multiple stores across New York. To efficiently manage its growing operations and provide seamless service to customers, the company decided to move its operations online. **ServiceEasy** serves as the ideal solution, offering a unified platform that simplifies service management while enhancing customer convenience.
-
-## Walkthrough Video
-
-Take a look at our platform in action by watching this [Walkthrough Video](https://youtu.be/QGSx0CbL9QA).
 
 ---
 
