@@ -8,7 +8,7 @@
 - **[Project Demo Video](https://youtu.be/QGSx0CbL9QA)**: Watch the full demo of ServiceEasy showcasing its features.
 - **[Project Pitch Video](https://youtu.be/VMgO6KVXhBc)**: View the project pitch video presenting the goals and design process of ServiceEasy.
 - **[Project PowerPoint Presentation](https://stevens0-my.sharepoint.com/:p:/g/personal/sdesai33_stevens_edu/ETEtZSdKuC1IqFznXEkIw8kBFflbsIGQ9Uz2YBGI8nIPLA?e=V7JCgR)**: Access the PowerPoint presentation that outlines the project’s design and approach.
-- **[Database Proposal](#)**: Link to the database proposal document.
+- **[Database Proposal](https://drive.google.com/file/d/1qIE49G8h7KCg4cLYeHmxadK4ryrgLeKD/view?usp=drive_link)**: Link to the database proposal document.
 
 ---
 
