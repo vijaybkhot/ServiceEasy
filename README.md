@@ -1,5 +1,17 @@
 # ServiceEasy: **Effortless service management for growing repair companies**
 
+---
+
+## 🎥 Links
+
+
+- **[Project Demo Video](https://youtu.be/QGSx0CbL9QA)**: Watch the full demo of ServiceEasy showcasing its features.
+- **[Project Pitch Video](https://youtu.be/VMgO6KVXhBc)**: View the project pitch video presenting the goals and design process of ServiceEasy.
+- **[Project PowerPoint Presentation](https://stevens0-my.sharepoint.com/:p:/g/personal/sdesai33_stevens_edu/ETEtZSdKuC1IqFznXEkIw8kBFflbsIGQ9Uz2YBGI8nIPLA?e=V7JCgR)**: Access the PowerPoint presentation that outlines the project’s design and approach.
+- **[Database Proposal](#)**: Link to the database proposal document.
+
+---
+
 ## Walkthrough Video
 
 Take a look at our platform in action by watching this [Walkthrough Video](https://youtu.be/QGSx0CbL9QA).
