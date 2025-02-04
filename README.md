@@ -34,7 +34,7 @@ Take a look at our platform in action by watching this [Walkthrough Video](https
 
 ## Overview
 
-**ServiceEasy** is a web platform developed with the growth of a service repair company in mind. The company, which started with one store, has expanded to multiple stores across New York. To efficiently manage its growing operations and provide seamless service to customers, the company decided to move its operations online. **ServiceEasy** serves as the ideal solution, offering a unified platform that simplifies service management while enhancing customer convenience.
+**ServiceEasy** is a web platform developed with the growth of a fictional electronic device service repair company in mind. The company, which started with one store, has expanded to multiple stores across New York. To efficiently manage its growing operations and provide seamless service to customers, the company decided to move its operations online. **ServiceEasy** serves as the ideal solution, offering a unified platform that simplifies service management while enhancing customer convenience.
 
 ---
 
